@@ -10,8 +10,8 @@ namespace ModelDLL
     {
         // Go crazy Tord!
 
-        // This solution is seperated from graphics.
-        // You can build the game undisturbed, in peace, quiet, like a Buddhist Monk living on a Tibetian Mountain.
+        // This project is seperated from graphics.
+        // You can build the game undisturbedly, in peace, quiet, like a Buddhist Monk living on a Tibetian Mountain.
 
         // This solution is compiled as a DLL by default.
         // If you want a console to work with, R-click the ModelDLL solution in Solution Explorer,
