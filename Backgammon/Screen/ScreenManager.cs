@@ -32,7 +32,7 @@ namespace Backgammon.Screen
         }
         private ScreenManager()
         { // A private constructor overrides any default, public constructors.
-            Dimension = new Vector2(640, 480);
+            Dimension = new Vector2(1080, 720);
             currentScreen = new SplashScreen();
             xmlGameScreenManager = new XmlManager<GameScreen>();
             xmlGameScreenManager.Type = currentScreen.Type;
