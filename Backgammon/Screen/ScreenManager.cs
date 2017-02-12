@@ -14,7 +14,10 @@ namespace Backgammon.Screen
     {
         public Vector2 Dimension { private set; get; }
         public ContentManager Content { private set; get; }
+        XmlManager<GameScreen> xmlGameScreenManager;
         GameScreen currentScreen;
+        public GraphicsDevice GraphicsDevice;
+        public SpriteBatch SpriteBatch;
 
         // Make a singleton class
         private static ScreenManager instance;
@@ -31,6 +34,9 @@ namespace Backgammon.Screen
         { // A private constructor overrides any default, public constructors.
             Dimension = new Vector2(640, 480);
             currentScreen = new SplashScreen();
+            xmlGameScreenManager = new XmlManager<GameScreen>();
+            xmlGameScreenManager.Type = currentScreen.Type;
+            currentScreen = xmlGameScreenManager.Load("Load/SplashScreen.xml");
         }
 
 

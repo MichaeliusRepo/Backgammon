@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using System.Xml.Serialization;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -10,30 +11,30 @@ namespace Backgammon.Screen
 {
     public class SplashScreen : GameScreen
     {
-        Texture2D image;
-        string path;
+        public Image Image;
 
         public override void LoadContent()
         {
             base.LoadContent();
-            path = "Images/Backgammons";
-            image = content.Load<Texture2D>(path);
+            Image.LoadContent();
+            //Image.FadeEffect.FadeSpeed = 0.5f;
         }
 
         public override void UnloadContent()
         {
             base.UnloadContent();
+            Image.UnloadContent();
         }
 
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
+            Image.Update(gameTime);
         }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            //base.Draw(spriteBatch);
-            spriteBatch.Draw(image, Vector2.Zero, Color.White);
+            Image.Draw(spriteBatch);
         }
 
 

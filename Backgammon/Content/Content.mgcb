@@ -25,3 +25,9 @@
 /processorParam:TextureFormat=Color
 /build:Images/Backgammons.jpg
 
+#begin EB Garamond 12.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:TextureFormat=Compressed
+/build:EB Garamond 12.spritefont
+

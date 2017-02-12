@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<SplashScreen>
+  <Image>
+    <Path>Images/Backgammons</Path>
+    <Effects>FadeEffect</Effects>
+    <IsActive>true</IsActive>
+    <!--<FadeEffect>
+      <FadeSpeed>0.5</FadeSpeed>
+    </FadeEffect>-->
+    <Position>
+      <X>300</X>
+      <Y>200</Y>
+    </Position>
+    <Alpha>0.75</Alpha>
+    <!--<Scale>
+      <X>2.0</X>
+      <Y>2.0</Y>
+    </Scale>-->
+  </Image>
+
+</SplashScreen>
