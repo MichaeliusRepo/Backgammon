@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using Backgammon.Input;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
@@ -17,9 +18,12 @@ namespace Backgammon.Screen
         [XmlIgnore]
         public Type Type;
 
+        public string XmlPath;
+
         public GameScreen()
         {
             Type = this.GetType();
+            XmlPath = "Load/" + Type.ToString().Replace("Backgammon.Screen.","") + ".xml";
         }
 
         public virtual void LoadContent()
@@ -33,7 +37,7 @@ namespace Backgammon.Screen
 
         public virtual void Update(GameTime gameTime)
         {
-
+            InputManager.Instance.Update();
         }
 
         public virtual void Draw(SpriteBatch spriteBatch)

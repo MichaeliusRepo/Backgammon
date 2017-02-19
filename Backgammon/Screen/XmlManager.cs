@@ -8,9 +8,14 @@ using System.IO;
 
 namespace Backgammon.Screen
 {
-    public class XmlManager <T>
+    public class XmlManager<T>
     {
         public Type Type;
+
+        public XmlManager()
+        {
+            Type = typeof(T);
+        }
 
         public T Load(string path)
         {
