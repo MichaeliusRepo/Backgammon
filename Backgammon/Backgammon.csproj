@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -13,7 +13,8 @@
     <AssemblyName>Backgammon</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MonoGamePlatform>Windows</MonoGamePlatform>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -43,8 +44,12 @@
   <ItemGroup>
     <Compile Include="Backgammon.cs" />
     <Compile Include="Input\InputManager.cs" />
+    <Compile Include="Object\Board.cs" />
+    <Compile Include="Object\Checker.cs" />
+    <Compile Include="Object\Point.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Screen\BoardScreen.cs" />
     <Compile Include="Screen\Effects\FadeEffect.cs" />
     <Compile Include="Screen\GameScreen.cs" />
     <Compile Include="Screen\Image.cs" />
@@ -68,6 +73,7 @@
     <Content Include="Icon.ico" />
     <Content Include="Load\ScreenManager.xml" />
     <Content Include="Load\AnotherMenu.xml" />
+    <Content Include="Load\BoardScreen.xml" />
     <Content Include="Load\SettingsMenu.xml" />
     <Content Include="Load\SplashScreen.xml" />
   </ItemGroup>
@@ -79,6 +85,9 @@
       <Project>{7b678eab-8ec8-46ae-a397-2da56cd78742}</Project>
       <Name>ModelDLL</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" />
