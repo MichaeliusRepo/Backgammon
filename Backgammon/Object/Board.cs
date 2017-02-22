@@ -19,9 +19,9 @@ namespace Backgammon.Object
 
         // Modify algorithm's distance of points.
         private readonly static float leftX = 82;
-        private readonly static float topY = 96;
-        //private readonly static float rightX = 540 + leftX;
-        private readonly static float botY =720 - topY;
+        private readonly static float topY = 92;
+        private readonly static float rightX = 540 + leftX;
+        private readonly static float botY = 720 + 6 - topY;
 
         private readonly int[] defaultGameBoard = new int[] { -2, 0, 0, 0,  0,  5,
                                             0, 3, 0, 0,  0, -5,
@@ -46,28 +46,28 @@ namespace Backgammon.Object
 
         private void createPoints()
         {
-            //for (int i = 1; i <= 6; i++) // White Home Board
-            //    Points.Add(new Point(new Vector2(rightX + ((i % 6 - 1) * pointDistance), botY), getCheckers(i)));
+            for (int i = 1; i <= 6; i++) // White Home Board
+                Points.Add(new Point(new Vector2(rightX + ((6 - i) * pointDistance), botY), getCheckers(i)));
 
-            //for (int i = 7; i <= 12; i++) // Bottom Outer Board
-            //    Points.Add(new Point(new Vector2(leftX + ((i % 6 - 1) * pointDistance), botY), getCheckers(i)));
+            for (int i = 7; i <= 12; i++) // Bottom Outer Board
+                Points.Add(new Point(new Vector2(leftX + ((12 - i) * pointDistance), botY), getCheckers(i)));
 
             for (int i = 13; i <= 18; i++) // Upper Outer Board
-                Points.Add(new Point(new Vector2(leftX + ((i % 6 - 1) * pointDistance), topY), getCheckers(i)));
+                Points.Add(new Point(new Vector2(leftX + ((i - 13) * pointDistance), topY), getCheckers(i)));
 
-            //for (int i = 19; i <= 24; i++) // Black Home Board
-            //    Points.Add(new Point(new Vector2(rightX + ((i % 6 - 1) * pointDistance), topY), getCheckers(i)));
+            for (int i = 19; i <= 24; i++) // Black Home Board
+                Points.Add(new Point(new Vector2(rightX + ((i - 19) * pointDistance), topY), getCheckers(i)));
         }
 
         private List<Checker> getCheckers(int i)
         {
-            int amountOfCheckers = gameBoard[i-1];
+            int amountOfCheckers = gameBoard[i - 1];
             CheckerColor checkerColor;
 
             if (amountOfCheckers < 0)
             {
                 checkerColor = CheckerColor.Black;
-                amountOfCheckers *= -1; // make positive
+                amountOfCheckers *= -1; // make positive for use in loop
             }
             else
                 checkerColor = CheckerColor.White;

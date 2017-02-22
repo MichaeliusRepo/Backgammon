@@ -18,51 +18,38 @@ namespace Backgammon.Object
         private List<Checker> Checkers;
 
         // Modify this value for Y distance (if < 5) between checkers
-        private readonly static float checkerDistance = 56.0f;
+        private readonly static float checkerDistance = 50.0f;
 
         internal Point(Vector2 Position, List<Checker> Checkers)
         {
             this.Position = Position;
             this.Checkers = Checkers;
-            //foreach (Checker checker in Checkers)
-            //    if (Position.Y > 360) // Is this Point at bottom?
-            //        checker.SetPosition(Position.X, Position.Y - Checkers.Count * checkerDistance);
-            //    else // or on top?
-            //        checker.SetPosition(Position.X, Position.Y + Checkers.Count * checkerDistance);
-
-            for (int i = 0; i < Checkers.Count; i++)
-                if (Position.Y > 360) // Is this Point at bottom?
-                    Checkers[i].SetPosition(Position.X, Position.Y - i * checkerDistance);
-            else
-                    Checkers[i].SetPosition(Position.X, Position.Y + i * checkerDistance);
+            arrangeCheckers();
         }
-
-        //internal Point(Vector2 Position)
-        //{
-        //    this.Position = Position;
-        //    Checkers = new List<Checker>();
-        //}
 
         internal void AddChecker(Checker checker)
         {
             Checkers.Add(checker);
-            if (Checkers.Count < 15) // Do we need to make space for many checkers
-            {
-                if (Position.Y > 360) // Is this Point at bottom?
-                    checker.SetPosition(Position.X, Position.Y - Checkers.Count * checkerDistance);
-                else // or on top?
-                    checker.SetPosition(Position.X, Position.Y + Checkers.Count * checkerDistance);
-            }
-            else // Make space for many checkers
-            {
-                throw new NotImplementedException();
-            }
-
+            arrangeCheckers();
         }
 
         internal void RemoveChecker(Checker checker)
         {
             Checkers.Remove(checker);
+            arrangeCheckers();
+        }
+
+        private void arrangeCheckers()
+        {
+            float dist = checkerDistance;
+            if (Checkers.Count > 5)
+                dist = checkerDistance * (1 / Checkers.Count);
+
+            for (int i = 0; i < Checkers.Count; i++)
+                if (Position.Y > 360) // Is this Point at bottom?
+                    Checkers[i].SetPosition(Position.X, Position.Y - i * checkerDistance);
+                else
+                    Checkers[i].SetPosition(Position.X, Position.Y + i * checkerDistance);
         }
 
         internal void Update(GameTime gameTime)

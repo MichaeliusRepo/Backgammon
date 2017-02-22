@@ -18,7 +18,7 @@ namespace Backgammon.Object
         private Image Image;
 
         // Modify this value to change checker size!
-        private readonly static Vector2 Size = new Vector2(0.09f, 0.09f);
+        private readonly static Vector2 Size = new Vector2(0.08f, 0.08f);
 
         internal Checker(CheckerColor Color)
         {
