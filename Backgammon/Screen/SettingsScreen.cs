@@ -2,47 +2,46 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Xml.Serialization;
-using Backgammon.Input;
+using System.Threading.Tasks;
+using Backgammon.Screen.Menu;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
 
 namespace Backgammon.Screen
 {
-    public class SplashScreen : GameScreen
+    public class SettingsScreen : GameScreen
     {
-        public Image Image;
+        MenuManager menuManager;
+
+        public SettingsScreen()
+        {
+            menuManager = new MenuManager();
+        }
 
         public override void LoadContent()
         {
             base.LoadContent();
-            Image.LoadContent();
-            //Image.FadeEffect.FadeSpeed = 0.5f;
+            menuManager.LoadContent("Load/SettingsMenu.xml");
         }
 
         public override void UnloadContent()
         {
             base.UnloadContent();
-            Image.UnloadContent();
+            menuManager.UnloadContent();
         }
 
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
-            Image.Update(gameTime);
-
-            if (InputManager.Instance.KeyPressed(Keys.Enter, Keys.Z))
-                //ScreenManager.Instance.ChangeScreens("SettingsScreen");
-                ScreenManager.Instance.ChangeScreens("BoardScreen");
+            menuManager.Update(gameTime);
         }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            Image.Draw(spriteBatch);
+            base.Draw(spriteBatch);
+            menuManager.Draw(spriteBatch); 
         }
-
 
     }
 }

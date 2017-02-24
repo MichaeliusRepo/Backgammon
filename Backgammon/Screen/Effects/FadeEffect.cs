@@ -15,10 +15,10 @@ namespace Backgammon.Screen.Effects
 
         public FadeEffect()
         {
-            FadeSpeed = 0.2f;
+            FadeSpeed = 2.5f;
             Increase = false;
-            MinAlpha = 0.2f;
-            MaxAlpha = 0.8f;
+            MinAlpha = 0.0f;
+            MaxAlpha = 1.0f;
         }
 
         public override void LoadContent(ref Image Image)

@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Backgammon.Screen;
+using Backgammon.Input;
 
 namespace Backgammon
 {
@@ -17,6 +18,7 @@ namespace Backgammon
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+            this.IsMouseVisible = true;
         }
 
         /// <summary>
@@ -67,7 +69,7 @@ namespace Backgammon
         protected override void Update(GameTime gameTime)
         {
             // This method is called about 30 times per second, i.e. 30 FPS.
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || InputManager.Instance.KeyPressed(Keys.Escape))
                 Exit();
 
             // TODO: Add your update logic here
