@@ -9,16 +9,60 @@ namespace ModelDLL
     class GameBoard
     {
         Position[] positions = new Position[24];
+        private BarPosition whiteBar;
+        private BarPosition blackBar;
 
         public GameBoard(int[] gameBoard)
         {
+            this.initialize(gameBoard, 0,0,0,0);
+        }
+
+        public GameBoard(int[]gameBoard, 
+                         int whiteCheckersOnBar, 
+                         int whiteCheckersBoreOff, 
+                         int blackCheckersOnBar, 
+                         int blackCheckersBoreOff)
+        {
+            this.initialize(gameBoard, 
+                            whiteCheckersOnBar, 
+                            whiteCheckersBoreOff,
+                            blackCheckersOnBar,
+                            blackCheckersBoreOff);
+        }
+        // constructor end
+
+
+        private void initialize(
+            int[] gameBoard,
+            int whiteCheckersOnBar,
+            int whiteCheckersBoreOff,
+            int blackCheckersOnBar,
+            int blackCheckersBoreOff)
+        {
+
+            this.whiteBar = new BarPosition(BarPosition.WHITE_BAR_ID,
+                                            whiteCheckersOnBar,
+                                            CheckerColor.White);
+
+            this.blackBar = new BarPosition(BarPosition.BLACK_BAR_ID,
+                                            blackCheckersOnBar,
+                                            CheckerColor.Black);
+
+
             //Creating 24 positions
             for (int i = 0; i < 24; i++)
             {
-                positions[i] = new Position(i + 1, gameBoard[i]);
-                    //gameBoard[i]);
+                positions[i] = new Position(i + 1, gameBoard[i], whiteBar, blackBar);
             }
 
+            Position[] whiteBarNeighbours = whiteBar.GetNeighboursArray(CheckerColor.White);
+            Position[] blackBarNeighbours = whiteBar.GetNeighboursArray(CheckerColor.Black);
+
+            for(int i = 0; i < 6; i++)
+            {
+                whiteBarNeighbours[i] = positions[23 - i];
+                blackBarNeighbours[i] = positions[i];
+            }
 
             //Updating the neighbours of the first 6 positions, taking into consideration any edge cases 
             for (int i = 0; i < 6; i++)
@@ -73,13 +117,19 @@ namespace ModelDLL
                 }
             }
         }
-        // constructor end
-
 
 
         public HashSet<int> GetLegalMovesFor(CheckerColor color, int initialPosition, int[] moves)
         {
-            return positions[initialPosition-1].GetLegalMoves(color, moves);
+            switch (initialPosition)
+            {
+                case BackgammonGame.WHITE_BAR_ID:
+                    return whiteBar.GetLegalMoves(color, moves);
+                case BackgammonGame.BLACK_BAR_ID:
+                    return blackBar.GetLegalMoves(color, moves);
+                default:
+                    return positions[initialPosition - 1].GetLegalMoves(color, moves);
+            }
         }
 
 

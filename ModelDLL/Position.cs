@@ -29,11 +29,21 @@ namespace ModelDLL
         //The number of checkers that are currently on this position. Positive numbers for white checkers
         //and negative numbers for black checkers
         public int checkers;
+        private BarPosition blackBar;
+        private BarPosition whiteBar;
 
         public Position(int id, int checkers)
         {
             this.id = id;
             this.checkers = checkers;
+        }
+
+        public Position(int id, int checkers, BarPosition whiteBar, BarPosition blackBar)
+        {
+            this.id = id;
+            this.checkers = checkers;
+            this.whiteBar = whiteBar;
+            this.blackBar = blackBar;
         }
 
         //Returns the reachable positions based on the color of the checkers
@@ -117,7 +127,10 @@ namespace ModelDLL
         //Checks whether it is legal to move a specified color of checker away from here
         protected virtual bool LegalToMoveFromHere(CheckerColor color)
         {
-            return (color == CheckerColor.White) ? this.checkers > 0 : this.checkers < 0;
+            bool legal = (color == CheckerColor.White) ? this.checkers > 0 : this.checkers < 0;
+            legal = legal && !GetBar(color).AreCheckersOnBar();
+            return legal;
+
         }
 
         //Checks whether it is legal to move a specified color of checker to this position
@@ -151,8 +164,49 @@ namespace ModelDLL
         {
             return GetNeighboursArray(color)[moveDistance - 1];
         }
+
+        //Given the checker color, return the bar for that color of checkers
+        private BarPosition GetBar(CheckerColor color)
+        {
+            return ( color == CheckerColor.White )? whiteBar : blackBar;
+        }
     }
 
+
+    //Class representing the Bar
+    class BarPosition : Position
+    {
+        public const int WHITE_BAR_ID = 151357818;
+        public const int BLACK_BAR_ID = 612345638;
+
+        private CheckerColor color;
+
+        public BarPosition(int id, int checkers, CheckerColor color) : base(id, checkers)
+        {
+            this.color = color;
+
+        }
+
+        public bool LegalToMoveFromHere()
+        {
+            return AreCheckersOnBar();
+        }
+
+        public bool LegalToMoveHere()
+        {
+            return false;
+        }
+
+        public void CalculateLegalMoves()
+        {
+            return;
+        }
+
+        public bool AreCheckersOnBar()
+        {
+            return checkers != 0;
+        }
+    }
 
     //This position represents positions outside the board
     class OutOfBoundsPosition : Position

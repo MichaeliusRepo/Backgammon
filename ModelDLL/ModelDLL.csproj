@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BackgammonGame.cs" />
+    <Compile Include="CheckerColor.cs" />
     <Compile Include="GameBoard.cs" />
     <Compile Include="FakeDice.cs" />
     <Compile Include="Dice.cs" />

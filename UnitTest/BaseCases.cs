@@ -243,7 +243,7 @@ namespace UnitTest
             Assert.IsTrue(actualLegalMovesBlack.Count == 0);
         }
 
-       /* [TestMethod]
+        [TestMethod]
         public void TestCannotMoveCheckersOnBoardWhenHasCheckerOnBar()
         {
             //removing a checker white at position 6. WILL BE RESET AFTER TEST
@@ -267,6 +267,39 @@ namespace UnitTest
             //Checking that black cannot move to any positions with another checker
             HashSet<int> legalMovesBlack = bg.GetLegalMovesFor(CheckerColor.Black, 12);
             Assert.AreEqual(0, legalMovesBlack.Count);
+
+        }
+        /*
+        [TestMethod]
+        public void TestGetLegalMovesForCheckersOnBar()
+        {
+            //removing a checker white at position 6. WILL BE RESET AFTER TEST
+            initialGameBoard[5] -= 1;
+
+            //removing a black checker at position 19. WILL BE RESET AFTER TEST
+            initialGameBoard[19] += 1;
+
+            //putting one black and one white checker on the bar
+            bg = new BackgammonGame(initialGameBoard, fd, 1, 0, 1, 0);
+
+            fd.SetReturnValues(new int[] { 6, 3 });
+
+            //With the current setup, white should be able to move to positions 22, 16
+            //and black to positions 3 and 9
+            HashSet<int> expectedLegalMovesBlack = HashSetFromArray(new int[] { 3, 9 });
+            HashSet<int> actualLegalMovesBlack =
+                bg.GetLegalMovesFor(CheckerColor.Black, BackgammonGame.BLACK_BAR_ID);
+
+            Console.WriteLine(string.Join(", ", actualLegalMovesBlack));
+
+
+            Assert.IsTrue(actualLegalMovesBlack.SetEquals(expectedLegalMovesBlack));
+
+            HashSet<int> expectedLegalMovesWhite = HashSetFromArray(new int[] { 22, 16 });
+            HashSet<int> actualLegalMovesWhite =
+                bg.GetLegalMovesFor(CheckerColor.White, BackgammonGame.WHITE_BAR_ID);
+
+            Assert.IsTrue(actualLegalMovesWhite.SetEquals(expectedLegalMovesWhite));
 
         }*/
 

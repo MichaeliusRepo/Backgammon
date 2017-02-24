@@ -4,16 +4,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace ModelDLL
 {
     //Player1 is represented by positive numbers, 
     //Player2 is represented by negative numbers
 
-    public enum CheckerColor { White, Black };
 
+
+    
 
     public class BackgammonGame
     {
+        public const int WHITE_BAR_ID = BarPosition.WHITE_BAR_ID;
+        public const int BLACK_BAR_ID = BarPosition.BLACK_BAR_ID;
 
         private Dice dice;
         private GameBoard gameBoard;
@@ -22,7 +26,12 @@ namespace ModelDLL
                              int blackCheckersOnBar, int blackCheckersBoreOff)
         {
             this.dice = dice;
-            this.gameBoard = new GameBoard(gameBoard);
+            this.gameBoard = new GameBoard(
+                           gameBoard,
+                           whiteCheckersOnBar,
+                           whiteCheckersBoreOff,
+                           blackCheckersOnBar,
+                           blackCheckersBoreOff);
         }
 
         public BackgammonGame(int[] gameBoard, Dice dice)
