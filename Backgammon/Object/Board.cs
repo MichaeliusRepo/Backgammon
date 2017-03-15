@@ -13,7 +13,6 @@ namespace Backgammon.Object
 {
     public class Board
     {
-
         // Modify this value for X distance between points
         private readonly static float pointDistance = 76;
 
@@ -30,7 +29,7 @@ namespace Backgammon.Object
 
         private int[] gameBoard;
 
-        private List<Point> Points = new List<Point>();
+        internal List<Point> Points { get; private set; }
 
         public Board()
         {
@@ -44,8 +43,17 @@ namespace Backgammon.Object
             createPoints();
         }
 
+        internal void MoveChecker(Point from, Point to)
+        {
+            if (from.IsEmpty())
+                throw new Exception();
+            from.SendToPoint(to);
+        }
+
         private void createPoints()
         {
+            Points = new List<Point>();
+
             for (int i = 1; i <= 6; i++) // White Home Board
                 Points.Add(new Point(new Vector2(rightX + ((6 - i) * pointDistance), botY), getCheckers(i)));
 

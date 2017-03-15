@@ -27,8 +27,9 @@ namespace Backgammon.Screen
         SpriteFont font;
         Dictionary<string, ImageEffect> effectList;
         public string Effects;
-
+        public SpriteEffects SpriteEffect;
         public FadeEffect FadeEffect;
+        public float LayerDepth;
 
         void SetEffect<T>(ref T effect)
         {
@@ -94,6 +95,8 @@ namespace Backgammon.Screen
             Alpha = 1.0f;
             SourceRect = Rectangle.Empty;
             effectList = new Dictionary<string, ImageEffect>();
+            SpriteEffect = SpriteEffects.None;
+            LayerDepth = 0.0f;
         }
 
 
@@ -160,7 +163,7 @@ namespace Backgammon.Screen
         public void Draw(SpriteBatch spriteBatch)
         {
             origin = new Vector2(SourceRect.Width / 2, SourceRect.Height / 2);
-            spriteBatch.Draw(Texture, Position, SourceRect, Color.White * Alpha, 0.0f, origin, Scale, SpriteEffects.None, 0.0f);
+            spriteBatch.Draw(Texture, Position, SourceRect, Color.White * Alpha, 0.0f, origin, Scale, SpriteEffect, LayerDepth);
         }
 
     }

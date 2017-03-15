@@ -17,13 +17,25 @@ namespace Backgammon.Object
         internal Vector2 Position { get; private set; }
         private Image Image;
 
-        // Modify this value to change checker size!
+        private Vector2 Acceleration = Vector2.Zero;
+        private Vector2 Velocity = Vector2.Zero;
+        private float DeltaHalfDistance;
+        private Vector2 FinalPosition;
+        private float Timer;
+        private Point TargetPoint = null;
+
+        internal bool moving { get; private set; }
+
+        // Modify this value to change checker size
         private readonly static Vector2 Size = new Vector2(0.08f, 0.08f);
+
+        // Do not modify.
+        private readonly static float Time = 4;
 
         internal Checker(CheckerColor Color)
         {
             this.Color = Color;
-            Image = new Image() { Position = this.Position, Scale = Size };
+            Image = new Image() { Position = Position, Scale = Size };
             if (Color == CheckerColor.White)
                 Image.Path = "Images/White Checker";
             else
@@ -43,13 +55,52 @@ namespace Backgammon.Object
             Image.Position = Position;
         }
 
-        internal void MoveToPosition(Vector2 NewPosition)
+        internal void MoveToPoint(Point p)
         {
-            throw new NotImplementedException();
+            TargetPoint = p;
+            MoveToPosition(p.ReceivingPosition);
+        }
+
+        internal void MoveToPosition(Vector2 NewPosition)
+        { // Don't worry, I did the math on paper first.
+            FinalPosition = NewPosition;
+            Vector2 DeltaPosition = NewPosition - Position;
+            DeltaHalfDistance = Vector2.Distance(Position, FinalPosition) / 2;
+            Acceleration = new Vector2(DeltaPosition.X / (Time * Time), DeltaPosition.Y / (Time * Time));
+            moving = true;
+        }
+
+        private void MoveByDeltaTime(float DeltaTime)
+        {
+            if (Vector2.Distance(Position, FinalPosition) < DeltaHalfDistance)
+            {
+                Acceleration = -Acceleration;
+                DeltaHalfDistance = -1; // Set to -1 to avoid this block, as distance cannot be less than 0
+            }
+            Velocity += (Acceleration * DeltaTime);
+            Position += (Velocity);
+            Timer += DeltaTime;
+
+            if (Timer >= 1.0) // Less than a magic number
+
+            {
+                Position = FinalPosition;
+                moving = false;
+                Acceleration = Velocity = Vector2.Zero;
+                if (TargetPoint != null)
+                {
+                    TargetPoint.ArrangeCheckers();
+                    TargetPoint = null;
+                }
+
+            }
+            Image.Position = Position;
         }
 
         internal void Update(GameTime gameTime)
         {
+            if (moving)
+                MoveByDeltaTime((float)gameTime.ElapsedGameTime.TotalSeconds);
             Image.Update(gameTime);
         }
 
