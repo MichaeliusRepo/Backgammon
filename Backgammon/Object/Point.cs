@@ -17,7 +17,7 @@ namespace Backgammon.Object
         internal int Number { get; private set; }
         internal Vector2 Position { get; private set; }
         internal List<Checker> Checkers { get; private set; }
-        private Image Image;
+        private Image Image = new Image() { Path = "Images/Glow", Effects = "FadeEffect", IsActive = false};
         internal Vector2 ReceivingPosition { get; private set; }
 
         // Modifies Y distance (if < 5) between checkers
@@ -29,13 +29,18 @@ namespace Backgammon.Object
         // Do not modify.
         private readonly static float MiddleY = 720 / 2;
 
+        internal Rectangle GetBounds()
+        {
+            return Image.GetBounds();
+        }
+
         internal Point(Vector2 Position, List<Checker> Checkers)
         {
             this.Position = Position;
             this.Checkers = Checkers;
             ArrangeCheckers();
 
-            Image = new Image() { Path = "Images/Glow", Effects = "FadeEffect", Position = Position};
+            Image.Position = Position;
             if (Position.Y > MiddleY)
                 Image.Position += new Vector2(0, -YModifier);
             else
@@ -61,7 +66,7 @@ namespace Backgammon.Object
         internal void SendToPoint(Point p)
         {
             Glow(false);
-            Checker c = ReturnTopChecker();
+            Checker c = GetTopChecker();
             c.MoveToPoint(p);
             RemoveChecker(c);
             p.AddChecker(c);
@@ -72,10 +77,10 @@ namespace Backgammon.Object
             return (Checkers.Count == 0);
         }
 
-        internal Checker ReturnTopChecker()
+        internal Checker GetTopChecker()
         {
             if (IsEmpty())
-                throw new Exception();
+                return null;
             else
                 return Checkers.ElementAt(Checkers.Count - 1);
         }
@@ -115,8 +120,7 @@ namespace Backgammon.Object
 
         internal void Draw(SpriteBatch spriteBatch)
         {
-            if (Image.IsActive)
-                Image.Draw(spriteBatch);
+            Image.Draw(spriteBatch);
             foreach (Checker c in Checkers)
                 c.Draw(spriteBatch);
         }

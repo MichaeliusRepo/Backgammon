@@ -32,33 +32,38 @@ namespace Backgammon.Input
                 currentKeyState = Keyboard.GetState();
         }
 
+        public bool IsWithinBounds(Rectangle bounds)
+        {
+            return bounds.Contains(GetMousePosition());
+        }
+
+        public Vector2 GetMousePosition()
+        {
+            var currentMouseState = Mouse.GetState();
+            return new Vector2(currentMouseState.X, currentMouseState.Y);
+        }
+
         public bool KeyPressed(params Keys[] keys)
         {
             foreach (Keys key in keys)
-            {
                 if (currentKeyState.IsKeyDown(key) && prevKeyState.IsKeyUp(key))
                     return true;
-            }
             return false;
         }
 
         public bool KeyUp(params Keys[] keys)
         {
             foreach (Keys key in keys)
-            {
                 if (currentKeyState.IsKeyUp(key) && prevKeyState.IsKeyDown(key))
                     return true;
-            }
             return false;
         }
 
         public bool KeyDown(params Keys[] keys)
         {
             foreach (Keys key in keys)
-            {
                 if (currentKeyState.IsKeyDown(key))
                     return true;
-            }
             return false;
         }
 

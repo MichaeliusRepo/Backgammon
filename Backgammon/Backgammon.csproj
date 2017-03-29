@@ -42,6 +42,7 @@
     <StartupObject>Backgammon.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Audio\AudioManager.cs" />
     <Compile Include="Backgammon.cs" />
     <Compile Include="Input\InputManager.cs" />
     <Compile Include="Object\Board.cs" />
@@ -53,14 +54,9 @@
     <Compile Include="Screen\Effects\FadeEffect.cs" />
     <Compile Include="Screen\GameScreen.cs" />
     <Compile Include="Screen\Image.cs" />
-    <Compile Include="Screen\ImageEffect.cs" />
-    <Compile Include="Screen\Menu\Menu.cs" />
-    <Compile Include="Screen\Menu\MenuItem.cs" />
-    <Compile Include="Screen\Menu\MenuManager.cs" />
+    <Compile Include="Screen\Effects\ImageEffect.cs" />
     <Compile Include="Screen\ScreenManager.cs" />
-    <Compile Include="Screen\SettingsScreen.cs" />
     <Compile Include="Screen\SplashScreen.cs" />
-    <Compile Include="Screen\XmlManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MonoGame.Framework">
@@ -71,11 +67,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Icon.ico" />
-    <Content Include="Load\ScreenManager.xml" />
-    <Content Include="Load\AnotherMenu.xml" />
-    <Content Include="Load\BoardScreen.xml" />
-    <Content Include="Load\SettingsMenu.xml" />
-    <Content Include="Load\SplashScreen.xml" />
   </ItemGroup>
   <ItemGroup>
     <MonoGameContentReference Include="Content\Content.mgcb" />

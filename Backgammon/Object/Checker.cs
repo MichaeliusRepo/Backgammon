@@ -31,6 +31,12 @@ namespace Backgammon.Object
 
         // Do not modify.
         private readonly static float Time = 4;
+        private readonly static float Second = 1.0f;
+
+        internal Rectangle GetBounds()
+        {
+            return Image.GetBounds();
+        }
 
         internal Checker(CheckerColor Color)
         {
@@ -81,8 +87,7 @@ namespace Backgammon.Object
             Position += (Velocity);
             Timer += DeltaTime;
 
-            if (Timer >= 1.0) // Less than a magic number
-
+            if (Timer >= Second) // Moving animations last exactly a second.
             {
                 Position = FinalPosition;
                 moving = false;
@@ -92,7 +97,6 @@ namespace Backgammon.Object
                     TargetPoint.ArrangeCheckers();
                     TargetPoint = null;
                 }
-
             }
             Image.Position = Position;
         }

@@ -3,14 +3,10 @@
 namespace Backgammon
 {
 #if WINDOWS || LINUX
-    /// <summary>
-    /// The main class.
-    /// </summary>
+    // The main class.
     public static class Program
     {
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
+        // The main entry point for the application.
         [STAThread]
         static void Main()
         {

@@ -13,13 +13,12 @@ namespace Backgammon.Screen
 {
     public class SplashScreen : GameScreen
     {
-        public Image Image;
+        public Image Image = new Image() { Path = "Images/Backgammons" , Position = new Vector2(540, 360)};
 
         public override void LoadContent()
         {
             base.LoadContent();
             Image.LoadContent();
-            //Image.FadeEffect.FadeSpeed = 0.5f;
         }
 
         public override void UnloadContent()
@@ -42,7 +41,6 @@ namespace Backgammon.Screen
         {
             Image.Draw(spriteBatch);
         }
-
 
     }
 }

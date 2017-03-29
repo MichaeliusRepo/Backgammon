@@ -15,16 +15,8 @@ namespace Backgammon.Screen
     public class GameScreen
     {
         protected ContentManager content;
-        [XmlIgnore]
-        public Type Type;
 
-        public string XmlPath;
-
-        public GameScreen()
-        {
-            Type = this.GetType();
-            XmlPath = "Load/" + Type.ToString().Replace("Backgammon.Screen.","") + ".xml";
-        }
+        public GameScreen() { }
 
         public virtual void LoadContent()
         {
@@ -40,10 +32,7 @@ namespace Backgammon.Screen
             InputManager.Instance.Update();
         }
 
-        public virtual void Draw(SpriteBatch spriteBatch)
-        {
-
-        }
+        public virtual void Draw(SpriteBatch spriteBatch) { }
 
 
     }

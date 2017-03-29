@@ -14,20 +14,14 @@ namespace Backgammon.Screen
 {
     public class ScreenManager
     {
-        [XmlIgnore]
         public Vector2 Dimension { private set; get; }
-        [XmlIgnore]
         public ContentManager Content { private set; get; }
-        XmlManager<GameScreen> xmlGameScreenManager;
 
         GameScreen currentScreen, newScreen;
-        [XmlIgnore]
         public GraphicsDevice GraphicsDevice;
-        [XmlIgnore]
         public SpriteBatch SpriteBatch;
 
-        public Image Image;
-        [XmlIgnore]
+        public Image Image = new Image() { Path= "Images/FadeImage", Effects = "FadeEffect", Scale = new Vector2(1080, 720) };
         public bool IsTransitioning { get; private set; }
 
         // Make a singleton class
@@ -37,10 +31,7 @@ namespace Backgammon.Screen
             get
             {
                 if (instance == null)
-                {
-                    XmlManager<ScreenManager> xml = new XmlManager<ScreenManager>();
-                    instance = xml.Load("Load/ScreenManager.xml");
-                }
+                    instance = new ScreenManager();
                 return instance;
             }
         }
@@ -63,9 +54,6 @@ namespace Backgammon.Screen
                 {
                     currentScreen.UnloadContent();
                     currentScreen = newScreen;
-                    xmlGameScreenManager.Type = currentScreen.Type;
-                    if (File.Exists(currentScreen.XmlPath))
-                    currentScreen = xmlGameScreenManager.Load(currentScreen.XmlPath);
                     currentScreen.LoadContent();
                 }
                 else if (Image.Alpha == 0.0f)
@@ -80,12 +68,7 @@ namespace Backgammon.Screen
         { // A private constructor overrides any default, public constructors.
             Dimension = new Vector2(1080, 720);
             currentScreen = new SplashScreen();
-            xmlGameScreenManager = new XmlManager<GameScreen>();
-            xmlGameScreenManager.Type = currentScreen.Type;
-            currentScreen = xmlGameScreenManager.Load("Load/SplashScreen.xml");
         }
-
-
 
         public void LoadContent(ContentManager Content)
         {

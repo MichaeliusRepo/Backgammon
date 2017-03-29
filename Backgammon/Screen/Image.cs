@@ -17,7 +17,7 @@ namespace Backgammon.Screen
         public string Text, FontName, Path;
         public Vector2 Position, Scale;
         public Rectangle SourceRect;
-        public bool IsActive;
+        public bool IsActive = true;
 
         [XmlIgnore]
         public Texture2D Texture;
@@ -67,10 +67,8 @@ namespace Backgammon.Screen
         {
             Effects = String.Empty;
             foreach (var effect in effectList)
-            {
                 if (effect.Value.IsActive)
                     Effects += effect.Key + ":";
-            }
             if (Effects != String.Empty)
                 Effects.Remove(Effects.Length - 1);
         }
@@ -79,11 +77,14 @@ namespace Backgammon.Screen
         {
             foreach (var effect in effectList)
                 DeactivateEffect(effect.Key);
-
             string[] split = Effects.Split(':');
             foreach (string s in split)
                 ActivateEffect(s);
+        }
 
+        public Rectangle GetBounds()
+        {
+            return Texture.Bounds;
         }
 
         public Image()
@@ -163,7 +164,8 @@ namespace Backgammon.Screen
         public void Draw(SpriteBatch spriteBatch)
         {
             origin = new Vector2(SourceRect.Width / 2, SourceRect.Height / 2);
-            spriteBatch.Draw(Texture, Position, SourceRect, Color.White * Alpha, 0.0f, origin, Scale, SpriteEffect, LayerDepth);
+            if (IsActive)
+                spriteBatch.Draw(Texture, Position, SourceRect, Color.White * Alpha, 0.0f, origin, Scale, SpriteEffect, LayerDepth);
         }
 
     }

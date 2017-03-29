@@ -5,9 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Backgammon.Screen;
+using Backgammon.Audio;
 using Microsoft.Xna.Framework;
 using ModelDLL;
 using Microsoft.Xna.Framework.Graphics;
+using Backgammon.Input;
 
 namespace Backgammon.Object
 {
@@ -28,23 +30,58 @@ namespace Backgammon.Object
                                            -5, 0, 0, 0,  0,  2 };
 
         private int[] gameBoard;
+        private Image Image = new Image() { Path = "Images/CheckerGlow", Effects = "FadeEffect", IsActive = false };
 
         internal List<Point> Points { get; private set; }
 
-        public Board()
-        {
-            gameBoard = defaultGameBoard;
-            createPoints();
-        }
-
         public Board(int[] board)
         {
-            gameBoard = board;
+            if (board != null)
+                gameBoard = board;
+            else
+                gameBoard = defaultGameBoard;
             createPoints();
+            Image.LoadContent();
+        }
+
+        internal void PlaceGlow(Checker c)
+        {
+            Image.FadeEffect.FadeSpeed = 0.25f;
+            Image.FadeEffect.MinAlpha = 0.75f;
+            Image.Alpha = 0.0f;
+            Image.IsActive = Image.FadeEffect.Increase = (c != null);
+            Image.Position = c.Position;
+        }
+
+        internal Point GetClickedPoint()
+        {
+            foreach (Point p in Points)
+                if (InputManager.Instance.IsWithinBounds(p.GetBounds()))
+                    return p;
+            return null;
+        }
+
+        internal Checker GetClickedChecker()
+        {
+            List<Checker> list = getTopPoints();
+            foreach (Checker c in list)
+                if (InputManager.Instance.IsWithinBounds(c.GetBounds()))
+                    return c;
+            return null;
+        }
+
+        private List<Checker> getTopPoints()
+        {
+            List<Checker> list = new List<Checker>();
+            foreach (Point p in Points)
+                if (p.GetTopChecker() != null)
+                    list.Add(p.GetTopChecker());
+            return list;
         }
 
         internal void MoveChecker(Point from, Point to)
         {
+            AudioManager.Instance.PlaySound("Checker");
             if (from.IsEmpty())
                 throw new Exception();
             from.SendToPoint(to);
@@ -89,12 +126,14 @@ namespace Backgammon.Object
 
         internal void Update(GameTime gameTime)
         {
+            Image.Update(gameTime);
             foreach (Point p in Points)
                 p.Update(gameTime);
         }
 
         internal void Draw(SpriteBatch spriteBatch)
         {
+            Image.Draw(spriteBatch);
             foreach (Point p in Points)
                 p.Draw(spriteBatch);
         }

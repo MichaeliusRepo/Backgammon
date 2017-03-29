@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Backgammon.Screen;
 using Backgammon.Input;
+using Backgammon.Audio;
 
 namespace Backgammon
 {
@@ -47,6 +48,7 @@ namespace Backgammon
             ScreenManager.Instance.GraphicsDevice = GraphicsDevice;
             ScreenManager.Instance.SpriteBatch = spriteBatch;
             ScreenManager.Instance.LoadContent(Content);
+            AudioManager.Instance.LoadContent(Content);
 
             // TODO: use this.Content to load your game content here
         }
@@ -58,6 +60,7 @@ namespace Backgammon
         protected override void UnloadContent()
         {
             ScreenManager.Instance.UnloadContent();
+            AudioManager.Instance.UnloadContent();
             // TODO: Unload any non ContentManager content here
         }
 
@@ -69,8 +72,14 @@ namespace Backgammon
         protected override void Update(GameTime gameTime)
         {
             // This method is called about 30 times per second, i.e. 30 FPS.
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || InputManager.Instance.KeyPressed(Keys.Escape))
+            if (InputManager.Instance.KeyPressed(Keys.Escape))
                 Exit();
+
+            if (InputManager.Instance.KeyPressed(Keys.M))
+                AudioManager.Instance.ToggleAudio();
+
+            //if (InputManager.Instance.KeyPressed(Keys.C))
+            //    AudioManager.Instance.PlaySound("MenuClick");
 
             // TODO: Add your update logic here
             ScreenManager.Instance.Update(gameTime);
