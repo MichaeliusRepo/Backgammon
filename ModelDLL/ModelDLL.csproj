@@ -42,6 +42,9 @@
   <ItemGroup>
     <Compile Include="BackgammonGame.cs" />
     <Compile Include="CheckerColor.cs" />
+    <Compile Include="BarPosition.cs" />
+    <Compile Include="BearOffPosition.cs" />
+    <Compile Include="Edge.cs" />
     <Compile Include="GameBoard.cs" />
     <Compile Include="FakeDice.cs" />
     <Compile Include="Dice.cs" />

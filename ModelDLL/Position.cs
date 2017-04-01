@@ -10,18 +10,8 @@ namespace ModelDLL
     class Position
     {
 
-        
-        public static Position OOBP = new OutOfBoundsPosition(0, 0);
-
-        //Initialize all the neighbours for each position to be unreachable. The reachable neighbours are added
-        //in GameBoard.cs
-        
-        //The positions that are reachable for white checkers
-        private Position[] whiteMoves = new Position[] { OOBP, OOBP, OOBP, OOBP, OOBP, OOBP };
-
-        //The positions that are reachable for black checkers
-        private Position[] blackMoves = new Position[] { OOBP, OOBP, OOBP, OOBP, OOBP, OOBP };
-
+        private Edge[] whiteMovesEdges = new Edge[] { Edge.DeadEdge, Edge.DeadEdge, Edge.DeadEdge, Edge.DeadEdge, Edge.DeadEdge, Edge.DeadEdge };
+        private Edge[] blackMovesEdges = new Edge[] { Edge.DeadEdge, Edge.DeadEdge, Edge.DeadEdge, Edge.DeadEdge, Edge.DeadEdge, Edge.DeadEdge };
 
         //The id for this position. For the "Points" on the Backgammon game board, this will range from 1 to 24. 
         public int id;
@@ -46,10 +36,14 @@ namespace ModelDLL
             this.blackBar = blackBar;
         }
 
-        //Returns the reachable positions based on the color of the checkers
-        public Position[] GetNeighboursArray(CheckerColor color)
+        //Returns edges based on checker color type
+        public Edge[] GetEdges(CheckerColor color)
         {
-            return (color == CheckerColor.White) ? whiteMoves : blackMoves;
+            if (color == CheckerColor.White)
+            {
+                return whiteMovesEdges;
+            }
+            else return blackMovesEdges;
         }
 
 
@@ -62,59 +56,52 @@ namespace ModelDLL
         //Returns all the legal move from this position based on the color of the checkers 
         //and the moves (values on the dice) that are available
         public virtual HashSet<int> GetLegalMoves(CheckerColor color, int[] moves)
-        { 
-
-            //If it is not legal to move any checkers of the specified color from here
-            //then the reachable positions are none
-            if ( !LegalToMoveFromHere(color))
+        {
+            //If it is illegal to move the specified color from this position, there is nowhere to go.
+            if (!LegalToMoveFromHere(color))
             {
                 return new HashSet<int>();
             }
 
-            //Gets the reachable positions
-            Position[] nextPositions = GetNeighboursArray(color);
-
-            //The HashSet<int> to store the output result into
+            //The set to which all the reachable positions will be added to 
             HashSet<int> output = new HashSet<int>();
 
-            //For each of the moves...
-            for(int i = 0; i < moves.Length; i++)
-            {
-                //Create a list over all the moves except this move
-                int[] movesLeft = CopyArrayWithoutIndex(moves, i);
+            //Recursive helper function
+            CalculateLegalMoves(color, output, moves, this.id);
 
-                //Move to the next position
-                int move = moves[i];
-                Position positionAfterMove = GetPositionAfterMove(color, move);
-
-                //Check what other positions are reachable from this new position 
-                //after we exclude the move we used to get here
-                //Save these positions to the output set
-                //See CalculateLegalMoves for more info
-                positionAfterMove.CalculateLegalMoves(color, output, movesLeft);
-            }
-
+            //Returns the output
             return output;
         }
 
 
-        //The recursive method that is used for calculating all reachable positions
-        protected virtual void CalculateLegalMoves(CheckerColor color, HashSet<int> output, int[] moves)
-        {
-            if (LegalToMoveHere(color))
-            {
-                //If it is in fact legal to move here, add this position to the output list
-                output.Add(GetId());
 
-                //Repeat procedure from GetLegalMoves...
-                Position[] nextPositions = GetNeighboursArray(color);
+        //The recursive helper function that is used for calculating all reachable positions
+        protected virtual void CalculateLegalMoves(CheckerColor color, HashSet<int> output, int[] moves, int initialPosition)
+        {
+            if (LegalToMoveHere(color) || GetId() == initialPosition)
+            {
+
+                if (GetId() != initialPosition)
+                {
+                    //If it is in fact legal to move here, add this position to the output list, as long as it is not the 
+                    //initial position we started moving from
+                    output.Add(GetId());
+                }
+
+                //Get the edges to the next 6 positions, based on checker color
+                Edge[] edges = GetEdges(color);
                 for (int i = 0; i < moves.Length; i++)
                 {
-                    int[] movesLeft = CopyArrayWithoutIndex(moves, i);
 
                     int move = moves[i];
-                    Position positionAfterMove = GetPositionAfterMove(color, move);
-                    positionAfterMove.CalculateLegalMoves(color, output, movesLeft);
+                    //Checks if the edge is legal to be followed
+                    if (edges[move - 1].canBeFollowed())
+                    {
+                        //Remove the move that was used to travel that edge, and recurse on the next position
+                        int[] movesLeft = CopyArrayWithoutIndex(moves, i);
+                        Position positionAfterMove = edges[move - 1].getTarget();
+                        positionAfterMove.CalculateLegalMoves(color, output, movesLeft, initialPosition);
+                    }
                 }
             }
 
@@ -122,7 +109,6 @@ namespace ModelDLL
             //this position. End without adding anything
             else return;
         }
-
 
         //Checks whether it is legal to move a specified color of checker away from here
         protected virtual bool LegalToMoveFromHere(CheckerColor color)
@@ -159,80 +145,79 @@ namespace ModelDLL
         }
 
 
-        //Given a checker color and the distance of the move to be performed, gives the position the move ends at
+       /** //Given a checker color and the distance of the move to be performed, gives the position the move ends at
         private Position GetPositionAfterMove(CheckerColor color, int moveDistance)
         {
             return GetNeighboursArray(color)[moveDistance - 1];
-        }
+        }*/
+
 
         //Given the checker color, return the bar for that color of checkers
         private BarPosition GetBar(CheckerColor color)
         {
             return ( color == CheckerColor.White )? whiteBar : blackBar;
         }
-    }
 
-
-    //Class representing the Bar
-    class BarPosition : Position
-    {
-        public const int WHITE_BAR_ID = 151357818;
-        public const int BLACK_BAR_ID = 612345638;
-
-        private CheckerColor color;
-
-        public BarPosition(int id, int checkers, CheckerColor color) : base(id, checkers)
+        public int NumberOfCheckersOnPosition(CheckerColor color)
         {
-            this.color = color;
-
+            if( color == CheckerColor.White)
+            {
+                return checkers > 0 ? checkers : 0;
+            }
+            else
+            {
+                return checkers < 0 ? checkers * -1 : 0;
+            }
         }
 
-        public bool LegalToMoveFromHere()
+        public Boolean isLegalMove(CheckerColor color, int distance, int[] moves)
         {
-            return AreCheckersOnBar();
+            if (!LegalToMoveFromHere(color))
+            {
+                return false;
+            }
+
+            int target = GetId() + (color == CheckerColor.White ? -distance : distance);
+
+            return GetLegalMoves(color, moves).Contains(target);
+        } 
+
+        public int GetCheckers()
+        {
+            return this.checkers;
         }
 
-        public bool LegalToMoveHere()
+        public void removeChecker(CheckerColor color)
         {
-            return false;
+            this.checkers += (color == CheckerColor.White ? -1 : 1);
         }
 
-        public void CalculateLegalMoves()
+        public void addChecker(CheckerColor color)
         {
-            return;
-        }
-
-        public bool AreCheckersOnBar()
-        {
-            return checkers != 0;
-        }
-    }
-
-    //This position represents positions outside the board
-    class OutOfBoundsPosition : Position
-    {
-        public OutOfBoundsPosition(int id, int checkers) : base(id, checkers)
-        {
-        }
-
-        protected override void CalculateLegalMoves(CheckerColor color, HashSet<int> legalPositions, int[] movesLeft)
-        {
-            return;
-        }
-
-        public override HashSet<int> GetLegalMoves(CheckerColor color, int[] moves)
-        {
-            return new HashSet<int>();
-        }
-
-        protected override bool LegalToMoveFromHere(CheckerColor color)
-        {
-            return false;
-        }
-
-        protected override bool LegalToMoveHere(CheckerColor color)
-        {
-            return false;
+            if (color == CheckerColor.White)
+            {
+                if (NumberOfCheckersOnPosition(CheckerColor.Black) == 1)
+                {
+                    checkers = 0;
+                    blackBar.addChecker(CheckerColor.Black);
+                }
+            }
+            else
+            {
+                if (NumberOfCheckersOnPosition(CheckerColor.White) == 1)
+                {
+                    checkers = 0;
+                    whiteBar.addChecker(CheckerColor.White);
+                }
+            }
+            this.checkers += (color == CheckerColor.White ? 1 : -1);
         }
     }
+
+
+    
+
+   
+
+    
 }

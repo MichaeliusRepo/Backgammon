@@ -18,6 +18,8 @@ namespace ModelDLL
     {
         public const int WHITE_BAR_ID = BarPosition.WHITE_BAR_ID;
         public const int BLACK_BAR_ID = BarPosition.BLACK_BAR_ID;
+        public const int WHITE_BEAR_OFF_ID = BearOffPosition.WHITE_BEAR_OFF_ID;
+        public const int BLACK_BEAR_OFF_ID = BearOffPosition.BLACK_BEAR_OFF_ID;
 
         private Dice dice;
         private GameBoard gameBoard;
@@ -43,6 +45,21 @@ namespace ModelDLL
         public HashSet<int> GetLegalMovesFor(CheckerColor color, int initialPosition)
         {
             return gameBoard.GetLegalMovesFor(color, initialPosition, dice.GetDiceValues());
+        }
+
+        public void move(CheckerColor color, int from, int distance)
+        {
+            gameBoard.move(color, from, distance, this.dice.GetDiceValues());
+        }
+
+        public int[] GetGameBoard()
+        {
+            return gameBoard.GetGameBoard();
+        }
+
+        public int GetCheckersOnBar(CheckerColor color)
+        {
+            return gameBoard.GetCheckersOnBar(color);
         }
     } 
 }
