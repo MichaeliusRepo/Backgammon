@@ -35,7 +35,7 @@ namespace UnitTest
         [TestInitialize]
         public void Initialize()
         {
-            fd = new FakeDice(new int[] { 1, 1 });
+            fd = new FakeDice(new int[] { 1, 2 });
             initialGameBoard = new int[] { -2, 0, 0, 0,  0,  5,
                                             0, 3, 0, 0,  0, -5,
                                             5, 0, 0, 0, -3,  0,
@@ -69,18 +69,18 @@ namespace UnitTest
         public void TestFakeDice()
         {
 
-            int[] CurrentDiceValues = new int[] { 1, 1 };
+            int[] CurrentDiceValues = new int[] { 1, 2 };
             //Testing that FakeDice actually returns what is specified in the constructor
             //and that the output stays the same unless otherwise specified
             for (int i = 0; i < 30; i++)
             { 
-                Assert.IsTrue(AreEqualArrays(CurrentDiceValues, fd.GetDiceValues()));
+                Assert.IsTrue(AreEqualArrays(CurrentDiceValues, fd.RollDice()));
             }
 
             //Testing that the return change if new return values are specified
             int[] NewReturnValues = new int[] { 2, 3, 4 };
             fd.SetReturnValues(NewReturnValues);
-            Assert.IsTrue(AreEqualArrays(NewReturnValues, fd.GetDiceValues()));
+            Assert.IsTrue(AreEqualArrays(NewReturnValues, fd.RollDice()));
             
         }
 
@@ -88,8 +88,9 @@ namespace UnitTest
         public void TestGetLegalMovesForWhite()
         {
 
-            bg = new BackgammonGame(initialGameBoard, fd);
             fd.SetReturnValues(new int[] { 2, 3 });
+            bg = new BackgammonGame(initialGameBoard, fd);
+            
 
             //Get the legal moves for whites checkers on position 13.
             HashSet<int> ActualLegalMoves = bg.GetLegalMovesFor(CheckerColor.White, 13);
@@ -104,8 +105,9 @@ namespace UnitTest
         [TestMethod]
         public void TestGetLegalMovesForBlack()
         {
+            fd.SetReturnValues(new int[] { 5, 3 });
             bg = new BackgammonGame(initialGameBoard, fd);
-            fd.SetReturnValues(new int[] { 5,3});
+            
 
             //Get the legal moves for black's checkers on position 12
             HashSet<int> ActualLegalMoves = bg.GetLegalMovesFor(CheckerColor.Black, 12);
@@ -133,8 +135,9 @@ namespace UnitTest
                                             5, 0, 0, 0, -3,  0,
                                            -3, -2, 0, 0,  0,  2 };
 
-            this.bg = new BackgammonGame(gameBoard, fd);
             fd.SetReturnValues(new int[] { 4, 5 });
+            this.bg = new BackgammonGame(gameBoard, fd);
+            
 
             HashSet<int> ActualLegalMovesWhite = bg.GetLegalMovesFor(CheckerColor.White, 24);
             Assert.AreEqual(0, ActualLegalMovesWhite.Count);
@@ -182,8 +185,8 @@ namespace UnitTest
         [TestMethod]
         public void TestCannotMoveToPositionWithTwoOrMoreEnemyCheckers()
         {
-            bg = new BackgammonGame(initialGameBoard, fd);
             fd.SetReturnValues(new int[] { 5, 2 });
+            bg = new BackgammonGame(initialGameBoard, fd);
 
             //Given the initial board setup and the values 5 and 2 on the dice, 
             //white can only move to position 22 from position 24,
@@ -274,10 +277,12 @@ namespace UnitTest
             //removing a black checker at position 19. WILL BE RESET AFTER TEST
             initialGameBoard[19] += 1;
 
+            fd.SetReturnValues(new int[] { 6, 3 });
+
             //putting one black and one white checker on the bar
             bg = new BackgammonGame(initialGameBoard, fd, 1, 0, 1, 0);
 
-            fd.SetReturnValues(new int[] { 6, 3 });
+            
 
             //With the current setup, white should be able to move to positions 22, 16
             //and black to positions 3 and 9
@@ -333,8 +338,9 @@ namespace UnitTest
                                            0, 0, 0, 0,  0,  0,
                                            5, 0, 0, 0,  0,  0,
                                           -3, -3, -3, -3,  -3, 0 };
+            fd.SetReturnValues(new int[] { 2, 3 });
             bg = new BackgammonGame(gameBoard, fd);
-            fd.SetReturnValues( new int[] { 2, 3 } );
+
             //With this setup, both players should be able to bear off checkers that are two, three or five positions away
 
             HashSet<int> expectedLegalMovesBlack = HashSetFromArray(new int[] { 22, 23, BackgammonGame.BLACK_BEAR_OFF_ID } );
@@ -352,12 +358,14 @@ namespace UnitTest
         [TestMethod]
         public void TestCannotBearOffUsingOvershootIfCheckersFurtherAwayArePresent()
         {
+            
             int[] gameBoard = new int[] {  0, 3, 3, 3,  3,  3,
                                            0, 0, 0, 0,  0,  0,
                                            5, 0, 0, 0,  0,  0,
                                           -3, -3, -3, -3,  -3, 0 };
-            bg = new BackgammonGame(gameBoard, fd);
             fd.SetReturnValues(new int[] { 6, 4 });
+            bg = new BackgammonGame(gameBoard, fd);
+            
 
             HashSet<int> expectedWhiteMoves = HashSetFromArray(new int[] {1});
             HashSet<int> actualWhiteMoves = bg.GetLegalMovesFor(CheckerColor.White, 5);
@@ -377,8 +385,9 @@ namespace UnitTest
                                            0, 0, 0, 0,  0,  0,
                                            5, 0, 0, 0,  0,  0,
                                            0, -6, -3, -3,  -3, 0 };
-            bg = new BackgammonGame(gameBoard, fd);
             fd.SetReturnValues(new int[] { 6, 4 });
+            bg = new BackgammonGame(gameBoard, fd);
+            
 
             HashSet<int> expectedWhiteMoves = HashSetFromArray(new int[] { 1, BackgammonGame.WHITE_BEAR_OFF_ID});
             HashSet<int> actualWhiteMoves = bg.GetLegalMovesFor(CheckerColor.White, 5);
@@ -399,7 +408,7 @@ namespace UnitTest
         {
             bg = new BackgammonGame(initialGameBoard, fd);
             fd.SetReturnValues(new int[] {5,1});
-            bg.move(CheckerColor.White, 5, 5);
+            bg.move(CheckerColor.White, 6, 5);
         }
 
         [TestMethod]
@@ -412,14 +421,14 @@ namespace UnitTest
         }
 
         [TestMethod]
-        public void TestMoveUpdatesCheckersOnPositions()
+        public void TestMoveUpdatesCheckersOnPositionsWhite()
         {
+            fd.SetReturnValues(new int[] { 2, 3 });
             bg = new BackgammonGame(initialGameBoard, fd);
-            fd.SetReturnValues(new int[] { 2,3});
 
             bg.move(CheckerColor.White, 6, 3);
 
-            int[] actualResult = bg.GetGameBoard();
+            int[] actualResult = bg.GetGameBoardState().getMainBoard();
 
             int[] expectedResult =  new int[] { -2, 0, 1, 0,  0,  4,
                                                  0, 3, 0, 0,  0, -5,
@@ -427,17 +436,23 @@ namespace UnitTest
                                                - 5, 0, 0, 0,  0,  2 };
 
             Assert.IsTrue(Enumerable.SequenceEqual(actualResult, expectedResult));
+        }
 
+        [TestMethod]
+        public void TestMoveUpdatesCheckersOnPositionsBlack()
+        {
             fd.SetReturnValues(new int[] { 2, 3 });
+            bg = new BackgammonGame(initialGameBoard, fd, 0,0,0,0,CheckerColor.Black);
             bg.move(CheckerColor.Black, 19, 3);
-            actualResult = bg.GetGameBoard();
-            expectedResult =        new int[] { -2, 0, 1, 0,  0,  4,
+            int[] actualResult = bg.GetGameBoardState().getMainBoard();
+            int[] expectedResult = new int[] { -2, 0, 0, 0,  0,  5,
                                                  0, 3, 0, 0,  0, -5,
                                                  5, 0, 0, 0, -3,  0,
                                                - 4, 0, 0, -1,  0,  2 };
 
             Assert.IsTrue(Enumerable.SequenceEqual(actualResult, expectedResult));
         }
+
 
         [TestMethod]
         public void TestMoveToEnemyPositionWithOneCheckerCapturesCheckerWhite()
@@ -450,7 +465,7 @@ namespace UnitTest
             bg = new BackgammonGame(gameBoard, fd);
 
             bg.move(CheckerColor.White, 6, 4);
-            int[] actualResult = bg.GetGameBoard();
+            int[] actualResult = bg.GetGameBoardState().getMainBoard();
             int[] expectedResult =  new int[] { -1, 1, 0, 0,  0,  4,
                                                  0, 3, 0, 0,  0, -5,
                                                  5, 0, 0, 0, -3,  0,
@@ -458,7 +473,7 @@ namespace UnitTest
 
             Assert.IsTrue(Enumerable.SequenceEqual(actualResult, expectedResult), "Game boards are not equal");
 
-            Assert.IsTrue(bg.GetCheckersOnBar(CheckerColor.Black) == 1);
+            Assert.IsTrue(bg.GetGameBoardState().getBlackCheckersOnBar() == 1);
         }
 
         [TestMethod]
@@ -469,19 +484,17 @@ namespace UnitTest
                                                  5, 0, 0, 0, -3,  0,
                                                - 5, 0, 0, 0,  1,  1 };
             fd.SetReturnValues(new int[] { 3, 4 });
-            bg = new BackgammonGame(gameBoard, fd);
+            bg = new BackgammonGame(gameBoard, fd, 0,0,0,0, CheckerColor.Black);
 
             bg.move(CheckerColor.Black, 19, 4);
-            int[] actualResult = bg.GetGameBoard();
+            int[] actualResult = bg.GetGameBoardState().getMainBoard();
             int[] expectedResult = new int[] { -1, -1, 0, 0,  0,  5,
                                                  0, 3, 0, 0,  0, -5,
                                                  5, 0, 0, 0, -3,  0,
                                                - 4, 0, 0, 0,  -1,  1 };
 
             Assert.IsTrue(Enumerable.SequenceEqual(actualResult, expectedResult), "Game boards are not equal");
-            Assert.IsTrue(bg.GetCheckersOnBar(CheckerColor.White) == 1);
+            Assert.IsTrue(bg.GetGameBoardState().getWhiteCheckersOnBar() == 1);
         }
-
-        //test capture
     }
 }

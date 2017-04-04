@@ -21,11 +21,6 @@ namespace ModelDLL
             return DiceValues;
         }
 
-        public override int[] GetDiceValues()
-        {
-            return DiceValues;
-        }
-
         public void SetReturnValues(int[] diceValues)
         {
             this.DiceValues = diceValues;

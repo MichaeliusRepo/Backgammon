@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace ModelDLL
 {
-    public abstract class Dice
+    public interface Player
     {
-        public abstract int[] RollDice();
-  
+        void TurnStarted();
+        void TurnEnded();
     }
 }

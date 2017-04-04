@@ -44,10 +44,14 @@
     <Compile Include="CheckerColor.cs" />
     <Compile Include="BarPosition.cs" />
     <Compile Include="BearOffPosition.cs" />
+    <Compile Include="ViewInterface.cs" />
+    <Compile Include="GameBoardState.cs" />
     <Compile Include="Edge.cs" />
     <Compile Include="GameBoard.cs" />
     <Compile Include="FakeDice.cs" />
     <Compile Include="Dice.cs" />
+    <Compile Include="Player.cs" />
+    <Compile Include="PlayerInterface.cs" />
     <Compile Include="Position.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

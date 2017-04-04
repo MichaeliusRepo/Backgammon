@@ -200,7 +200,6 @@ namespace ModelDLL
             }
         }
 
-
         public int[] GetGameBoard()
         {
             int[] gameBoard = new int[positions.Length];
@@ -229,6 +228,13 @@ namespace ModelDLL
             return (color == CheckerColor.White ?
                 whiteBar.NumberOfCheckersOnPosition(CheckerColor.White) :
                 blackBar.NumberOfCheckersOnPosition(CheckerColor.Black));
+        }
+
+        public int GetCheckersOnTarget(CheckerColor color)
+        {
+            return (color == CheckerColor.White ?
+                whiteBearOff.NumberOfCheckersOnPosition(CheckerColor.White) :
+                blackBearOff.NumberOfCheckersOnPosition(CheckerColor.Black));
         }
 
         public HashSet<int> GetLegalMovesFor(CheckerColor color, int initialPosition, int[] moves)
