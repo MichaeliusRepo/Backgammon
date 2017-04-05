@@ -39,40 +39,42 @@ namespace Backgammon.Screen
 
     public class BoardScreen : GameScreen
     {
-        public Image Image = new Image { Path = "Images/Board", Position = new Vector2(540, 360) };
-        public Board board;
+        #region You have a right to privacy, and your rights are important because you do not know when you will need them.
+        private Image Image = new Image { Path = "Images/Board", Position = new Vector2(540, 360) };
+        private Board board;
         private FakeDice fakeDice;
-        public BackgammonGame Model;
-        //public PlayerInterface Player1 = new PlayerInterface(new GameBoard)
-        public ViewInterface ViewInterface;
-        public PlayerInterface WhitePlayer;
-        public PlayerInterface BlackPlayer; // inser race joke
-
-
-        // Temporary!
-        public List<int> temp1;
-
+        private BackgammonGame Model;
+        private ViewInterface ViewInterface;
+        private PlayerInterface WhitePlayer;
+        private PlayerInterface BlackPlayer;
         private CheckerColor CurrentPlayer;
+        private GameState State = GameState.PickChecker;
+        private List<int> MovableCheckers;
+        private List<int> PossibleDestinations;
+        private int SelectedPoint;
+        #endregion
 
         private void PlayerTurn()
         {
             Console.WriteLine(CurrentPlayer);
 
             List<int> getDice = ViewInterface.GetMoves();
-            Console.WriteLine(string.Join(", ", getDice));
+            Console.WriteLine("Dice Rolls: " + string.Join(", ", getDice));
 
-            List<int> MovableCheckers = ViewInterface.GetMoveableCheckers();
-            Console.WriteLine(string.Join(", ", MovableCheckers));
+            MovableCheckers = ViewInterface.GetMoveableCheckers();
+            Console.WriteLine("Movable Checkers: " + string.Join(", ", MovableCheckers));
 
             board.GlowPoints(MovableCheckers);
 
-            // TODO Click a checker here
-            if (CurrentPlayer == CheckerColor.White)
-                temp1 = ViewInterface.GetLegalMovesForCheckerAtPosition(24);
-            if (CurrentPlayer == CheckerColor.Black)
-                temp1 = ViewInterface.GetLegalMovesForCheckerAtPosition(17);
+            #region Who needs to read when one can simply watch? I farewell thy writing, lest you let me within thy world.
+            //// TODO Click a checker here
+            //if (CurrentPlayer == CheckerColor.White)
+            //    PossibleDestinations = ViewInterface.GetLegalMovesForCheckerAtPosition(24);
+            //if (CurrentPlayer == CheckerColor.Black)
+            //    PossibleDestinations = ViewInterface.GetLegalMovesForCheckerAtPosition(17);
 
-            Console.WriteLine(string.Join(", ", temp1));
+            //Console.WriteLine(string.Join(", ", PossibleDestinations));
+            #endregion
         }
 
         public override void LoadContent()
@@ -81,10 +83,13 @@ namespace Backgammon.Screen
             Image.LoadContent();
             int[] defaultGameBoard = BackgammonGame.DefaultGameBoard;
 
+            #region One day, I long to own a true dice in this fleeting, ephemeral manifistation of virtuality
             List<int[]> moves = new List<int[]>();
             moves.Add(new int[] { 5, 6 });
             moves.Add(new int[] { 2, 2 });
             fakeDice = new FakeDice(moves);
+            #endregion
+
             Model = new BackgammonGame(defaultGameBoard, fakeDice);
             board = new Board(defaultGameBoard);
             ViewInterface = new ViewInterface(Model);
@@ -101,45 +106,91 @@ namespace Backgammon.Screen
             Image.UnloadContent();
         }
 
+        private void PickChecker(int pointIndex)
+        {
+            board.HighlightChecker(pointIndex);
+            PossibleDestinations = ViewInterface.GetLegalMovesForCheckerAtPosition(pointIndex);
+            SetState(GameState.PickDestination);
+            SelectedPoint = pointIndex;
+        }
+
+        private void MoveChecker(int pointIndex)
+        {
+            if (CurrentPlayer == CheckerColor.White)
+                WhitePlayer.move(SelectedPoint, new List<int>() { 6, 5 });
+            else
+                BlackPlayer.move(SelectedPoint, new List<int>() { 6, 5 });
+
+            SetState(GameState.Animating);
+            board.StopGlowPoints();
+            board.RemoveCheckerHighlight();
+            board.MoveChecker(SelectedPoint, pointIndex);
+            Console.WriteLine(string.Join(", ", ViewInterface.GetGameBoardState().getMainBoard()));
+        }
+
+        private void SetState(GameState setTo)
+        {
+            State = setTo;
+            if (State == GameState.PickChecker)
+            {
+                board.GlowPoints(MovableCheckers);
+                board.RemoveCheckerHighlight();
+            }
+            if (State == GameState.PickDestination)
+                board.GlowPoints(PossibleDestinations);
+        }
+
         public override void Update(GameTime gameTime)
         {
-            // TODO Deal with inputs here
-            //if (InputManager.Instance.KeyPressed(Keys.Enter, Keys.Z))
-            //    ScreenManager.Instance.ChangeScreens("SettingsScreen");
-            //if (!Board.Points[0].ReturnTopChecker().moving && InputManager.Instance.KeyPressed(Keys.Enter, Keys.M))
-            //if (!board.Points[0].IsEmpty())
-            //    board.Points[0].Glow(true); // TEST - Delete this line
-            //else if (!board.Points[5].IsEmpty())
-            //    board.Points[5].Glow(true); // TEST - Delete this line
-
-            // Dummy method
-            if (InputManager.Instance.KeyPressed(Keys.Z))
+            int pointIndex = board.GetClickedPoint();
+            switch (State)
             {
-                board.PlaceGlow(24);
-                board.GlowPoints(temp1);
+                case GameState.Animating:
+                    if (!board.InAnimation)
+                        SetState(GameState.PickChecker);
+                    break;
+
+                case GameState.PickChecker:
+                    if (MovableCheckers.Contains(pointIndex))
+                        PickChecker(pointIndex);
+                    break;
+
+                case GameState.PickDestination:
+                    if (pointIndex == SelectedPoint) // Cancel selected checker
+                        SetState(GameState.PickChecker);
+                    else if (PossibleDestinations.Contains(pointIndex))
+                        MoveChecker(pointIndex);
+                    break;
             }
 
-            if (InputManager.Instance.KeyPressed(Keys.X))
-            {
-                WhitePlayer.move(24, new List<int>() { 6, 5 });
-                board.StopGlowPoints();
-                board.RemoveGlow();
-                board.MoveChecker(23, 12);
-                Console.WriteLine(string.Join(", ", ViewInterface.GetGameBoardState().getMainBoard()));
-            }
+            #region From a day long past, I remind thee with beautiful memories from whence we explored the depths of our dreams
+            //if (InputManager.Instance.KeyPressed(Keys.X))
+            //{
+            //    WhitePlayer.move(24, new List<int>() { 6, 5 });
+            //    board.StopGlowPoints();
+            //    board.RemoveGlow();
+            //    board.MoveChecker(24, 13);
+            //    Console.WriteLine(string.Join(", ", ViewInterface.GetGameBoardState().getMainBoard()));
+            //}
 
-            if (InputManager.Instance.KeyPressed(Keys.C))
-            {
-                //fakeDice.SetReturnValues(new int[] { 2,2});
-                PlayerTurn();
+            //if (InputManager.Instance.KeyPressed(Keys.Z))
+            //{
+            //    board.PlaceGlow(24);
+            //    board.GlowPoints(PossibleDestinations);
+            //}
 
-            }
+            //if (InputManager.Instance.KeyPressed(Keys.C))
+            //{
+            //    //fakeDice.SetReturnValues(new int[] { 2,2});
+            //    PlayerTurn();
 
-            if (InputManager.Instance.KeyPressed(Keys.V))
-            {
-                board.PlaceGlow(17);
-                board.GlowPoints(temp1);
-            }
+            //}
+
+            //if (InputManager.Instance.KeyPressed(Keys.V))
+            //{
+            //    board.PlaceGlow(17);
+            //    board.GlowPoints(PossibleDestinations);
+            //}
 
             //if (InputManager.Instance.KeyPressed(Keys.B))
             //{
@@ -150,9 +201,6 @@ namespace Backgammon.Screen
             //    Console.WriteLine(string.Join(", ", ViewInterface.GetGameBoardState().getMainBoard()));
             //}
 
-
-
-
             //if (InputManager.Instance.KeyPressed(Keys.Enter))
             //    //Board.Points[0].ReturnTopChecker().MoveToPosition(new Vector2(50, 60));
             //    if (!board.Points[0].IsEmpty())
@@ -162,6 +210,7 @@ namespace Backgammon.Screen
 
             //if (InputManager.Instance.KeyPressed(Keys.T))
             //    board.PlaceGlow(board.Points[7].GetTopChecker());
+            #endregion
 
             base.Update(gameTime);
             Image.Update(gameTime);
@@ -172,6 +221,13 @@ namespace Backgammon.Screen
         {
             Image.Draw(spriteBatch);
             board.Draw(spriteBatch);
+        }
+
+        private enum GameState
+        {
+            PickChecker,
+            PickDestination,
+            Animating
         }
     }
 }

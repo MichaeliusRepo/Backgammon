@@ -19,7 +19,6 @@ namespace Backgammon.Screen
         public Rectangle SourceRect;
         public bool IsActive = true;
 
-        [XmlIgnore]
         public Texture2D Texture;
         Vector2 origin;
         ContentManager content;
@@ -84,7 +83,9 @@ namespace Backgammon.Screen
 
         public Rectangle GetBounds()
         {
-            return Texture.Bounds;
+            Rectangle rectangle = Texture.Bounds;
+            rectangle.Offset(Position.X - (rectangle.Width/2), Position.Y - (rectangle.Height/2));
+            return rectangle;
         }
 
         public Image()

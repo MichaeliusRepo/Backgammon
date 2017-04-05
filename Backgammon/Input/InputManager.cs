@@ -12,6 +12,7 @@ namespace Backgammon.Input
     public class InputManager
     {
         KeyboardState currentKeyState, prevKeyState;
+        MouseState currentMouseState, prevMouseState;
 
         private static InputManager instance;
 
@@ -28,29 +29,32 @@ namespace Backgammon.Input
         public void Update()
         {
             prevKeyState = currentKeyState;
+            prevMouseState = currentMouseState;
             if (!ScreenManager.Instance.IsTransitioning)
+            {
                 currentKeyState = Keyboard.GetState();
+                currentMouseState = Mouse.GetState();
+            }
         }
 
-        public bool IsWithinBounds(Rectangle bounds)
+        private bool IsWithinBounds(Rectangle bounds)
         {
             return bounds.Contains(GetMousePosition());
         }
 
-        public Vector2 GetMousePosition()
+        public bool WasClicked(Rectangle bounds)
         {
-            var currentMouseState = Mouse.GetState();
-            return new Vector2(currentMouseState.X, currentMouseState.Y);
+            return MouseLeftPressed() && IsWithinBounds(bounds);
+        }
+
+        private Point GetMousePosition()
+        {
+            return currentMouseState.Position;
         }
 
         public bool MouseLeftPressed()
         {
-            return Mouse.GetState().LeftButton == ButtonState.Pressed;
-        }
-
-        public bool MouseLeftReleased()
-        {
-            return Mouse.GetState().LeftButton == ButtonState.Released;
+            return (currentMouseState.LeftButton == ButtonState.Released && prevMouseState.LeftButton == ButtonState.Pressed);
         }
 
         public bool KeyPressed(params Keys[] keys)

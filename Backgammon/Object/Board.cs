@@ -24,12 +24,12 @@ namespace Backgammon.Object
         private readonly static float rightX = 540 + leftX;
         private readonly static float botY = 720 + 6 - topY;
 
-
-
         private int[] gameBoard;
-        private Image Image = new Image() { Path = "Images/CheckerGlow", Effects = "FadeEffect", IsActive = false, Scale = new Vector2(2, 2) };
+        private Image Image = new Image() { Path = "Images/CheckerGlow", Effects = "FadeEffect", IsActive = false, Scale = new Vector2(1.2f, 1.2f) };
+        private Checker movingChecker;
 
         internal List<Point> Points { get; private set; }
+        public bool InAnimation { get; private set; }
 
         public Board(int[] board)
         {
@@ -40,8 +40,8 @@ namespace Backgammon.Object
 
         public void GlowPoints(List<int> list)
         {
-            for(int i = 0; i < Points.Count; i++)
-                Points[i].Glow(list.Contains(i+1));
+            for (int i = 0; i < Points.Count; i++)
+                Points[i].Glow(list.Contains(i + 1));
         }
 
         public void StopGlowPoints()
@@ -49,7 +49,7 @@ namespace Backgammon.Object
             GlowPoints(new List<int>());
         }
 
-        public void PlaceGlow(int i)
+        public void HighlightChecker(int i)
         {
             Checker c = Points[i - 1].GetTopChecker();
             Image.FadeEffect.FadeSpeed = 0.25f;
@@ -59,51 +59,27 @@ namespace Backgammon.Object
             Image.Position = c.Position;
         }
 
-        internal void RemoveGlow()
+        public void RemoveCheckerHighlight()
         {
             Image.IsActive = false;
         }
 
-        internal Point GetClickedPoint()
+        internal int GetClickedPoint()
         {
             foreach (Point p in Points)
-                if (InputManager.Instance.IsWithinBounds(p.GetBounds()))
-                    return p;
-            return null;
-        }
-
-        internal Checker GetClickedChecker()
-        {
-            List<Checker> list = getTopPoints();
-            foreach (Checker c in list)
-                if (InputManager.Instance.IsWithinBounds(c.GetBounds()))
-                    return c;
-            return null;
-        }
-
-        private List<Checker> getTopPoints()
-        {
-            List<Checker> list = new List<Checker>();
-            foreach (Point p in Points)
-                if (p.GetTopChecker() != null)
-                    list.Add(p.GetTopChecker());
-            return list;
-        }
-
-        internal void MoveChecker(Point from, Point to)
-        {
-            AudioManager.Instance.PlaySound("Checker");
-            if (from.IsEmpty())
-                throw new Exception();
-            from.SendToPoint(to);
+                if (InputManager.Instance.WasClicked(p.GetBounds()))
+                    return Points.IndexOf(p) + 1;
+            return -1;
         }
 
         public void MoveChecker(int from, int to)
         {
             AudioManager.Instance.PlaySound("Checker");
-            if (Points[from].IsEmpty())
+            if (Points[from - 1].IsEmpty())
                 throw new Exception();
-            Points[from].SendToPoint(Points[to]);
+            movingChecker = Points[from - 1].GetTopChecker();
+            InAnimation = true;
+            Points[from - 1].SendToPoint(Points[to - 1]);
         }
 
         private void createPoints()
@@ -145,6 +121,8 @@ namespace Backgammon.Object
 
         internal void Update(GameTime gameTime)
         {
+            if (InAnimation && !movingChecker.moving)
+                InAnimation = false;
             Image.Update(gameTime);
             foreach (Point p in Points)
                 p.Update(gameTime);
