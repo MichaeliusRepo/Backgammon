@@ -16,8 +16,6 @@ namespace Backgammon.Screen
     {
         protected ContentManager content;
 
-        public GameScreen() { }
-
         public virtual void LoadContent()
         {
             content = new ContentManager(ScreenManager.Instance.Content.ServiceProvider, "Content");

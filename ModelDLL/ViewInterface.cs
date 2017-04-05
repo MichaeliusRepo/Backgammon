@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ModelDLL
 {
-    class ViewInterface
+    public class ViewInterface
     {
         private readonly BackgammonGame bg;
 
@@ -36,7 +36,10 @@ namespace ModelDLL
             return bg.GetMoveableCheckers();
         }
 
-
+        public List<int> GetMoves()
+        {
+            return bg.GetMovesLeft();
+        }
 
     }
 }

@@ -35,19 +35,26 @@ namespace ModelDLL
             return bg.GetGameBoardState();
         }
 
-        public void move(int from, int distance)
+        public void move(int from, List<int> moves)
         {
-            bg.move(color, from, distance);
+            foreach(int i in moves)
+            {
+                bg.move(color, from, i);
+                from += (color == CheckerColor.White ? -i : i);
+            }
         }
 
         void TurnStarted()
         {
-            player.TurnStarted();
+            if (player != null)
+                player.TurnStarted();
         }
 
         void TurnEnded()
         {
-            player.TurnEnded();
+            if (player != null)
+                player.TurnEnded();
         }
+
     }
 }

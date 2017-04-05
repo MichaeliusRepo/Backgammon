@@ -12,10 +12,14 @@ namespace ModelDLL
 
 
 
-    
+
 
     public class BackgammonGame
     {
+        public static readonly int[] DefaultGameBoard = new int[] { -2, 0, 0, 0,  0,  5,
+                                            0, 3, 0, 0,  0, -5,
+                                            5, 0, 0, 0, -3,  0,
+                                           -5, 0, 0, 0,  0,  2 };
         public const int WHITE_BAR_ID = BarPosition.WHITE_BAR_ID;
         public const int BLACK_BAR_ID = BarPosition.BLACK_BAR_ID;
         public const int WHITE_BEAR_OFF_ID = BearOffPosition.WHITE_BEAR_OFF_ID;
@@ -70,7 +74,8 @@ namespace ModelDLL
             }
             gameBoard.move(color, from, distance, moves.ToArray());
             moves.Remove(distance);
-            if(moves.Count() == 0)
+            Console.WriteLine("Thre are " + moves.Count() + " moves left...");
+            if (moves.Count() == 0)
             {
                 changeTurns();
             }

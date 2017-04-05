@@ -24,33 +24,44 @@ namespace Backgammon.Object
         private readonly static float rightX = 540 + leftX;
         private readonly static float botY = 720 + 6 - topY;
 
-        private readonly int[] defaultGameBoard = new int[] { -2, 0, 0, 0,  0,  5,
-                                            0, 3, 0, 0,  0, -5,
-                                            5, 0, 0, 0, -3,  0,
-                                           -5, 0, 0, 0,  0,  2 };
+
 
         private int[] gameBoard;
-        private Image Image = new Image() { Path = "Images/CheckerGlow", Effects = "FadeEffect", IsActive = false };
+        private Image Image = new Image() { Path = "Images/CheckerGlow", Effects = "FadeEffect", IsActive = false, Scale = new Vector2(2, 2) };
 
         internal List<Point> Points { get; private set; }
 
         public Board(int[] board)
         {
-            if (board != null)
-                gameBoard = board;
-            else
-                gameBoard = defaultGameBoard;
+            gameBoard = board;
             createPoints();
             Image.LoadContent();
         }
 
-        internal void PlaceGlow(Checker c)
+        public void GlowPoints(List<int> list)
         {
+            for(int i = 0; i < Points.Count; i++)
+                Points[i].Glow(list.Contains(i+1));
+        }
+
+        public void StopGlowPoints()
+        {
+            GlowPoints(new List<int>());
+        }
+
+        public void PlaceGlow(int i)
+        {
+            Checker c = Points[i - 1].GetTopChecker();
             Image.FadeEffect.FadeSpeed = 0.25f;
             Image.FadeEffect.MinAlpha = 0.75f;
             Image.Alpha = 0.0f;
             Image.IsActive = Image.FadeEffect.Increase = (c != null);
             Image.Position = c.Position;
+        }
+
+        internal void RemoveGlow()
+        {
+            Image.IsActive = false;
         }
 
         internal Point GetClickedPoint()
@@ -85,6 +96,14 @@ namespace Backgammon.Object
             if (from.IsEmpty())
                 throw new Exception();
             from.SendToPoint(to);
+        }
+
+        public void MoveChecker(int from, int to)
+        {
+            AudioManager.Instance.PlaySound("Checker");
+            if (Points[from].IsEmpty())
+                throw new Exception();
+            Points[from].SendToPoint(Points[to]);
         }
 
         private void createPoints()

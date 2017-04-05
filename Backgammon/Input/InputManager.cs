@@ -43,6 +43,16 @@ namespace Backgammon.Input
             return new Vector2(currentMouseState.X, currentMouseState.Y);
         }
 
+        public bool MouseLeftPressed()
+        {
+            return Mouse.GetState().LeftButton == ButtonState.Pressed;
+        }
+
+        public bool MouseLeftReleased()
+        {
+            return Mouse.GetState().LeftButton == ButtonState.Released;
+        }
+
         public bool KeyPressed(params Keys[] keys)
         {
             foreach (Keys key in keys)
