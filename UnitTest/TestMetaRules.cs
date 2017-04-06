@@ -10,7 +10,7 @@ namespace UnitTest
     public class TestMetaRules
     {
 
-        BackgammonGame bg;
+       /* BackgammonGame bg;
         FakeDice fd;
         int[] initialGameBoard;
         Player player1;
@@ -98,6 +98,6 @@ namespace UnitTest
             movesLeft = white.GetMovesLeft();
             Assert.AreEqual(1, movesLeft.Count());
             Assert.IsTrue(movesLeft.Contains(1));
-        }
+        }*/
     }
 }

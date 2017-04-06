@@ -20,16 +20,23 @@ namespace ModelDLL
                                             0, 3, 0, 0,  0, -5,
                                             5, 0, 0, 0, -3,  0,
                                            -5, 0, 0, 0,  0,  2 };
-        public const int WHITE_BAR_ID = BarPosition.WHITE_BAR_ID;
-        public const int BLACK_BAR_ID = BarPosition.BLACK_BAR_ID;
-        public const int WHITE_BEAR_OFF_ID = BearOffPosition.WHITE_BEAR_OFF_ID;
-        public const int BLACK_BEAR_OFF_ID = BearOffPosition.BLACK_BEAR_OFF_ID;
+
+        private const CheckerColor WHITE = CheckerColor.White;
+        private const CheckerColor BLACK = CheckerColor.Black;
+        public static readonly int WHITE_BAR_ID = WHITE.GetBar();
+        public static readonly int BLACK_BAR_ID = BLACK.GetBar();
+        public const int WHITE_BEAR_OFF_ID = 71524733;
+        public const int BLACK_BEAR_OFF_ID = 91241467;
+        public const int MAX_MOVE_DISTANCE_ACCEPTED = 6;
 
 
         private CheckerColor turnColor;
         private Dice dice;
-        private GameBoard gameBoard;
+        //private GameBoard gameBoard;
         private List<int> moves;
+
+
+        private GameBoardState currentGameBoardState;
 
         public BackgammonGame(int[] gameBoard, Dice dice, int whiteCheckersOnBar, int whiteCheckersBoreOff,
                              int blackCheckersOnBar, int blackCheckersBoreOff, CheckerColor playerToMove)
@@ -51,20 +58,24 @@ namespace ModelDLL
         private void initialize(int[] gameBoard, Dice dice, int whiteCheckersOnBar, int whiteCheckersBoreOff,
                              int blackCheckersOnBar, int blackCheckersBoreOff, CheckerColor playerToMove)
         {
-            this.gameBoard = new ModelDLL.GameBoard(gameBoard, whiteCheckersOnBar, whiteCheckersBoreOff, blackCheckersOnBar, blackCheckersBoreOff);
+          //  this.gameBoard = new ModelDLL.GameBoard(gameBoard, whiteCheckersOnBar, whiteCheckersBoreOff, blackCheckersOnBar, blackCheckersBoreOff);
             this.turnColor = playerToMove;
             this.dice = dice;
             recalculateMoves();
+
+            this.currentGameBoardState = new GameBoardState(gameBoard, whiteCheckersOnBar, whiteCheckersBoreOff, blackCheckersOnBar, blackCheckersBoreOff);
         }
 
         public HashSet<int> GetLegalMovesFor(CheckerColor color, int initialPosition)
         {
-            return gameBoard.GetLegalMovesFor(color, initialPosition, moves.ToArray());
+            MoveTreeState root = new MoveTreeState(currentGameBoardState, color, initialPosition, GetMovesLeft());
+            return root.GetReachablePositions();
+            
         }
 
         public void move(CheckerColor color, int from, int distance)
         {
-            if(turnColor != color)
+            /*if(turnColor != color)
             {
                 throw new InvalidOperationException("Player " + color.ToString() + " tried to move when it was not his turn");
             }
@@ -78,13 +89,13 @@ namespace ModelDLL
             if (moves.Count() == 0)
             {
                 changeTurns();
-            }
+            }*/
         }
 
         private void changeTurns()
         {
-            recalculateMoves();
-            turnColor = (turnColor == CheckerColor.White ? CheckerColor.Black : CheckerColor.White); 
+            //recalculateMoves();
+            //turnColor = (turnColor == CheckerColor.White ? CheckerColor.Black : CheckerColor.White); 
         }
 
         public List<int> GetMovesLeft()
@@ -94,11 +105,12 @@ namespace ModelDLL
 
         public GameBoardState GetGameBoardState()
         {
-            return new GameBoardState(gameBoard.GetGameBoard(),
+            return currentGameBoardState;
+            /*return new GameBoardState(gameBoard.GetGameBoard(),
                                       gameBoard.GetCheckersOnBar(CheckerColor.White),
                                       gameBoard.GetCheckersOnTarget(CheckerColor.White),
                                       gameBoard.GetCheckersOnBar(CheckerColor.Black),
-                                      gameBoard.GetCheckersOnTarget(CheckerColor.Black));
+                                      gameBoard.GetCheckersOnTarget(CheckerColor.Black));*/
                 
         }
 

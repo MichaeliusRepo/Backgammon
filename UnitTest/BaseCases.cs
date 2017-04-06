@@ -84,6 +84,9 @@ namespace UnitTest
             
         }
 
+
+
+        
         [TestMethod]
         public void TestGetLegalMovesForWhite()
         {
@@ -101,7 +104,9 @@ namespace UnitTest
             Assert.IsTrue(ActualLegalMoves.SetEquals(ExpectedLegalMoves));
 
         }
+        
 
+        
         [TestMethod]
         public void TestGetLegalMovesForBlack()
         {
@@ -117,6 +122,7 @@ namespace UnitTest
             HashSet<int> ExpectedLegalMoves = HashSetFromArray(new int[] { 15, 17, 20 });
             Assert.IsTrue(ActualLegalMoves.SetEquals(ExpectedLegalMoves));
         }
+        
 
 
         /*
@@ -124,6 +130,8 @@ namespace UnitTest
          * 4th and 3rd position from the player are blocked, then the 7th should also be unreachable. Therefore, no 
          * positions should be reachable. This test ensures that is the case.
          * */
+
+        
         [TestMethod]
         public void TestPositionIsUnreachableIfRoadIsBlocked()
         {
@@ -146,7 +154,7 @@ namespace UnitTest
             Assert.AreEqual(0, ActualLegalMovesBlack.Count);
         }
 
-
+        
         //Checking that there are no legal moves from a point where there is no
         //Checker for that player
         [TestMethod]
@@ -182,6 +190,7 @@ namespace UnitTest
             Assert.IsTrue(legalMovesBlack.Count == 0);
         }
 
+        
         [TestMethod]
         public void TestCannotMoveToPositionWithTwoOrMoreEnemyCheckers()
         {
@@ -213,7 +222,7 @@ namespace UnitTest
 
         }
 
-
+        
         [TestMethod]
         public void TestCannotMoveCheckersOutsideGameBoard()
         {
@@ -241,6 +250,7 @@ namespace UnitTest
             Assert.IsTrue(actualLegalMovesBlack.Count == 0);
         }
 
+        
         [TestMethod]
         public void TestCannotMoveCheckersOnBoardWhenHasCheckerOnBar()
         {
@@ -248,7 +258,7 @@ namespace UnitTest
             initialGameBoard[5] -= 1;
 
             //removing a black checker at position 19. WILL BE RESET AFTER TEST
-            initialGameBoard[19] += 1;
+            initialGameBoard[18] += 1;
 
             //putting one black and one white checker on the bar
             bg = new BackgammonGame(initialGameBoard, fd, 1, 0, 1, 0);
@@ -268,6 +278,7 @@ namespace UnitTest
 
         }
         
+        
         [TestMethod]
         public void TestGetLegalMovesForCheckersOnBar()
         {
@@ -275,7 +286,7 @@ namespace UnitTest
             initialGameBoard[5] -= 1;
 
             //removing a black checker at position 19. WILL BE RESET AFTER TEST
-            initialGameBoard[19] += 1;
+            initialGameBoard[18] += 1;
 
             fd.SetReturnValues(new int[] { 6, 3 });
 
@@ -290,18 +301,17 @@ namespace UnitTest
             HashSet<int> actualLegalMovesBlack =
                 bg.GetLegalMovesFor(CheckerColor.Black, BackgammonGame.BLACK_BAR_ID);
 
-
-            Console.WriteLine(string.Join(", ", actualLegalMovesBlack));
-
             Assert.IsTrue(actualLegalMovesBlack.SetEquals(expectedLegalMovesBlack));
+
 
             HashSet<int> expectedLegalMovesWhite = HashSetFromArray(new int[] { 22, 16 });
             HashSet<int> actualLegalMovesWhite =
-                bg.GetLegalMovesFor(CheckerColor.White, BackgammonGame.WHITE_BAR_ID);
+               bg.GetLegalMovesFor(CheckerColor.White, BackgammonGame.WHITE_BAR_ID);
 
             Assert.IsTrue(actualLegalMovesWhite.SetEquals(expectedLegalMovesWhite));
         }
 
+        
         [TestMethod]
         public void TestGetWhiteMovesFromBlackBarEmptyAndViceVersa()
         {
@@ -349,12 +359,16 @@ namespace UnitTest
             Assert.IsTrue(expectedLegalMovesBlack.SetEquals(actualLegalMovesBlack));
         }
 
+        
+
 
         /*
          * Sometimes, a checker can be bore off if the eyes on the dice are greater than the distance to the bear off position.
          * For instance, if you have a checker on position 5, and you get a 6 on a die, you can bear off the checker on position 5
          * if you don't have a checker on position 6. This test checks that this criteria is maintained.
          */
+
+        /*
         [TestMethod]
         public void TestCannotBearOffUsingOvershootIfCheckersFurtherAwayArePresent()
         {
@@ -496,5 +510,7 @@ namespace UnitTest
             Assert.IsTrue(Enumerable.SequenceEqual(actualResult, expectedResult), "Game boards are not equal");
             Assert.IsTrue(bg.GetGameBoardState().getWhiteCheckersOnBar() == 1);
         }
+
+        */
     }
 }
