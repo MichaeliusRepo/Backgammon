@@ -25,8 +25,8 @@ namespace ModelDLL
         private const CheckerColor BLACK = CheckerColor.Black;
         public static readonly int WHITE_BAR_ID = WHITE.GetBar();
         public static readonly int BLACK_BAR_ID = BLACK.GetBar();
-        public const int WHITE_BEAR_OFF_ID = 71524733;
-        public const int BLACK_BEAR_OFF_ID = 91241467;
+        public static readonly int WHITE_BEAR_OFF_ID = WHITE.BearOffPositionID();
+        public static readonly int BLACK_BEAR_OFF_ID = BLACK.BearOffPositionID();
         public const int MAX_MOVE_DISTANCE_ACCEPTED = 6;
 
 

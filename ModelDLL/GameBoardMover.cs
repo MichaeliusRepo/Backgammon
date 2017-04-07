@@ -13,7 +13,7 @@ namespace ModelDLL
         private static CheckerColor BLACK = CheckerColor.Black;
 
 
-        // *** This is the most important method in this class. Start reading the code here. ***
+        // *** This is the central method in this class. Start reading the code here. ***
         public static GameBoardState Move(GameBoardState state, CheckerColor color, int from, int distance)
         {
             if (!IsLegalMove(state, color, from, distance))
@@ -29,7 +29,7 @@ namespace ModelDLL
         {
             int targetPosition = GetPositionAfterMove(color, from, distance);
             return IsLegalToMoveFromPosition(state, color, from) &&
-                   IsLegalToMoveToPosition(state, color, targetPosition); 
+                   IsLegalToMoveToPosition(state, color, from, targetPosition); 
         }
 
         static bool IsLegalToMoveFromPosition(GameBoardState state, CheckerColor color, int position)
@@ -61,16 +61,26 @@ namespace ModelDLL
         }
 
 
-        static bool IsLegalToMoveToPosition(GameBoardState state, CheckerColor color, int position)
+        static bool IsLegalToMoveToPosition(GameBoardState state, CheckerColor color, int from, int targetPosition)
         {
-            //Return false if the target position is outside the board
-            if (position < 1) return false;
-            if (position > GameBoardState.NUMBER_OF_POSITIONS_ON_BOARD) return false;
+            if(targetPosition <= WHITE.BearOffPositionWithRegardsToBoard() ||
+               targetPosition >= BLACK.BearOffPositionWithRegardsToBoard() )
+            {
+                return IsLegalToBearOff(state, color, targetPosition, from);
+            }
 
             //Otherwise, there has to be less than two enemy checkers on the position.
-            return PositionIsOpen(state, color, position);
+            return PositionIsOpen(state, color, targetPosition);
         }
 
+        private static bool IsLegalToBearOff(GameBoardState state, CheckerColor color, int from, int to)
+        {
+            if (to != color.BearOffPositionWithRegardsToBoard())
+            {
+                return false;
+            }
+            return true;
+        }
 
 
         //Checks whether or not there are less than two enemy checkers on the given position
@@ -112,6 +122,13 @@ namespace ModelDLL
                 return state
                     .WhereCheckerIsRemovedFromBar(color)
                     .WhereCheckerIsAddedToPosition(color, to);
+            }
+
+            if(to == color.BearOffPositionID())
+            {
+                return state
+                    .WhereCheckerIsRemovedFromPosition(color, from)
+                    .WhereCheckerIsAddedToTarget(color);
             }
 
             return state

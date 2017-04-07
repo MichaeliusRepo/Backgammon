@@ -11,6 +11,8 @@ namespace ModelDLL
     {
         public const int WHITE_BAR_ID = 151357818;
         public const int BLACK_BAR_ID = 612345638;
+        public const int BEAR_OFF_WHITE_ID = 71524733;
+        public const int BEAR_OFF_BLACK_ID = 91241467;
 
         public static int GetBar(this CheckerColor color)
         {
@@ -40,6 +42,16 @@ namespace ModelDLL
         public static int BarPositionWithRegardsToBoard(this CheckerColor color)
         {
             return (color == CheckerColor.White ? GameBoardState.NUMBER_OF_POSITIONS_ON_BOARD + 1 : 0);
+        }
+
+        public static int BearOffPositionWithRegardsToBoard(this CheckerColor color)
+        {
+            return (color == CheckerColor.White? 0 : GameBoardState.NUMBER_OF_POSITIONS_ON_BOARD+1);
+        }
+
+        public static int BearOffPositionID(this CheckerColor color)
+        {
+            return (color == CheckerColor.White ? BEAR_OFF_WHITE_ID : BEAR_OFF_BLACK_ID);
         }
     }
 

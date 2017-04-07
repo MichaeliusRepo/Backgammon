@@ -106,6 +106,23 @@ namespace ModelDLL
             return WithCheckersOnBar(color, getCheckersOnBar(color) - 1);
         }
 
+        internal GameBoardState WithCheckersOnBearOffPosition(CheckerColor color, int number)
+        {
+            int updatedWhiteCheckers = (color == CheckerColor.White ? number : this.whiteCheckersOnTarget);
+            int updatedBlackCheckers = (color == CheckerColor.Black ? number : this.blackCheckersOnTarget);
+            return new GameBoardState(getMainBoard(), 
+                                      whiteCheckersOnBar, 
+                                      updatedWhiteCheckers,
+                                      blackCheckersOnBar, 
+                                      updatedBlackCheckers,
+                                      false);
+        }
+
+        internal GameBoardState WhereCheckerIsAddedToTarget(CheckerColor color)
+        {
+            return WithCheckersOnBearOffPosition(color, getCheckersOnTarget(color) + 1);
+        }
+
         public int[] getMainBoard()
         {
             int[] copy = new int[mainBoard.Length];

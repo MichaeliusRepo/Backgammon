@@ -346,7 +346,7 @@ namespace UnitTest
         {
             int[] gameBoard = new int[] {  0, 3, 3, 3,  3,  3,
                                            0, 0, 0, 0,  0,  0,
-                                           5, 0, 0, 0,  0,  0,
+                                           0, 0, 0, 0,  0,  0,
                                           -3, -3, -3, -3,  -3, 0 };
             fd.SetReturnValues(new int[] { 2, 3 });
             bg = new BackgammonGame(gameBoard, fd);
@@ -355,6 +355,7 @@ namespace UnitTest
 
             HashSet<int> expectedLegalMovesBlack = HashSetFromArray(new int[] { 22, 23, BackgammonGame.BLACK_BEAR_OFF_ID } );
             HashSet<int> actualLegalMovesBlack = bg.GetLegalMovesFor(CheckerColor.Black, 20);
+            Console.WriteLine(string.Join(", ", actualLegalMovesBlack));
 
             Assert.IsTrue(expectedLegalMovesBlack.SetEquals(actualLegalMovesBlack));
         }
