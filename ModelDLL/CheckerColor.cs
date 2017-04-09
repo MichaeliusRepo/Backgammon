@@ -13,6 +13,9 @@ namespace ModelDLL
         public const int BLACK_BAR_ID = 612345638;
         public const int BEAR_OFF_WHITE_ID = 71524733;
         public const int BEAR_OFF_BLACK_ID = 91241467;
+        internal const int OVERFLOW_BEAR_OFF_WHITE_ID = 3967124;
+        internal const int OVERFLOW_BEAR_OFF_BLACK_ID = 5124626;
+        
 
         public static int GetBar(this CheckerColor color)
         {
@@ -52,6 +55,23 @@ namespace ModelDLL
         public static int BearOffPositionID(this CheckerColor color)
         {
             return (color == CheckerColor.White ? BEAR_OFF_WHITE_ID : BEAR_OFF_BLACK_ID);
+        }
+
+        internal static int OverflowBearOffID(this CheckerColor color)
+        {
+            return (color == CheckerColor.White ? OVERFLOW_BEAR_OFF_WHITE_ID : OVERFLOW_BEAR_OFF_BLACK_ID);
+        }
+
+        public static Tuple<int, int> HomeBoardRange(this CheckerColor color)
+        {
+            return color == CheckerColor.White ?
+                       new Tuple<int, int>(1, 6)  :
+                       new Tuple<int, int>(19, 24);
+        }
+
+        public static CheckerColor OppositeColor(this CheckerColor color)
+        {
+            return (color == CheckerColor.White ? CheckerColor.Black : CheckerColor.White);
         }
     }
 

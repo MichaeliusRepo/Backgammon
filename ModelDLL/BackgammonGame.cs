@@ -38,6 +38,8 @@ namespace ModelDLL
 
         private GameBoardState currentGameBoardState;
 
+
+        //Constructors
         public BackgammonGame(int[] gameBoard, Dice dice, int whiteCheckersOnBar, int whiteCheckersBoreOff,
                              int blackCheckersOnBar, int blackCheckersBoreOff, CheckerColor playerToMove)
         {
@@ -66,6 +68,8 @@ namespace ModelDLL
             this.currentGameBoardState = new GameBoardState(gameBoard, whiteCheckersOnBar, whiteCheckersBoreOff, blackCheckersOnBar, blackCheckersBoreOff);
         }
 
+        //Constructors end
+
         public HashSet<int> GetLegalMovesFor(CheckerColor color, int initialPosition)
         {
             MoveTreeState root = new MoveTreeState(currentGameBoardState, color, initialPosition, GetMovesLeft());
@@ -73,23 +77,13 @@ namespace ModelDLL
             
         }
 
-        public void move(CheckerColor color, int from, int distance)
+        public void Move(CheckerColor color, int from, int distance)
         {
-            /*if(turnColor != color)
+            if( !GameBoardMover.IsLegalMove(currentGameBoardState, color, from, distance))
             {
-                throw new InvalidOperationException("Player " + color.ToString() + " tried to move when it was not his turn");
+                throw new InvalidOperationException("The specified move is illegal"); 
             }
-            if (!moves.Contains(distance))
-            {
-                throw new InvalidOperationException("A move of that magnitude is not avalable");
-            }
-            gameBoard.move(color, from, distance, moves.ToArray());
-            moves.Remove(distance);
-            Console.WriteLine("Thre are " + moves.Count() + " moves left...");
-            if (moves.Count() == 0)
-            {
-                changeTurns();
-            }*/
+            currentGameBoardState = GameBoardMover.Move(currentGameBoardState, color, from, distance);
         }
 
         private void changeTurns()
@@ -98,22 +92,23 @@ namespace ModelDLL
             //turnColor = (turnColor == CheckerColor.White ? CheckerColor.Black : CheckerColor.White); 
         }
 
+
+        //Returns the list of moves that remains to be used
         public List<int> GetMovesLeft()
         {
             return new List<int>(moves);
         }
 
+
+        //Returns the current state of the game
         public GameBoardState GetGameBoardState()
         {
             return currentGameBoardState;
-            /*return new GameBoardState(gameBoard.GetGameBoard(),
-                                      gameBoard.GetCheckersOnBar(CheckerColor.White),
-                                      gameBoard.GetCheckersOnTarget(CheckerColor.White),
-                                      gameBoard.GetCheckersOnBar(CheckerColor.Black),
-                                      gameBoard.GetCheckersOnTarget(CheckerColor.Black));*/
-                
         }
 
+
+        //Returns a set of integers, representing the positions from which a checker can be moved
+        //based on the state of the game and the remaining moves
         public List<int> GetMoveableCheckers()
         {
             List<int> output = new List<int>();

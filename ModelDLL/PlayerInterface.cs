@@ -39,7 +39,7 @@ namespace ModelDLL
         {
             foreach(int i in moves)
             {
-                bg.move(color, from, i);
+                bg.Move(color, from, i);
                 from += (color == CheckerColor.White ? -i : i);
             }
         }
