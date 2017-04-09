@@ -19,9 +19,6 @@ namespace UnitTest
         private int[] emptyArray = new int[0];
         private int[] initialGameBoard;
 
-
-        //var b = new BackgammonGame();
-
         [TestInitialize]
         public void Initialize()
         {
@@ -455,7 +452,7 @@ namespace UnitTest
             fd.SetReturnValues(new int[] { 5, 1 });
             bg = new BackgammonGame(initialGameBoard, fd);
 
-            bg.Move(WHITE, 6, 5);
+            bg.Move(WHITE, 6, 1);
         }
 
         //Test that an exception is thrown if the attempted move is illegal
@@ -465,7 +462,7 @@ namespace UnitTest
         {
             fd.SetReturnValues(new int[] { 5, 1 });
             bg = new BackgammonGame(initialGameBoard, fd);
-            bg.Move(BLACK, 19, 5);
+            bg.Move(BLACK, 19, 24);
         }
 
 
@@ -494,7 +491,7 @@ namespace UnitTest
         {
             fd.SetReturnValues(new int[] { 2, 3 });
             bg = new BackgammonGame(initialGameBoard, fd, 0,0,0,0,BLACK);
-            bg.Move(BLACK, 19, 3);
+            bg.Move(BLACK, 19, 22);
             int[] actualResult = bg.GetGameBoardState().getMainBoard();
             int[] expectedResult = new int[] { -2, 0, 0, 0,  0,  5,
                                                  0, 3, 0, 0,  0, -5,
@@ -516,7 +513,7 @@ namespace UnitTest
             fd.SetReturnValues(new int[] { 3,4});
             bg = new BackgammonGame(gameBoard, fd);
 
-            bg.Move(WHITE, 6, 4);
+            bg.Move(WHITE, 6, 2);
             int[] actualResult = bg.GetGameBoardState().getMainBoard();
             int[] expectedResult =  new int[] { -1, 1, 0, 0,  0,  4,
                                                  0, 3, 0, 0,  0, -5,
@@ -539,7 +536,7 @@ namespace UnitTest
             fd.SetReturnValues(new int[] { 3, 4 });
             bg = new BackgammonGame(gameBoard, fd, 0,0,0,0, BLACK);
 
-            bg.Move(BLACK, 19, 4);
+            bg.Move(BLACK, 19, 23);
             int[] actualResult = bg.GetGameBoardState().getMainBoard();
             int[] expectedResult = new int[] { -1, -1, 0, 0,  0,  5,
                                                  0, 3, 0, 0,  0, -5,
@@ -550,5 +547,77 @@ namespace UnitTest
             Assert.IsTrue(bg.GetGameBoardState().getWhiteCheckersOnBar() == 1);
         }
 
+        [TestMethod]
+        public void TestMoveConsistingOfMultipleMovesWhite()
+        {
+            fd.SetReturnValues(new int[] {3,1});
+            bg = new BackgammonGame(initialGameBoard, fd);
+
+            bg.Move(WHITE, 6, 2);
+
+            int[] expectedGameBoard = new int[] { -2, 1, 0, 0,  0,  4,
+                                                   0, 3, 0, 0,  0, -5,
+                                                   5, 0, 0, 0, -3,  0,
+                                                  -5, 0, 0, 0,  0,  2 };
+
+            int[] actualGameBoard = bg.GetGameBoardState().getMainBoard();
+
+            Assert.IsTrue(Enumerable.SequenceEqual(expectedGameBoard, actualGameBoard));
+        }
+
+        [TestMethod]
+        public void TestMoveConsistingOfMultipleMovesBlack()
+        {
+            fd.SetReturnValues(new int[] { 3, 1 });
+            bg = new BackgammonGame(initialGameBoard, fd, 0,0,0,0, BLACK);
+
+            bg.Move(BLACK, 19, 23);
+
+            int[] expectedGameBoard = new int[] { -2, 0, 0, 0,  0,  5,
+                                                   0, 3, 0, 0,  0, -5,
+                                                   5, 0, 0, 0, -3,  0,
+                                                  -4, 0, 0, 0, -1,  2 };
+
+            int[] actualGameBoard = bg.GetGameBoardState().getMainBoard();
+
+            Assert.IsTrue(Enumerable.SequenceEqual(expectedGameBoard, actualGameBoard));
+        }
+
+        //Whenever there are multiple ways to get from one position to another, and one of the ways captures a checker
+        //While the others do not, the way capturing a checker is to be prioritized 
+        [TestMethod]
+        public void TestMoveConsistingOfMultipleMovesPrioritisesCapturingChecker()
+        {
+            int[] gameBoard =         new int[] { -1, 0, 0, -1,  0,  5,
+                                                   0, 3, 0,  0,  0, -5,
+                                                   5, 0, 0,  0, -3,  0,
+                                                  -5, 0, 0,  0,  0,  2 };
+
+            fd.SetReturnValues(new int[] { 1, 2 });
+            bg = new BackgammonGame(gameBoard, fd);
+
+            bg.Move(WHITE, 6, 3);
+
+            int[] expectedGameBoard = new int[] { -1, 0, 1, 0,  0,  4,
+                                                   0, 3, 0, 0,  0, -5,
+                                                   5, 0, 0, 0, -3,  0,
+                                                  -5, 0, 0, 0,  0,  2 };
+
+            int[] actualGameBoard = bg.GetGameBoardState().getMainBoard();
+
+            Assert.IsTrue(Enumerable.SequenceEqual(expectedGameBoard, actualGameBoard));
+            Assert.IsTrue(bg.GetGameBoardState().getCheckersOnBar(BLACK) == 1);
+        }
+
+        [TestMethod]
+        public void TestIndividualMovesMadeForLastMove()
+        {
+            fd.SetReturnValues(new int[] { 1, 2 });
+            bg = new BackgammonGame(initialGameBoard, fd);
+            bg.Move(WHITE, 6, 3);
+
+            //TODO IMPLEMENT THIS
+            Assert.IsTrue(false);
+        }
     }
 }

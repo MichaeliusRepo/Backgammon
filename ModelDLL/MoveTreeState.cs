@@ -45,7 +45,7 @@ namespace ModelDLL
         {
             HashSet<int> output = new HashSet<int>();
             GetReachablePositionsRecursion(output);
-            output.Remove(this.position);
+            output.Remove(position);
             return output;
         }
 
@@ -61,8 +61,66 @@ namespace ModelDLL
             }
         }
 
+        internal bool LegalToMoveToPosition(int position)
+        {
+            return GetReachablePositions().Contains(position);
+        }
 
+        internal GameBoardState MoveToPosition(int position)
+        {
+            if (!LegalToMoveToPosition(position))
+            {
+                throw new InvalidOperationException("Illegal move to position: " + position);
+            }
 
+            return GetStatesBelongingToPosition(position);
+        }
 
+        private GameBoardState GetStatesBelongingToPosition(int position)
+        {
+            List<GameBoardState> states = new List<GameBoardState>();
+
+            GetStatesBelongingToPositionRecursive(position, states);
+
+            return SelectBestAlternative(states);
+        }
+
+        private GameBoardState SelectBestAlternative(List<GameBoardState> states)
+        {
+            if(states.Count() == 1)
+            {
+                return states[0];
+            }
+            CheckerColor opponent = color.OppositeColor();
+            GameBoardState best = states[0];
+            foreach(GameBoardState state in states)
+            {
+                if(state.getCheckersOnBar(opponent) > best.getCheckersOnBar(opponent))
+                {
+                    best = state;
+                }
+            }
+
+            return best;
+        }
+
+        private void GetStatesBelongingToPositionRecursive(int position, List<GameBoardState> states)
+        {
+            if(this.position == position)
+            {
+                states.Add(this.state);
+                return;
+            }
+            else
+            {
+                foreach(MoveTreeState mts in resultingStates)
+                {
+                    if(mts != null)
+                    {
+                        mts.GetStatesBelongingToPositionRecursive(position, states);
+                    }
+                }
+            }
+        }
     }
 }

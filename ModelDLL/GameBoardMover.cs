@@ -17,22 +17,15 @@ namespace ModelDLL
         public static GameBoardState Move(GameBoardState state, CheckerColor color, int initialPosiion, int distance)
         {
             int targetPosition = GetAbsolutePositionAfterMove(color, initialPosiion, distance);
-            if (IsLegalMoveInternal(state, color, initialPosiion, targetPosition))
+            if (IsLegalMove(state, color, initialPosiion, targetPosition))
             {
                 return MoveChecker(state, color, initialPosiion, targetPosition);
             }
             else return null;
         }
 
-
-        //Given a state, color, orignal position and travel distance, checks if the specified move is legal
-        public static bool IsLegalMove(GameBoardState state, CheckerColor color, int from, int distance)
-        {
-            return Move(state, color, from, distance) != null;
-        }
-
         //Given a state, color, origin position and target position, checks if the specified move is legal
-        private static bool IsLegalMoveInternal(GameBoardState state, CheckerColor color, int from, int targetPosition)
+        public static bool IsLegalMove(GameBoardState state, CheckerColor color, int from, int targetPosition)
         {
             Position fromPosition = GetPosition(from);
             Position toPosition = GetPosition(targetPosition);
@@ -67,7 +60,7 @@ namespace ModelDLL
         // Throws an exception if the move is illegal. 
         static GameBoardState MoveChecker(GameBoardState state, CheckerColor color, int from, int to)
         {
-            if (!IsLegalMoveInternal(state, color, from, to))
+            if (!IsLegalMove(state, color, from, to))
             {
                 throw new InvalidOperationException("The specified move is illegal");
             }

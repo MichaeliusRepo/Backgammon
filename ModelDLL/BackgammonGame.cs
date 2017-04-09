@@ -77,13 +77,17 @@ namespace ModelDLL
             
         }
 
-        public void Move(CheckerColor color, int from, int distance)
+        public void Move(CheckerColor color, int from, int targetPosition)
         {
-            if( !GameBoardMover.IsLegalMove(currentGameBoardState, color, from, distance))
+            MoveTreeState mts = new MoveTreeState(currentGameBoardState, color, from, moves);
+            if (mts.LegalToMoveToPosition(targetPosition))
             {
-                throw new InvalidOperationException("The specified move is illegal"); 
+                currentGameBoardState = mts.MoveToPosition(targetPosition);
             }
-            currentGameBoardState = GameBoardMover.Move(currentGameBoardState, color, from, distance);
+            else
+            {
+                throw new InvalidOperationException("The move is illegal");
+            }
         }
 
         private void changeTurns()
@@ -108,7 +112,7 @@ namespace ModelDLL
 
 
         //Returns a set of integers, representing the positions from which a checker can be moved
-        //based on the state of the game and the remaining moves
+        //based on the state of the game and the remina
         public List<int> GetMoveableCheckers()
         {
             List<int> output = new List<int>();
