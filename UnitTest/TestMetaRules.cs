@@ -30,7 +30,7 @@ namespace UnitTest
                                            -5, 0, 0, 0,  0,  2 };
             fd = new FakeDice(new int[] { 1, 2 });
             bg = new BackgammonGame(initialGameBoard, fd);
-            
+
         }
 
 
@@ -63,6 +63,13 @@ namespace UnitTest
         }
 
         [TestMethod]
+        public void TestMovesDepletedForMovesConsistingOfMultipleDice()
+        {
+            bg.Move(CheckerColor.White, 6, 3);
+            Assert.AreEqual(CheckerColor.Black, bg.playerToMove());
+        }
+
+        [TestMethod]
         public void TestPlayerInterfaceIsMyTurn()
         {
 
@@ -71,11 +78,11 @@ namespace UnitTest
             Assert.IsTrue(white.IsMyTurn());
             Assert.IsFalse(black.IsMyTurn());
         }
-        
+
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
         public void TestPlayerGetMovesLeftThrowsExceptionIfNotYourTurn()
-        { 
+        {
             PlayerInterface black = new PlayerInterface(bg, CheckerColor.Black, player2);
             black.GetMovesLeft();
         }
@@ -99,5 +106,7 @@ namespace UnitTest
             Assert.AreEqual(1, movesLeft.Count());
             Assert.IsTrue(movesLeft.Contains(1));
         }
+
+
     }
 }
