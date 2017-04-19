@@ -13,10 +13,11 @@ namespace Backgammon.Screen
 {
     public class Image
     {
-        public float Alpha;
-        public string Text, FontName, Path;
-        public Vector2 Position, Scale;
-        public Rectangle SourceRect;
+        public float Alpha = 1.0f;
+        public string Text, Path = string.Empty;
+        public string FontName = "EB Garamond 12";
+        public Vector2 Position, Scale = Vector2.One;
+        public Rectangle SourceRect = Rectangle.Empty;
         public bool IsActive = true;
 
         public Texture2D Texture;
@@ -24,11 +25,10 @@ namespace Backgammon.Screen
         ContentManager content;
         RenderTarget2D renderTarget;
         SpriteFont font;
-        Dictionary<string, ImageEffect> effectList;
-        public string Effects;
-        public SpriteEffects SpriteEffect;
+        Dictionary<string, ImageEffect> effectList = new Dictionary<string, ImageEffect>();
+        public string Effects = string.Empty;
+        public SpriteEffects SpriteEffect = SpriteEffects.None;
         public FadeEffect FadeEffect;
-        public float LayerDepth;
 
         void SetEffect<T>(ref T effect)
         {
@@ -87,20 +87,6 @@ namespace Backgammon.Screen
             rectangle.Offset(Position.X - (rectangle.Width/2), Position.Y - (rectangle.Height/2));
             return rectangle;
         }
-
-        public Image()
-        {
-            Path = Text = Effects = String.Empty;
-            FontName = "EB Garamond 12";
-            Position = Vector2.Zero;
-            Scale = Vector2.One;
-            Alpha = 1.0f;
-            SourceRect = Rectangle.Empty;
-            effectList = new Dictionary<string, ImageEffect>();
-            SpriteEffect = SpriteEffects.None;
-            LayerDepth = 0.0f;
-        }
-
 
         public void LoadContent()
         {
@@ -166,7 +152,7 @@ namespace Backgammon.Screen
         {
             origin = new Vector2(SourceRect.Width / 2, SourceRect.Height / 2);
             if (IsActive)
-                spriteBatch.Draw(Texture, Position, SourceRect, Color.White * Alpha, 0.0f, origin, Scale, SpriteEffect, LayerDepth);
+                spriteBatch.Draw(Texture, Position, SourceRect, Color.White * Alpha, 0.0f, origin, Scale, SpriteEffect, 0.0f);
         }
 
     }

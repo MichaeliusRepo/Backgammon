@@ -51,6 +51,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Screen\BoardScreen.cs" />
+    <Compile Include="Screen\Button.cs" />
     <Compile Include="Screen\Effects\FadeEffect.cs" />
     <Compile Include="Screen\GameScreen.cs" />
     <Compile Include="Screen\Image.cs" />

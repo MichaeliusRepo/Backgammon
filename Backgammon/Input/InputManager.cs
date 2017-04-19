@@ -37,7 +37,7 @@ namespace Backgammon.Input
             }
         }
 
-        private bool IsWithinBounds(Rectangle bounds)
+        public bool IsWithinBounds(Rectangle bounds)
         {
             return bounds.Contains(GetMousePosition());
         }
