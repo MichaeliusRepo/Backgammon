@@ -14,6 +14,7 @@ namespace ModelDLL
         private CheckerColor color;
         private GameBoardState state;
         private int position;
+        private List<int> moves;
 
 
         internal MoveTreeState(GameBoardState state, CheckerColor color, int fromPosition, List<int> moves)
@@ -21,8 +22,9 @@ namespace ModelDLL
             this.color = color;
             this.state = state;
             this.position = fromPosition;
+            this.moves = moves;
 
-            foreach(int move in moves)
+            foreach (int move in moves)
             {
                 List<int> movesCopy = new List<int>(moves);
                 movesCopy.Remove(move);
@@ -44,21 +46,14 @@ namespace ModelDLL
         internal HashSet<int> GetReachablePositions()
         {
             HashSet<int> output = new HashSet<int>();
-            GetReachablePositionsRecursion(output);
-            output.Remove(position);
-            return output;
-        }
+            List<MoveTreeState> reachableStates = GetReachableMoveTreeStates();
 
-        private void GetReachablePositionsRecursion(HashSet<int> set)
-        {
-            set.Add(position);
-            foreach(MoveTreeState mts in resultingStates)
+            foreach (MoveTreeState state in reachableStates)
             {
-                if(mts != null)
-                {
-                    mts.GetReachablePositionsRecursion(set);
-                }
+                output.Add(state.position);
             }
+
+            return output;
         }
 
         internal bool LegalToMoveToPosition(int position)
@@ -66,61 +61,93 @@ namespace ModelDLL
             return GetReachablePositions().Contains(position);
         }
 
-        internal GameBoardState MoveToPosition(int position)
+        internal MoveTreeState MoveToPosition(int position)
         {
             if (!LegalToMoveToPosition(position))
             {
                 throw new InvalidOperationException("Illegal move to position: " + position);
             }
 
-            return GetStatesBelongingToPosition(position);
+            return GetMoveTreeStateWithPosition(position);
         }
 
-        private GameBoardState GetStatesBelongingToPosition(int position)
+        //Gets a move tree state where the original checker has been moved the specified position
+        public MoveTreeState GetMoveTreeStateWithPosition(int position)
         {
-            List<GameBoardState> states = new List<GameBoardState>();
+            //Get all the reachable move tree states from this state
+            List<MoveTreeState> states = GetReachableMoveTreeStates();
 
-            GetStatesBelongingToPositionRecursive(position, states);
-
-            return SelectBestAlternative(states);
-        }
-
-        private GameBoardState SelectBestAlternative(List<GameBoardState> states)
-        {
-            if(states.Count() == 1)
+            //Filter out the states that have the same position as the method argument
+            List<MoveTreeState> usableStates = new List<MoveTreeState>();
+            foreach (MoveTreeState state in states)
             {
-                return states[0];
+                if (state.GetPosition() == position)
+                {
+                    usableStates.Add(state);
+                }
             }
+
+            //Return null if there are no suitable states
+            if (usableStates.Count() == 0)
+            {
+                return null;
+            }
+
+            //Else return the best suited state
+            return SelectBestMoveTreeState(usableStates);
+        }
+
+
+        //Given a list of MoveTreeStates, select the most beneficial to the current player.
+        //The most beneficial state is the one that has the most enemy checkers on the bar
+        private MoveTreeState SelectBestMoveTreeState(List<MoveTreeState> states)
+        {
             CheckerColor opponent = color.OppositeColor();
-            GameBoardState best = states[0];
-            foreach(GameBoardState state in states)
+            MoveTreeState bestOption = states[0];
+
+            foreach (MoveTreeState state in states)
             {
-                if(state.getCheckersOnBar(opponent) > best.getCheckersOnBar(opponent))
+                if (state.GetState().getCheckersOnBar(opponent) > bestOption.GetState().getCheckersOnBar(opponent))
                 {
-                    best = state;
+                    bestOption = state;
                 }
             }
-
-            return best;
+            return bestOption;
         }
 
-        private void GetStatesBelongingToPositionRecursive(int position, List<GameBoardState> states)
+        private List<MoveTreeState> GetReachableMoveTreeStates()
         {
-            if(this.position == position)
+            List<MoveTreeState> output = new List<MoveTreeState>();
+            GetReachableMoveTreeStatesRecursion(output);
+            output.Remove(this);
+            return output;
+        }
+
+        private void GetReachableMoveTreeStatesRecursion(List<MoveTreeState> states)
+        {
+            states.Add(this);
+            foreach (MoveTreeState state in resultingStates)
             {
-                states.Add(this.state);
-                return;
-            }
-            else
-            {
-                foreach(MoveTreeState mts in resultingStates)
+                if (state != null)
                 {
-                    if(mts != null)
-                    {
-                        mts.GetStatesBelongingToPositionRecursive(position, states);
-                    }
+                    state.GetReachableMoveTreeStatesRecursion(states);
                 }
             }
+        }
+
+        internal GameBoardState GetState()
+        {
+            return this.state;
+        }
+
+        internal int GetPosition()
+        {
+            return this.position;
+        }
+
+        internal List<int> GetMoves()
+        {
+            return this.moves;
         }
     }
 }
