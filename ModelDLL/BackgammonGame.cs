@@ -60,7 +60,7 @@ namespace ModelDLL
         private void initialize(int[] gameBoard, Dice dice, int whiteCheckersOnBar, int whiteCheckersBoreOff,
                              int blackCheckersOnBar, int blackCheckersBoreOff, CheckerColor playerToMove)
         {
-          //  this.gameBoard = new ModelDLL.GameBoard(gameBoard, whiteCheckersOnBar, whiteCheckersBoreOff, blackCheckersOnBar, blackCheckersBoreOff);
+            //  this.gameBoard = new ModelDLL.GameBoard(gameBoard, whiteCheckersOnBar, whiteCheckersBoreOff, blackCheckersOnBar, blackCheckersBoreOff);
             this.turnColor = playerToMove;
             this.dice = dice;
             recalculateMoves();
@@ -74,12 +74,12 @@ namespace ModelDLL
         {
             MoveTreeState root = new MoveTreeState(currentGameBoardState, color, initialPosition, GetMovesLeft());
             return root.GetReachablePositions();
-            
+
         }
 
         public void Move(CheckerColor color, int from, int targetPosition)
         {
-            if(color != playerToMove())
+            if (color != playerToMove())
             {
                 throw new InvalidOperationException();
             }
@@ -87,9 +87,10 @@ namespace ModelDLL
             MoveTreeState mts = new MoveTreeState(currentGameBoardState, color, from, moves);
             if (mts.LegalToMoveToPosition(targetPosition))
             {
-                currentGameBoardState = mts.MoveToPosition(targetPosition);
-                moves.Remove(Math.Abs(targetPosition - from));
-                if(moves.Count() == 0)
+                MoveTreeState resultingState = mts.MoveToPosition(targetPosition);
+                currentGameBoardState = resultingState.GetState();
+                moves = resultingState.GetMoves();
+                if (moves.Count() == 0)
                 {
                     changeTurns();
                 }
@@ -103,7 +104,7 @@ namespace ModelDLL
         private void changeTurns()
         {
             recalculateMoves();
-            turnColor = (turnColor == CheckerColor.White ? CheckerColor.Black : CheckerColor.White); 
+            turnColor = (turnColor == CheckerColor.White ? CheckerColor.Black : CheckerColor.White);
         }
 
 
@@ -126,9 +127,9 @@ namespace ModelDLL
         public List<int> GetMoveableCheckers()
         {
             List<int> output = new List<int>();
-            for(int i = 1; i <= 24; i++)
+            for (int i = 1; i <= 24; i++)
             {
-                if(GetLegalMovesFor(playerToMove(), i).Count() >= 1)
+                if (GetLegalMovesFor(playerToMove(), i).Count() >= 1)
                 {
                     output.Add(i);
                 }
@@ -140,15 +141,15 @@ namespace ModelDLL
         {
             moves = new List<int>();
             int[] diceValues = dice.RollDice();
-            if(diceValues[0] == diceValues[1])
+            if (diceValues[0] == diceValues[1])
             {
                 moves = new List<int>() { diceValues[0], diceValues[0], diceValues[0], diceValues[0] };
             }
             else
             {
-                moves = new List<int>() { diceValues[0], diceValues[1]};
+                moves = new List<int>() { diceValues[0], diceValues[1] };
             }
-            
+
         }
 
         //Meta rules below here
@@ -157,7 +158,7 @@ namespace ModelDLL
             return this.turnColor;
         }
 
-    } 
+    }
 }
 
 
