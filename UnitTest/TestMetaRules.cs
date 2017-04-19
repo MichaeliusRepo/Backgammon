@@ -63,6 +63,13 @@ namespace UnitTest
         }
 
         [TestMethod]
+        public void TestMovesDepletedForMovesConsistingOfMultipleDice()
+        {
+            bg.Move(CheckerColor.White, 6, 3);
+            Assert.AreEqual(CheckerColor.Black, bg.playerToMove());
+        }
+
+        [TestMethod]
         public void TestPlayerInterfaceIsMyTurn()
         {
 
@@ -99,5 +106,7 @@ namespace UnitTest
             Assert.AreEqual(1, movesLeft.Count());
             Assert.IsTrue(movesLeft.Contains(1));
         }
+
+        
     }
 }

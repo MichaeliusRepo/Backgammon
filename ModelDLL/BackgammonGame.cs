@@ -87,8 +87,9 @@ namespace ModelDLL
             MoveTreeState mts = new MoveTreeState(currentGameBoardState, color, from, moves);
             if (mts.LegalToMoveToPosition(targetPosition))
             {
-                currentGameBoardState = mts.MoveToPosition(targetPosition);
-                moves.Remove(Math.Abs(targetPosition - from));
+                MoveTreeState resultingState = mts.MoveToPosition(targetPosition);
+                currentGameBoardState = resultingState.GetState();
+                moves = resultingState.GetMoves();
                 if(moves.Count() == 0)
                 {
                     changeTurns();

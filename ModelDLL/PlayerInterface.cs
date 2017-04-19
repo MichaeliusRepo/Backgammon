@@ -35,6 +35,8 @@ namespace ModelDLL
             return bg.GetGameBoardState();
         }
 
+        //public List<int> move(int from, int to)
+
         public void move(int from, List<int> moves)
         {
             foreach(int i in moves)
