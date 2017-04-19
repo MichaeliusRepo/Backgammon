@@ -6,23 +6,13 @@ using System.Threading.Tasks;
 
 namespace ModelDLL
 {
-    class BarPosition : Position
+    class InvalidPosition : Position
     {
-        //It is legal to move from the bar only if there are checkers on the bar
-        //and if the the bar trying be moved from belongs to the player trying to move
         public bool IsLegalToMoveFromHere(GameBoardState state, CheckerColor color, int thisPosition)
         {
-            if(thisPosition != color.GetBar())
-            {
-                return false;
-            }
-            else
-            {
-                return state.getCheckersOnBar(color) > 0;
-            }
+            return false;
         }
 
-        //It is allways illegal to make a move to the bar
         public bool IsLegalToMoveHere(GameBoardState state, CheckerColor color, int fromPosition, int thisPosition)
         {
             return false;
@@ -30,12 +20,12 @@ namespace ModelDLL
 
         public GameBoardState MoveCheckerHere(GameBoardState state, CheckerColor color, int position)
         {
-            throw new NotImplementedException();
+            throw new InvalidOperationException("Illegal to move to non existant position");
         }
 
         public GameBoardState MoveCheckerFromHere(GameBoardState state, CheckerColor color, int position)
         {
-            return state.WhereCheckerIsRemovedFromBar(color);
+            throw new InvalidOperationException("Illegal to move from non existant position");
         }
     }
 }

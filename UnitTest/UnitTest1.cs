@@ -10,7 +10,7 @@ namespace UnitTest
         // CTRL R, A to run
         // Alternatively, go to Tests > Run > All Tests
 
-        int one, two, three;
+/*        int one, two, three;
 
         [TestInitialize]
         public void Initialize()
@@ -44,5 +44,7 @@ namespace UnitTest
             }
 
         }
+
+    */
     }
 }
