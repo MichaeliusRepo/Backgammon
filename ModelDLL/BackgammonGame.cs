@@ -79,10 +79,20 @@ namespace ModelDLL
 
         public void Move(CheckerColor color, int from, int targetPosition)
         {
+            if(color != playerToMove())
+            {
+                throw new InvalidOperationException();
+            }
+
             MoveTreeState mts = new MoveTreeState(currentGameBoardState, color, from, moves);
             if (mts.LegalToMoveToPosition(targetPosition))
             {
                 currentGameBoardState = mts.MoveToPosition(targetPosition);
+                moves.Remove(Math.Abs(targetPosition - from));
+                if(moves.Count() == 0)
+                {
+                    changeTurns();
+                }
             }
             else
             {
@@ -92,8 +102,8 @@ namespace ModelDLL
 
         private void changeTurns()
         {
-            //recalculateMoves();
-            //turnColor = (turnColor == CheckerColor.White ? CheckerColor.Black : CheckerColor.White); 
+            recalculateMoves();
+            turnColor = (turnColor == CheckerColor.White ? CheckerColor.Black : CheckerColor.White); 
         }
 
 

@@ -10,7 +10,7 @@ namespace UnitTest
     public class TestMetaRules
     {
 
-       /* BackgammonGame bg;
+        BackgammonGame bg;
         FakeDice fd;
         int[] initialGameBoard;
         Player player1;
@@ -44,21 +44,21 @@ namespace UnitTest
         [ExpectedException(typeof(InvalidOperationException))]
         public void TestIllegalToMoveIfNotYourTurn()
         {
-            bg.move(CheckerColor.Black, 19, 20);
+            bg.Move(CheckerColor.Black, 19, 20);
         }
 
         [TestMethod]
         public void TestTurnDoesNotChangeIfNotAllMovesDepleted()
         {
-            bg.move(CheckerColor.White, 6, 2);
+            bg.Move(CheckerColor.White, 6, 4);
             Assert.AreEqual(CheckerColor.White, bg.playerToMove());
         }
 
         [TestMethod]
         public void TestTurnDoesChangeIfAllMovesDepleted()
         {
-            bg.move(CheckerColor.White, 6, 2);
-            bg.move(CheckerColor.White, 4, 1);
+            bg.Move(CheckerColor.White, 6, 4);
+            bg.Move(CheckerColor.White, 4, 3);
             Assert.AreEqual(CheckerColor.Black, bg.playerToMove());
         }
 
@@ -71,7 +71,7 @@ namespace UnitTest
             Assert.IsTrue(white.IsMyTurn());
             Assert.IsFalse(black.IsMyTurn());
         }
-
+        
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
         public void TestPlayerGetMovesLeftThrowsExceptionIfNotYourTurn()
@@ -93,11 +93,11 @@ namespace UnitTest
             Assert.IsTrue(movesLeft.Contains(1));
             Assert.IsTrue(movesLeft.Contains(2));
 
-            bg.move(CheckerColor.White, 6, 2);
+            bg.Move(CheckerColor.White, 6, 4);
 
             movesLeft = white.GetMovesLeft();
             Assert.AreEqual(1, movesLeft.Count());
             Assert.IsTrue(movesLeft.Contains(1));
-        }*/
+        }
     }
 }
