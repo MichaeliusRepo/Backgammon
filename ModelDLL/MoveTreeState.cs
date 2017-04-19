@@ -15,19 +15,35 @@ namespace ModelDLL
         private GameBoardState state;
         private int position;
         private List<int> moves;
+        private List<int> movesTaken;
+
 
 
         internal MoveTreeState(GameBoardState state, CheckerColor color, int fromPosition, List<int> moves)
         {
+            initialize(state, color, fromPosition, moves, new List<int>());
+        }
+
+        private MoveTreeState(GameBoardState state, CheckerColor color, int fromPosition, List<int> movesLeft, List<int> movesTaken)
+        {
+            initialize(state, color, fromPosition, movesLeft, movesTaken);
+        }
+
+        private void initialize(GameBoardState state, CheckerColor color, int fromPosition, List<int> movesLeft, List<int> movesTaken)
+        {
             this.color = color;
             this.state = state;
             this.position = fromPosition;
-            this.moves = moves;
+            this.moves = movesLeft;
+            this.movesTaken = movesTaken;
 
             foreach (int move in moves)
             {
-                List<int> movesCopy = new List<int>(moves);
-                movesCopy.Remove(move);
+                List<int> movesLeftCopy = new List<int>(movesLeft);
+                movesLeftCopy.Remove(move);
+
+                List<int> movesTakenCopy = new List<int>(movesTaken);
+                movesTakenCopy.Add(move);
 
                 int nextPosition = GameBoardMover.GetPositionAfterMove(color, position, move);
 
@@ -38,10 +54,10 @@ namespace ModelDLL
                 }
                 else
                 {
-                    resultingStates[move] = new MoveTreeState(newState, color, nextPosition, movesCopy);
+                    resultingStates[move] = new MoveTreeState(newState, color, nextPosition, movesLeftCopy, movesTakenCopy);
                 }
             }
-        }
+        } 
 
         internal HashSet<int> GetReachablePositions()
         {
@@ -145,9 +161,15 @@ namespace ModelDLL
             return this.position;
         }
 
-        internal List<int> GetMoves()
+        internal List<int> GetMovesLeft()
         {
             return this.moves;
         }
+
+        internal List<int> GetMovesTaken()
+        {
+            return this.movesTaken;
+        }
+
     }
 }

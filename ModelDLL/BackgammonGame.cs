@@ -77,7 +77,7 @@ namespace ModelDLL
 
         }
 
-        public void Move(CheckerColor color, int from, int targetPosition)
+        public List<int> Move(CheckerColor color, int from, int targetPosition)
         {
             if (color != playerToMove())
             {
@@ -89,16 +89,18 @@ namespace ModelDLL
             {
                 MoveTreeState resultingState = mts.MoveToPosition(targetPosition);
                 currentGameBoardState = resultingState.GetState();
-                moves = resultingState.GetMoves();
+                moves = resultingState.GetMovesLeft();
                 if (moves.Count() == 0)
                 {
                     changeTurns();
                 }
+                return resultingState.GetMovesTaken();
             }
             else
             {
                 throw new InvalidOperationException("The move is illegal");
             }
+
         }
 
         private void changeTurns()

@@ -596,7 +596,7 @@ namespace UnitTest
             fd.SetReturnValues(new int[] { 1, 2 });
             bg = new BackgammonGame(gameBoard, fd);
 
-            bg.Move(WHITE, 6, 3);
+            List<int> actualMovesTaken = bg.Move(WHITE, 6, 3);
 
             int[] expectedGameBoard = new int[] { -1, 0, 1, 0,  0,  4,
                                                    0, 3, 0, 0,  0, -5,
@@ -607,17 +607,13 @@ namespace UnitTest
 
             Assert.IsTrue(Enumerable.SequenceEqual(expectedGameBoard, actualGameBoard));
             Assert.IsTrue(bg.GetGameBoardState().getCheckersOnBar(BLACK) == 1);
+
+
+            //Checks that the moves taken are equal to the moves expected
+            List<int> expectedMovesTaken = new List<int>() { 2, 1 };
+            Assert.IsTrue(Enumerable.SequenceEqual(actualMovesTaken, expectedMovesTaken));
+
         }
 
-        [TestMethod]
-        public void TestIndividualMovesMadeForLastMove()
-        {
-            fd.SetReturnValues(new int[] { 1, 2 });
-            bg = new BackgammonGame(initialGameBoard, fd);
-            bg.Move(WHITE, 6, 3);
-
-            //TODO IMPLEMENT THIS
-            Assert.IsTrue(false);
-        }
     }
 }

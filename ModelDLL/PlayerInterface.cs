@@ -35,6 +35,17 @@ namespace ModelDLL
             return bg.GetGameBoardState();
         }
 
+        public HashSet<int> GetLegalMovesForChecker(int position)
+        {
+            return bg.GetLegalMovesFor(this.color, position);
+        }
+
+        public List<int> move(int intialPosition, int targetPosition)
+        {
+            
+            return bg.Move(this.color, intialPosition, targetPosition);
+        }
+
         public void move(int from, List<int> moves)
         {
             foreach(int i in moves)
