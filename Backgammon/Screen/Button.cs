@@ -29,26 +29,26 @@ namespace Backgammon.Screen
             this.Position = Image.Position = Position;
         }
 
-        internal void LoadContent()
+        protected void LoadContent()
         {
             Image.LoadContent();
             if (Highlighted != null)
                 Highlighted.LoadContent();
         }
 
-        internal void UnloadContent()
+        protected void UnloadContent()
         {
             Image.UnloadContent();
             if (Highlighted != null)
                 Highlighted.UnloadContent();
         }
 
-        internal void Update(GameTime gameTime)
+        protected void Update(GameTime gameTime)
         {
             Triggered = WasClicked();
         }
 
-        internal void Draw(SpriteBatch spriteBatch)
+        protected void Draw(SpriteBatch spriteBatch)
         {
             if (HoveredOver())
                 Highlighted.Draw(spriteBatch);

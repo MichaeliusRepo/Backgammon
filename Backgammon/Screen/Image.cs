@@ -14,7 +14,7 @@ namespace Backgammon.Screen
     public class Image
     {
         public float Alpha = 1.0f;
-        public string Text, Path = string.Empty;
+        public string Text, Path = String.Empty;
         public string FontName = "EB Garamond 12";
         public Vector2 Position, Scale = Vector2.One;
         public Rectangle SourceRect = Rectangle.Empty;
@@ -100,6 +100,10 @@ namespace Backgammon.Screen
             Vector2 dimensions = Vector2.Zero;
             if (Texture != null)
                 dimensions.X += Texture.Width;
+
+            if (Text == null)
+                Text = String.Empty;
+
             dimensions.X += font.MeasureString(Text).X;
 
             if (Texture != null)

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ModelDLL
 {
-    class RealDice : Dice
+    public class RealDice : Dice
     {
         private static Random generator = new Random();
 
