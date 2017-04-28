@@ -103,6 +103,9 @@ namespace ModelDLL
 
         }
 
+
+        // TODO Doesnt change turns in the case where there are no legal moves left.
+        //Also communicate when turn is changed to view
         private void changeTurns()
         {
             recalculateMoves();
