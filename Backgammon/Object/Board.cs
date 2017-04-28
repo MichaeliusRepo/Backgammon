@@ -32,6 +32,17 @@ namespace Backgammon.Object
         public bool InAnimation { get; private set; }
         private Point WhiteOnBoard, BlackOnBoard;
 
+        // Tests
+        public static readonly int[] TestBoard1 = new int[] { -5, 1, 1, 1,  1,  1,
+                                            1, 0, 0, 0,  0, 0,
+                                            -10, 0, 0, 0, 0,  0,
+                                           0, 0, 0, 0,  0,  9 };
+
+        public static readonly int[] TestBoard2 = new int[] { -15, 2, 2, 2,  3,  3,
+                                            3, 0, 0, 0,  0, 0,
+                                            0, 0, 0, 0, 0,  0,
+                                           0, 0, 0, 0,  0,  0 };
+
         public Board(int[] board)
         {
             gameBoard = board;
@@ -53,6 +64,24 @@ namespace Backgammon.Object
         public void HighlightChecker(int i)
         {
             Checker c = Points[i].GetTopChecker();
+            HighlightImage(c);
+        }
+
+        public void HighlightChecker(CheckerColor color)
+        {
+            HighlightImage(GetPointOnBoard(color).GetTopChecker());
+        }
+
+        private Point GetPointOnBoard(CheckerColor color)
+        {
+            if (color == CheckerColor.White)
+                return WhiteOnBoard;
+            else
+                return BlackOnBoard;
+        }
+
+        private void HighlightImage(Checker c)
+        {
             Image.FadeEffect.FadeSpeed = 0.25f;
             Image.FadeEffect.MinAlpha = 0.75f;
             Image.Alpha = 0.0f;
@@ -79,24 +108,29 @@ namespace Backgammon.Object
         }
 
         public void MoveChecker(int from, int to)
-        {  //if (Points[from - 1].IsEmpty()) throw new Exception();
-            MoveChecker(from, Points[to]);
+        {
+            MoveChecker(Points[from], Points[to]);
         }
 
-        public void MoveChecker(int from, Point to)
-        {  //if (Points[from - 1].IsEmpty()) throw new Exception();
+        public void MoveChecker(CheckerColor color, int to)
+        {
+            MoveChecker(GetPointOnBoard(color), Points[to]);
+        }
+
+        public void MoveChecker(Point from, Point to)
+        {
             AudioManager.Instance.PlaySound("Checker");
             InAnimation = true;
-            movingChecker = Points[from].GetTopChecker();
-            Points[from].SendToPoint(to);
+            movingChecker = from.GetTopChecker();
+            from.SendToPoint(to);
         }
 
         public void Capture(int at)
         {
             if (Points[at].GetTopChecker().Color == CheckerColor.White)
-                MoveChecker(at, WhiteOnBoard);
+                MoveChecker(Points[at], WhiteOnBoard);
             else
-                MoveChecker(at, BlackOnBoard);
+                MoveChecker(Points[at], BlackOnBoard);
         }
 
         private void createPoints()
@@ -106,7 +140,7 @@ namespace Backgammon.Object
             // Added dummy point to remove zero-indexing
             Points = new List<Point>() { new Point(Vector2.Zero, new List<Checker>()), WhiteOnBoard, BlackOnBoard };
             for (int i = 1; i <= 24; i++)
-                Points.Insert(i,(new Point(findBoard(i), getCheckers(i))));
+                Points.Insert(i, (new Point(findBoard(i), getCheckers(i))));
         }
 
         private Vector2 findBoard(int i)
