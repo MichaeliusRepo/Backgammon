@@ -58,7 +58,7 @@ namespace Backgammon.Screen
             Image.LoadContent();
 
             //int[] gameBoard = BackgammonGame.DefaultGameBoard;
-            int[] gameBoard = Board.TestBoard2;
+            int[] gameBoard = Board.TestBoard3;
 
             Model = new BackgammonGame(gameBoard, new RealDice());
             board = new Board(gameBoard);
@@ -86,14 +86,16 @@ namespace Backgammon.Screen
             MovableCheckers = ViewInterface.GetMoveableCheckers();
             Console.WriteLine("Movable Checkers: " + string.Join(", ", MovableCheckers));
             board.GlowPoints(MovableCheckers);
-            Console.WriteLine(string.Join(", ", ViewInterface.GetGameBoardState().getMainBoard()));
+            //Console.WriteLine(string.Join(", ", ViewInterface.GetGameBoardState().getMainBoard()));
 
             if (MovableCheckers.Contains(CurrentPlayer.GetBar()))
                 PickChecker(CurrentPlayer.GetBar());
             if (MovableCheckers.Count == 0)
+            {
                 Console.WriteLine("No possible moves for " + CurrentPlayer);
+                Console.WriteLine("GAME IS STUCK :,-(");
+            }
         }
-
 
         private void PickChecker(int pointIndex)
         {
@@ -112,7 +114,6 @@ namespace Backgammon.Screen
                 SetOfMoves = WhitePlayer.move(SelectedPoint, pointIndex);
             else
                 SetOfMoves = BlackPlayer.move(SelectedPoint, pointIndex);
-
             board.StopGlowPoints();
             board.RemoveCheckerHighlight();
             SetState(GameState.Animating);
@@ -129,7 +130,9 @@ namespace Backgammon.Screen
                 to += 25;
             if (board.CheckerWasCaptured(CurrentPlayer, to))
                 board.Capture(to);
-            if (NotOnBar())
+            if (CanBearOff())
+                board.BearOff(CurrentPlayer, SelectedPoint);
+            else if (NotOnBar())
                 board.MoveChecker(SelectedPoint, to);
             else
                 board.MoveChecker(CurrentPlayer, to);
@@ -143,7 +146,27 @@ namespace Backgammon.Screen
             if (State == GameState.PickChecker)
                 PlayerTurn();
             if (State == GameState.PickDestination)
-                board.GlowPoints(PossibleDestinations);
+            {
+                if (CanBearOff())
+                    MoveChecker(BearOffTo());
+                else
+                    board.GlowPoints(PossibleDestinations);
+                //Console.WriteLine(SelectedPoint + " can move to " + string.Join(", ", PossibleDestinations));
+            }
+        }
+
+        private bool CanBearOff()
+        {
+            foreach (int i in PossibleDestinations)
+                if (i > 25) return true;
+            return false;
+        }
+
+        private int BearOffTo()
+        {
+            foreach (int i in PossibleDestinations)
+                if (i > 25) return i;
+            throw new Exception();
         }
 
         private bool NotOnBar()

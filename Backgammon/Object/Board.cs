@@ -19,9 +19,10 @@ namespace Backgammon.Object
         private readonly static float pointDistance = 76;
 
         // Modify algorithm's distance of points.
+        private readonly static float midX = 540;
         private readonly static float leftX = 82;
         private readonly static float topY = 92;
-        private readonly static float rightX = 540 + leftX;
+        private readonly static float rightX = midX + leftX;
         private readonly static float botY = 720 + 6 - topY;
 
         private int[] gameBoard;
@@ -30,7 +31,7 @@ namespace Backgammon.Object
 
         private List<Point> Points { get; set; }
         public bool InAnimation { get; private set; }
-        private Point WhiteOnBoard, BlackOnBoard;
+        private Point WhiteOnBoard, BlackOnBoard, WhiteBoreOff, BlackBoreOff;
 
         // Tests
         public static readonly int[] TestBoard1 = new int[] { -5, 1, 1, 1,  1,  1,
@@ -42,6 +43,11 @@ namespace Backgammon.Object
                                             3, 0, 0, 0,  0, 0,
                                             0, 0, 0, 0, 0,  0,
                                            0, 0, 0, 0,  0,  0 };
+
+        public static readonly int[] TestBoard3 = new int[] { 2, 2, 2, 3,  3,  3,
+                                            0, 0, 0, 0, 0, 0,
+                                            0, 0, 0, 0, 0,  0,
+                                           -3, -3, -3, -2, -2, -2 };
 
         public Board(int[] board)
         {
@@ -78,6 +84,14 @@ namespace Backgammon.Object
                 return WhiteOnBoard;
             else
                 return BlackOnBoard;
+        }
+
+        private Point GetBearOffPoint(CheckerColor color)
+        {
+            if (color == CheckerColor.White)
+                return WhiteBoreOff;
+            else
+                return WhiteBoreOff;
         }
 
         private void HighlightImage(Checker c)
@@ -125,20 +139,30 @@ namespace Backgammon.Object
             from.SendToPoint(to);
         }
 
+        public void BearOff(CheckerColor color,int from)
+        {
+            MoveChecker(Points[from], GetBearOffPoint(color));
+        }
+
         public void Capture(int at)
         {
-            if (Points[at].GetTopChecker().Color == CheckerColor.White)
-                MoveChecker(Points[at], WhiteOnBoard);
-            else
-                MoveChecker(Points[at], BlackOnBoard);
+            MoveChecker(Points[at], GetPointOnBoard(Points[at].GetTopChecker().Color));
+            //if (Points[at].GetTopChecker().Color == CheckerColor.White)
+            //    MoveChecker(Points[at], WhiteOnBoard);
+            //else
+            //    MoveChecker(Points[at], BlackOnBoard);
         }
 
         private void createPoints()
         {
-            WhiteOnBoard = new Point(new Vector2(540, topY), new List<Checker>());
-            BlackOnBoard = new Point(new Vector2(540, botY), new List<Checker>());
+            WhiteOnBoard = new Point(new Vector2(midX, topY), new List<Checker>());
+            BlackOnBoard = new Point(new Vector2(midX, botY), new List<Checker>());
+            WhiteBoreOff = new Point(new Vector2(midX * 2.5f, botY), new List<Checker>());
+            BlackBoreOff = new Point(new Vector2(midX * 2.5f, topY), new List<Checker>());
+
             // Added dummy point to remove zero-indexing
-            Points = new List<Point>() { new Point(Vector2.Zero, new List<Checker>()), WhiteOnBoard, BlackOnBoard };
+            Points = new List<Point>() { new Point(Vector2.Zero, new List<Checker>()),
+                                                                        WhiteOnBoard, BlackOnBoard, WhiteBoreOff, BlackBoreOff };
             for (int i = 1; i <= 24; i++)
                 Points.Insert(i, (new Point(findBoard(i), getCheckers(i))));
         }
