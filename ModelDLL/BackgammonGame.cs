@@ -110,6 +110,11 @@ namespace ModelDLL
         {
             recalculateMoves();
             turnColor = (turnColor == CheckerColor.White ? CheckerColor.Black : CheckerColor.White);
+            if(GetMoveableCheckers().Count() == 0)
+            {
+                Console.WriteLine("no legal moves. Changing turns.");
+                changeTurns();
+            }
         }
 
 
