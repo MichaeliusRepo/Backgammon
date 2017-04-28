@@ -128,10 +128,21 @@ namespace ModelDLL
         //based on the state of the game and the remina
         public List<int> GetMoveableCheckers()
         {
+
+            CheckerColor color = playerToMove();
+
             List<int> output = new List<int>();
+
+
+            //Add all the checkers for which there is at least one legal move to the output
+            if (GetLegalMovesFor(color, color.GetBar()).Count() >= 1)
+            {
+                output.Add(color.GetBar());
+            }
+            
             for (int i = 1; i <= 24; i++)
             {
-                if (GetLegalMovesFor(playerToMove(), i).Count() >= 1)
+                if (GetLegalMovesFor(color, i).Count() >= 1)
                 {
                     output.Add(i);
                 }
