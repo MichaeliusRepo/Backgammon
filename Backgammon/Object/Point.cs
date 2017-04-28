@@ -11,12 +11,11 @@ using System.Threading;
 
 namespace Backgammon.Object
 {
-
-    internal class Point
+    public class Point
     {
-        internal int Number { get; private set; }
-        internal Vector2 Position { get; private set; }
-        internal List<Checker> Checkers { get; private set; }
+        protected int Number { get; private set; }
+        protected Vector2 Position { get; private set; }
+        protected List<Checker> Checkers { get; private set; }
         private Image Image = new Image() { Path = "Images/Glow", Effects = "FadeEffect", IsActive = false};
         internal Vector2 ReceivingPosition { get; private set; }
 
@@ -28,6 +27,11 @@ namespace Backgammon.Object
 
         // Do not modify.
         private readonly static float MiddleY = 720 / 2;
+
+        internal int GetAmount()
+        {
+            return Checkers.Count;
+        }
 
         internal Rectangle GetBounds()
         {
@@ -52,12 +56,12 @@ namespace Backgammon.Object
             Image.FadeEffect.FadeSpeed = 1f;
         }
 
-        internal void AddChecker(Checker checker)
+        protected void AddChecker(Checker checker)
         {
             Checkers.Add(checker);
         }
 
-        internal void RemoveChecker(Checker checker)
+        protected void RemoveChecker(Checker checker)
         {
             Checkers.Remove(checker);
             ArrangeCheckers();

@@ -10,18 +10,15 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Backgammon.Object
 {
-
-    internal class Checker
+    public class Checker
     {
         internal CheckerColor Color { get; private set; }
         internal Vector2 Position { get; private set; }
         private Image Image;
 
-        private Vector2 Acceleration = Vector2.Zero;
-        private Vector2 Velocity = Vector2.Zero;
-        private float DeltaHalfDistance;
+        private Vector2 Acceleration, Velocity = Vector2.Zero;
+        private float DeltaHalfDistance, Timer;
         private Vector2 FinalPosition;
-        private float Timer;
         private Point TargetPoint = null;
 
         internal bool moving { get; private set; }
@@ -33,7 +30,7 @@ namespace Backgammon.Object
         private readonly static float Time = 4;
         private readonly static float Second = 1.0f;
 
-        internal Rectangle GetBounds()
+        protected Rectangle GetBounds()
         {
             return Image.GetBounds();
         }
@@ -49,12 +46,6 @@ namespace Backgammon.Object
             Image.LoadContent();
         }
 
-        internal void SetPosition(Vector2 Position)
-        {
-            this.Position = Position;
-            Image.Position = Position;
-        }
-
         internal void SetPosition(float X, float Y)
         {
             this.Position = new Vector2(X, Y);
@@ -63,11 +54,13 @@ namespace Backgammon.Object
 
         internal void MoveToPoint(Point p)
         {
+            Timer = 0;
+            Acceleration = Velocity = Vector2.Zero;
             TargetPoint = p;
             MoveToPosition(p.ReceivingPosition);
         }
 
-        internal void MoveToPosition(Vector2 NewPosition)
+        protected void MoveToPosition(Vector2 NewPosition)
         { // Don't worry, I did the math on paper first.
             FinalPosition = NewPosition;
             Vector2 DeltaPosition = NewPosition - Position;

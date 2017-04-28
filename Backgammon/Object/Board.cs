@@ -25,11 +25,12 @@ namespace Backgammon.Object
         private readonly static float botY = 720 + 6 - topY;
 
         private int[] gameBoard;
-        private Image Image = new Image() { Path = "Images/CheckerGlow", Effects = "FadeEffect", IsActive = false, Scale = new Vector2(1.2f, 1.2f) };
+        private Image Image = new Image() { Path = "Images/CheckerGlow", Effects = "FadeEffect", IsActive = false, Scale = new Vector2(1.1f, 1.1f) };
         private Checker movingChecker;
 
-        internal List<Point> Points { get; private set; }
+        private List<Point> Points { get; set; }
         public bool InAnimation { get; private set; }
+        private Point WhiteOnBoard, BlackOnBoard;
 
         public Board(int[] board)
         {
@@ -40,8 +41,8 @@ namespace Backgammon.Object
 
         public void GlowPoints(List<int> list)
         {
-            for (int i = 0; i < Points.Count; i++)
-                Points[i].Glow(list.Contains(i + 1));
+            for (int i = 1; i < Points.Count; i++)
+                Points[i].Glow(list.Contains(i));
         }
 
         public void StopGlowPoints()
@@ -51,7 +52,7 @@ namespace Backgammon.Object
 
         public void HighlightChecker(int i)
         {
-            Checker c = Points[i - 1].GetTopChecker();
+            Checker c = Points[i].GetTopChecker();
             Image.FadeEffect.FadeSpeed = 0.25f;
             Image.FadeEffect.MinAlpha = 0.75f;
             Image.Alpha = 0.0f;
@@ -64,58 +65,73 @@ namespace Backgammon.Object
             Image.IsActive = false;
         }
 
+        public bool CheckerWasCaptured(CheckerColor playerColor, int to)
+        {
+            return (Points[to].GetAmount() == 1 && Points[to].GetTopChecker().Color != playerColor);
+        }
+
         internal int GetClickedPoint()
         {
             foreach (Point p in Points)
                 if (InputManager.Instance.WasClicked(p.GetBounds()))
-                    return Points.IndexOf(p) + 1;
+                    return Points.IndexOf(p);
             return -1;
         }
 
         public void MoveChecker(int from, int to)
-        {
+        {  //if (Points[from - 1].IsEmpty()) throw new Exception();
+            MoveChecker(from, Points[to]);
+        }
+
+        public void MoveChecker(int from, Point to)
+        {  //if (Points[from - 1].IsEmpty()) throw new Exception();
             AudioManager.Instance.PlaySound("Checker");
-            if (Points[from - 1].IsEmpty())
-                throw new Exception();
-            movingChecker = Points[from - 1].GetTopChecker();
             InAnimation = true;
-            Points[from - 1].SendToPoint(Points[to - 1]);
+            movingChecker = Points[from].GetTopChecker();
+            Points[from].SendToPoint(to);
+        }
+
+        public void Capture(int at)
+        {
+            if (Points[at].GetTopChecker().Color == CheckerColor.White)
+                MoveChecker(at, WhiteOnBoard);
+            else
+                MoveChecker(at, BlackOnBoard);
         }
 
         private void createPoints()
         {
-            Points = new List<Point>();
+            WhiteOnBoard = new Point(new Vector2(540, topY), new List<Checker>());
+            BlackOnBoard = new Point(new Vector2(540, botY), new List<Checker>());
+            // Added dummy point to remove zero-indexing
+            Points = new List<Point>() { new Point(Vector2.Zero, new List<Checker>()), WhiteOnBoard, BlackOnBoard };
+            for (int i = 1; i <= 24; i++)
+                Points.Insert(i,(new Point(findBoard(i), getCheckers(i))));
+        }
 
-            for (int i = 1; i <= 6; i++) // White Home Board
-                Points.Add(new Point(new Vector2(rightX + ((6 - i) * pointDistance), botY), getCheckers(i)));
-
-            for (int i = 7; i <= 12; i++) // Bottom Outer Board
-                Points.Add(new Point(new Vector2(leftX + ((12 - i) * pointDistance), botY), getCheckers(i)));
-
-            for (int i = 13; i <= 18; i++) // Upper Outer Board
-                Points.Add(new Point(new Vector2(leftX + ((i - 13) * pointDistance), topY), getCheckers(i)));
-
-            for (int i = 19; i <= 24; i++) // Black Home Board
-                Points.Add(new Point(new Vector2(rightX + ((i - 19) * pointDistance), topY), getCheckers(i)));
+        private Vector2 findBoard(int i)
+        {
+            if (i <= 6) // White Home Board
+                return new Vector2(rightX + ((6 - i) * pointDistance), botY);
+            if (i <= 12) //Bottom Outer Board
+                return new Vector2(leftX + ((12 - i) * pointDistance), botY);
+            if (i <= 18) // Upper Outer Board
+                return new Vector2(leftX + ((i - 13) * pointDistance), topY);
+            // Black Home Board
+            return new Vector2(rightX + ((i - 19) * pointDistance), topY);
         }
 
         private List<Checker> getCheckers(int i)
         {
-            int amountOfCheckers = gameBoard[i - 1];
-            CheckerColor checkerColor;
-
+            int amountOfCheckers = gameBoard[i - 1]; // Game logic uses zero indexing :,-(
+            CheckerColor checkerColor = CheckerColor.Black;
             if (amountOfCheckers < 0)
-            {
-                checkerColor = CheckerColor.Black;
                 amountOfCheckers *= -1; // make positive for use in loop
-            }
             else
                 checkerColor = CheckerColor.White;
-
             List<Checker> checkers = new List<Checker>();
             for (int k = 0; k < amountOfCheckers; k++)
                 checkers.Add(new Checker(checkerColor));
-
             return checkers;
         }
 
