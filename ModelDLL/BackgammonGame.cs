@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -83,17 +84,26 @@ namespace ModelDLL
             {
                 throw new InvalidOperationException();
             }
+            Debug.WriteLine("-----------------------------------------");
+            Debug.WriteLine("Moving " + color + " checker from " + from + " to " + targetPosition);
 
             MoveTreeState mts = new MoveTreeState(currentGameBoardState, color, from, moves);
             if (mts.LegalToMoveToPosition(targetPosition))
             {
+                Debug.WriteLine("Move is legal");
+
                 MoveTreeState resultingState = mts.MoveToPosition(targetPosition);
                 currentGameBoardState = resultingState.GetState();
                 moves = resultingState.GetMovesLeft();
+
+                Debug.WriteLine("Moves left are: " + string.Join(", ", moves));
                 if (moves.Count() == 0)
                 {
+                    Debug.WriteLine("All moves used up. Changing turns");
                     changeTurns();
                 }
+                Debug.WriteLine("Done with moving");
+                Debug.WriteLine("-------------------------------------");
                 return resultingState.GetMovesTaken();
             }
             else
@@ -108,11 +118,13 @@ namespace ModelDLL
         //Also communicate when turn is changed to view
         private void changeTurns()
         {
+            Debug.WriteLine("Changing turns from " + playerToMove() + " to " + playerToMove().OppositeColor());
+
             recalculateMoves();
             turnColor = (turnColor == CheckerColor.White ? CheckerColor.Black : CheckerColor.White);
             if(GetMoveableCheckers().Count() == 0)
             {
-                Console.WriteLine("no legal moves. Changing turns.");
+                Debug.WriteLine("no legal moves. Changing turns.");
                 changeTurns();
             }
         }
@@ -160,6 +172,7 @@ namespace ModelDLL
 
         private void recalculateMoves()
         {
+            Debug.WriteLine("Recalculating moves");
             moves = new List<int>();
             int[] diceValues = dice.RollDice();
             if (diceValues[0] == diceValues[1])
@@ -170,7 +183,7 @@ namespace ModelDLL
             {
                 moves = new List<int>() { diceValues[0], diceValues[1] };
             }
-
+            Debug.WriteLine("New moves are: " + string.Join(",", moves));
         }
 
         //Meta rules below here
