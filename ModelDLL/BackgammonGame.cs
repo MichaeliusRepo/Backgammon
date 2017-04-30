@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -79,6 +80,9 @@ namespace ModelDLL
 
         public List<int> Move(CheckerColor color, int from, int targetPosition)
         {
+
+            //Debug.WriteLine("-------------------------------------------------");
+            //Debug.WriteLine("Moving " + color + " from " + from + " to " + targetPosition);
             if (color != playerToMove())
             {
                 throw new InvalidOperationException();
@@ -90,10 +94,31 @@ namespace ModelDLL
                 MoveTreeState resultingState = mts.MoveToPosition(targetPosition);
                 currentGameBoardState = resultingState.GetState();
                 moves = resultingState.GetMovesLeft();
+                //Debug.WriteLine("Moves left are: " + string.Join(",", moves));
+                //Debug.WriteLine("Done making the move");
+                
+                //Change turns if no moves, or no legal moves left
                 if (moves.Count() == 0)
                 {
+                    Debug.WriteLine("Changing turns as there are no more moves left.");
                     changeTurns();
                 }
+
+                if(GetMoveableCheckers().Count() == 0)
+                {
+                    Debug.WriteLine("There are still more moves left, but none are legal, so the turn is changed.");
+                    changeTurns();
+                }
+
+                
+
+                //Debug.WriteLine("Moveable checkers are:");
+                //Debug.WriteLine(string.Join(",", GetMoveableCheckers()));
+                //Debug.WriteLine("Game board looks like: " + string.Join(",", currentGameBoardState.getMainBoard()));
+                //Debug.WriteLine("Checkers on bar, white/black: " + currentGameBoardState.getCheckersOnBar(WHITE) + "/" + currentGameBoardState.getCheckersOnBar(BLACK));
+                //Debug.WriteLine("Checkers bore off, white/black: " + currentGameBoardState.getCheckersOnTarget(WHITE) +  "/" + currentGameBoardState.getCheckersOnTarget(BLACK));
+
+                //Debug.WriteLine("-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-");
                 return resultingState.GetMovesTaken();
             }
             else
@@ -110,11 +135,6 @@ namespace ModelDLL
         {
             recalculateMoves();
             turnColor = (turnColor == CheckerColor.White ? CheckerColor.Black : CheckerColor.White);
-            if(GetMoveableCheckers().Count() == 0)
-            {
-                Console.WriteLine("no legal moves. Changing turns.");
-                changeTurns();
-            }
         }
 
 
@@ -170,6 +190,9 @@ namespace ModelDLL
             {
                 moves = new List<int>() { diceValues[0], diceValues[1] };
             }
+
+            //Debug.WriteLine("Recalculating moves. New moves are:");
+            //Debug.WriteLine(string.Join(",", moves));
 
         }
 

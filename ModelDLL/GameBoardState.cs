@@ -69,7 +69,7 @@ namespace ModelDLL
             {
                 sum += NumberOfCheckersOnPosition(color, i);
             }
-            sum += getCheckersOnBar(color);
+            sum += getCheckersOnTarget(color);
             return sum;
         }
 

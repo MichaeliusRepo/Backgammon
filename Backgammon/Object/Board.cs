@@ -49,6 +49,11 @@ namespace Backgammon.Object
                                             0, 0, 0, 0, 0,  0,
                                            -3, -3, -3, -2, -2, -2 };
 
+        public static readonly int[] TestBoard4 = new int[] {-3, -3, -3, -3, -3,  4,
+                                                              4,  4,  3,  0,  0,  0,
+                                                              0,  0,  0,  0,  0,  0,
+                                                              0,  0,  0,  0,  0,  0 };
+
         public Board(int[] board)
         {
             gameBoard = board;
