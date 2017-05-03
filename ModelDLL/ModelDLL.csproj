@@ -43,6 +43,7 @@
     <Compile Include="BackgammonGame.cs" />
     <Compile Include="CheckerColor.cs" />
     <Compile Include="BarPosition.cs" />
+    <Compile Include="NaiveAI.cs" />
     <Compile Include="OverflowBearOffPosition.cs" />
     <Compile Include="ExactBearOffPosition.cs" />
     <Compile Include="InvalidPosition.cs" />

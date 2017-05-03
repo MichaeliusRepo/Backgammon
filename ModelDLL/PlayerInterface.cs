@@ -7,7 +7,7 @@ namespace ModelDLL
     {
         private readonly CheckerColor color;
         private readonly BackgammonGame bg;
-        private readonly Player player;
+        private Player player;
 
         public PlayerInterface(BackgammonGame bg, CheckerColor color, Player player)
         {
@@ -16,9 +16,26 @@ namespace ModelDLL
             this.player = player;
         }
 
+        public void SetPlayerIfNull(Player player)
+        {
+            if(this.player == null)
+            {
+                this.player = player;
+            }
+        }
+
         public bool IsMyTurn()
         {
             return bg.playerToMove() == color;
+        }
+
+        public HashSet<int> GetMoveableCheckers()
+        {
+            if (!IsMyTurn())
+            {
+                throw new InvalidOperationException("Player interface for player " + color + " tried to get moveable checkers when not his turn");
+            }
+            return new HashSet<int>(bg.GetMoveableCheckers());
         }
 
         public List<int> GetMovesLeft()

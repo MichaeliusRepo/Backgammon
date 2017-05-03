@@ -106,7 +106,5 @@ namespace UnitTest
             Assert.AreEqual(1, movesLeft.Count());
             Assert.IsTrue(movesLeft.Contains(1));
         }
-
-
     }
 }
