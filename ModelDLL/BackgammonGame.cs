@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-
 namespace ModelDLL
 {
     //Player1 is represented by positive numbers, 
@@ -32,9 +31,17 @@ namespace ModelDLL
 
 
         private CheckerColor turnColor;
-        private Dice dice;
+        internal Dice dice;
         //private GameBoard gameBoard;
-        private List<int> moves;
+        internal List<int> moves;
+
+        internal State state;
+        internal void NextState()
+        {
+            state = state.NextState();
+            state.Execute();
+        }
+
 
 
         private GameBoardState currentGameBoardState;
@@ -61,12 +68,13 @@ namespace ModelDLL
         private void initialize(int[] gameBoard, Dice dice, int whiteCheckersOnBar, int whiteCheckersBoreOff,
                              int blackCheckersOnBar, int blackCheckersBoreOff, CheckerColor playerToMove)
         {
-            //  this.gameBoard = new ModelDLL.GameBoard(gameBoard, whiteCheckersOnBar, whiteCheckersBoreOff, blackCheckersOnBar, blackCheckersBoreOff);
             this.turnColor = playerToMove;
             this.dice = dice;
-            recalculateMoves();
+
 
             this.currentGameBoardState = new GameBoardState(gameBoard, whiteCheckersOnBar, whiteCheckersBoreOff, blackCheckersOnBar, blackCheckersBoreOff);
+            this.state = new RollState(this, playerToMove);
+            state.Execute();
         }
 
         //Constructors end
@@ -80,10 +88,7 @@ namespace ModelDLL
 
         public List<int> Move(CheckerColor color, int from, int targetPosition)
         {
-
-            //Debug.WriteLine("-------------------------------------------------");
-            //Debug.WriteLine("Moving " + color + " from " + from + " to " + targetPosition);
-            if (color != playerToMove())
+            if(color != state.PlayerToMove())
             {
                 throw new InvalidOperationException();
             }
@@ -94,31 +99,8 @@ namespace ModelDLL
                 MoveTreeState resultingState = mts.MoveToPosition(targetPosition);
                 currentGameBoardState = resultingState.GetState();
                 moves = resultingState.GetMovesLeft();
-                //Debug.WriteLine("Moves left are: " + string.Join(",", moves));
-                //Debug.WriteLine("Done making the move");
-                
-                //Change turns if no moves, or no legal moves left
-                if (moves.Count() == 0)
-                {
-                    Debug.WriteLine("Changing turns as there are no more moves left.");
-                    changeTurns();
-                }
 
-                if(GetMoveableCheckers().Count() == 0)
-                {
-                    Debug.WriteLine("There are still more moves left, but none are legal, so the turn is changed.");
-                    changeTurns();
-                }
-
-                
-
-                //Debug.WriteLine("Moveable checkers are:");
-                //Debug.WriteLine(string.Join(",", GetMoveableCheckers()));
-                //Debug.WriteLine("Game board looks like: " + string.Join(",", currentGameBoardState.getMainBoard()));
-                //Debug.WriteLine("Checkers on bar, white/black: " + currentGameBoardState.getCheckersOnBar(WHITE) + "/" + currentGameBoardState.getCheckersOnBar(BLACK));
-                //Debug.WriteLine("Checkers bore off, white/black: " + currentGameBoardState.getCheckersOnTarget(WHITE) +  "/" + currentGameBoardState.getCheckersOnTarget(BLACK));
-
-                //Debug.WriteLine("-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-");
+                NextState();
                 return resultingState.GetMovesTaken();
             }
             else
@@ -126,15 +108,6 @@ namespace ModelDLL
                 throw new InvalidOperationException("The move is illegal");
             }
 
-        }
-
-
-        // TODO Doesnt change turns in the case where there are no legal moves left.
-        //Also communicate when turn is changed to view
-        private void changeTurns()
-        {
-            recalculateMoves();
-            turnColor = (turnColor == CheckerColor.White ? CheckerColor.Black : CheckerColor.White);
         }
 
 
@@ -156,8 +129,11 @@ namespace ModelDLL
         //based on the state of the game and the remina
         public List<int> GetMoveableCheckers()
         {
+            return GetMoveableCheckers(playerToMove());
+        }
 
-            CheckerColor color = playerToMove();
+        public List<int> GetMoveableCheckers(CheckerColor color)
+        {
 
             List<int> output = new List<int>();
 
@@ -178,28 +154,11 @@ namespace ModelDLL
             return output;
         }
 
-        private void recalculateMoves()
-        {
-            moves = new List<int>();
-            int[] diceValues = dice.RollDice();
-            if (diceValues[0] == diceValues[1])
-            {
-                moves = new List<int>() { diceValues[0], diceValues[0], diceValues[0], diceValues[0] };
-            }
-            else
-            {
-                moves = new List<int>() { diceValues[0], diceValues[1] };
-            }
-
-            //Debug.WriteLine("Recalculating moves. New moves are:");
-            //Debug.WriteLine(string.Join(",", moves));
-
-        }
-
         //Meta rules below here
         public CheckerColor playerToMove()
         {
-            return this.turnColor;
+            // return this.turnColor;
+            return state.PlayerToMove();
         }
 
     }

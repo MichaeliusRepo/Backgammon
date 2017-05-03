@@ -43,6 +43,12 @@
     <Compile Include="BackgammonGame.cs" />
     <Compile Include="CheckerColor.cs" />
     <Compile Include="BarPosition.cs" />
+    <Compile Include="MetaController\CheckLegalMovesState.cs" />
+    <Compile Include="MetaController\States.cs" />
+    <Compile Include="MetaController\MoveState.cs" />
+    <Compile Include="MetaController\GameFinishedState.cs" />
+    <Compile Include="MetaController\RollState.cs" />
+    <Compile Include="MetaController\State.cs" />
     <Compile Include="NaiveAI.cs" />
     <Compile Include="OverflowBearOffPosition.cs" />
     <Compile Include="ExactBearOffPosition.cs" />
@@ -60,6 +66,7 @@
     <Compile Include="PlayerInterface.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
