@@ -44,10 +44,10 @@ namespace Backgammon.Object
                                             0, 0, 0, 0, 0,  0,
                                            0, 0, 0, 0,  0,  0 };
 
-        public static readonly int[] TestBoard3 = new int[] { 2, 2, 2, 3,  3,  3,
-                                            0, 0, 0, 0, 0, 0,
-                                            0, 0, 0, 0, 0,  0,
-                                           -3, -3, -3, -2, -2, -2 };
+        public static readonly int[] TestBoard3 = new int[] { 2, 2, 2, 3,  3,  2,
+                                            1, 0, 0, 0, 0, 0,
+                                            0, 0, 0, 0, 0,  -1,
+                                           -2, -3, -3, -2, -2, -2 };
 
         public static readonly int[] TestBoard4 = new int[] {-3, -3, -3, -3, -3,  4,
                                                               4,  4,  3,  0,  0,  0,
@@ -65,6 +65,17 @@ namespace Backgammon.Object
         {
             for (int i = 1; i < Points.Count; i++)
                 Points[i].Glow(list.Contains(i));
+            bool canBearOff = NotOnBoard(list);
+            WhiteBoreOff.Glow(canBearOff && BoardScreen.CurrentPlayer == CheckerColor.White);
+            BlackBoreOff.Glow(canBearOff && BoardScreen.CurrentPlayer == CheckerColor.Black);
+        }
+
+        private bool NotOnBoard(List<int> list)
+        {
+            foreach (int i in list)
+                if (i > 25)
+                    return true;
+            return false;
         }
 
         public void StopGlowPoints()
@@ -162,8 +173,8 @@ namespace Backgammon.Object
         {
             WhiteOnBoard = new Point(new Vector2(midX, topY), new List<Checker>());
             BlackOnBoard = new Point(new Vector2(midX, botY), new List<Checker>());
-            WhiteBoreOff = new Point(new Vector2(midX * 2.5f, botY), new List<Checker>());
-            BlackBoreOff = new Point(new Vector2(midX * 2.5f, topY), new List<Checker>());
+            WhiteBoreOff = new Point(new Vector2(41, botY), new List<Checker>());
+            BlackBoreOff = new Point(new Vector2(41, topY), new List<Checker>());
 
             // Added dummy point to remove zero-indexing
             Points = new List<Point>() { new Point(Vector2.Zero, new List<Checker>()),
