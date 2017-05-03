@@ -59,7 +59,8 @@ namespace Backgammon.Screen
             //int[] gameBoard = BackgammonGame.DefaultGameBoard;
             int[] gameBoard = Board.TestBoard3;
 
-            Model = new BackgammonGame(gameBoard, new RealDice());
+            //Model = new BackgammonGame(gameBoard, new RealDice());
+            Model = new BackgammonGame(gameBoard, new FakeDice(new int[] { 1, 6 }));
             board = new Board(gameBoard);
             ViewInterface = new ViewInterface(Model);
             WhitePlayer = new PlayerInterface(Model, CheckerColor.White, null);
@@ -74,8 +75,17 @@ namespace Backgammon.Screen
             Image.UnloadContent();
         }
 
+        private void CheckInconsistencies()
+        {
+            int[] motherboard = Model.GetGameBoardState().getMainBoard();
+            for (int i = 0; i < motherboard.Length; i++)
+                if (board.GetAmountOfCheckersAtPoint(i + 1) != motherboard[i])
+                    throw new Exception("View was found to be inconsistent with model.");
+        }
+
         private void PlayerTurn()
         {
+            CheckInconsistencies();
             CurrentPlayer = ViewInterface.GetNextPlayerToMove();
 
             List<int> getDice = ViewInterface.GetMoves();
@@ -148,8 +158,8 @@ namespace Backgammon.Screen
                 //if (CanBearOff())
                 //    MoveChecker(BearOffTo());
                 //else
-                    board.GlowPoints(PossibleDestinations);
-                //Console.WriteLine(SelectedPoint + " can move to " + string.Join(", ", PossibleDestinations));
+                board.GlowPoints(PossibleDestinations);
+            //Console.WriteLine(SelectedPoint + " can move to " + string.Join(", ", PossibleDestinations));
         }
 
         private bool CanBearOff()
@@ -194,6 +204,8 @@ namespace Backgammon.Screen
                         SetState(GameState.PickChecker);
                     else if (PossibleDestinations.Contains(pointIndex))
                         MoveChecker(pointIndex);
+                    else if (pointIndex > 24 && PossibleDestinations.Contains(CurrentPlayer.BearOffPositionID()))
+                        MoveChecker(BearOffTo());
                     break;
             }
             base.Update(gameTime);

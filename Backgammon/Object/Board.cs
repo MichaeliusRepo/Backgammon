@@ -169,6 +169,14 @@ namespace Backgammon.Object
             //    MoveChecker(Points[at], BlackOnBoard);
         }
 
+        public int GetAmountOfCheckersAtPoint(int i)
+        {
+            int value = Points[i].GetAmount();
+            if (value != 0 && Points[i].GetTopChecker().Color == CheckerColor.Black)
+                return -value;
+            return value;
+        }
+
         private void CreatePoints()
         {
             WhiteOnBoard = new Point(new Vector2(midX, topY), new List<Checker>());

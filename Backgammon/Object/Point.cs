@@ -16,14 +16,14 @@ namespace Backgammon.Object
         protected int Number { get; private set; }
         protected Vector2 Position { get; private set; }
         protected List<Checker> Checkers { get; private set; }
-        private Image Image = new Image() { Path = "Images/Glow", Effects = "FadeEffect", IsActive = false};
+        private Image Image = new Image() { Path = "Images/Glow", Effects = "FadeEffect", IsActive = false, Scale = new Vector2(1.4f, 1.4f) };
         internal Vector2 ReceivingPosition { get; private set; }
 
         // Modifies Y distance (if < 5) between checkers
         private readonly static float checkerDistance = 33; // other values could be [25,50]
 
         // Modifies Y distance for glow effect.
-        private readonly static float YModifier = 90;
+        private readonly static float YModifier = 110;
 
         // Do not modify.
         private readonly static float MiddleY = 720 / 2;
