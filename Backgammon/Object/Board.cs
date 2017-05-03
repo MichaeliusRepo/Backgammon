@@ -57,7 +57,7 @@ namespace Backgammon.Object
         public Board(int[] board)
         {
             gameBoard = board;
-            createPoints();
+            CreatePoints();
             Image.LoadContent();
         }
 
@@ -158,7 +158,7 @@ namespace Backgammon.Object
             //    MoveChecker(Points[at], BlackOnBoard);
         }
 
-        private void createPoints()
+        private void CreatePoints()
         {
             WhiteOnBoard = new Point(new Vector2(midX, topY), new List<Checker>());
             BlackOnBoard = new Point(new Vector2(midX, botY), new List<Checker>());
@@ -169,10 +169,10 @@ namespace Backgammon.Object
             Points = new List<Point>() { new Point(Vector2.Zero, new List<Checker>()),
                                                                         WhiteOnBoard, BlackOnBoard, WhiteBoreOff, BlackBoreOff };
             for (int i = 1; i <= 24; i++)
-                Points.Insert(i, (new Point(findBoard(i), getCheckers(i))));
+                Points.Insert(i, (new Point(FindBoard(i), GetCheckers(i))));
         }
 
-        private Vector2 findBoard(int i)
+        private Vector2 FindBoard(int i)
         {
             if (i <= 6) // White Home Board
                 return new Vector2(rightX + ((6 - i) * pointDistance), botY);
@@ -184,7 +184,7 @@ namespace Backgammon.Object
             return new Vector2(rightX + ((i - 19) * pointDistance), topY);
         }
 
-        private List<Checker> getCheckers(int i)
+        private List<Checker> GetCheckers(int i)
         {
             int amountOfCheckers = gameBoard[i - 1]; // Game logic uses zero indexing :,-(
             CheckerColor checkerColor = CheckerColor.Black;

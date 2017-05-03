@@ -46,7 +46,7 @@ namespace Backgammon.Audio
         public void PlaySound(string name)
         { // Overload parameters at Play() are Volume, Pitch, Pan
             if (!AudioMuted())
-                SoundFX[name].Play(0.3f, 0, 0);
+                SoundFX[name].Play();
         }
 
         private void LoadSound(string name)

@@ -57,8 +57,8 @@ namespace Backgammon.Screen
             base.LoadContent();
             Image.LoadContent();
 
-            //int[] gameBoard = BackgammonGame.DefaultGameBoard;
-            int[] gameBoard = Board.TestBoard4;
+            int[] gameBoard = BackgammonGame.DefaultGameBoard;
+            //int[] gameBoard = Board.TestBoard4;
 
             Model = new BackgammonGame(gameBoard, new RealDice());
             board = new Board(gameBoard);

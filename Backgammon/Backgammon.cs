@@ -78,6 +78,9 @@ namespace Backgammon
             if (InputManager.Instance.KeyPressed(Keys.M))
                 AudioManager.Instance.ToggleAudio();
 
+            if (InputManager.Instance.KeyPressed(Keys.S))
+                AudioManager.Instance.PlaySound("Checker");
+
             //if (InputManager.Instance.KeyPressed(Keys.C))
             //    AudioManager.Instance.PlaySound("MenuClick");
 

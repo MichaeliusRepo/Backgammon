@@ -48,11 +48,6 @@
     <Compile Include="InvalidPosition.cs" />
     <Compile Include="NormalPosition.cs" />
     <Compile Include="Position.cs" />
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
     <Compile Include="RealDice.cs" />
     <Compile Include="MoveTreeState.cs" />
     <Compile Include="GameBoardMover.cs" />
@@ -63,12 +58,6 @@
     <Compile Include="Player.cs" />
     <Compile Include="PlayerInterface.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
