@@ -58,6 +58,7 @@ namespace Backgammon.Audio
         {
             this.Content = new ContentManager(Content.ServiceProvider, "Content");
             Music = Content.Load<Song>("Audio/Music");
+            MediaPlayer.IsRepeating = true;
 
             LoadSound("Checker");
             LoadSound("MenuClick");
