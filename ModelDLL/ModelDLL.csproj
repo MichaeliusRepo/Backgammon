@@ -42,13 +42,7 @@
   <ItemGroup>
     <Compile Include="BackgammonGame.cs" />
     <Compile Include="CheckerColor.cs" />
-    <Compile Include="BarPosition.cs" />
     <Compile Include="NaiveAI.cs" />
-    <Compile Include="OverflowBearOffPosition.cs" />
-    <Compile Include="ExactBearOffPosition.cs" />
-    <Compile Include="InvalidPosition.cs" />
-    <Compile Include="NormalPosition.cs" />
-    <Compile Include="Position.cs" />
     <Compile Include="RealDice.cs" />
     <Compile Include="MoveTreeState.cs" />
     <Compile Include="GameBoardMover.cs" />

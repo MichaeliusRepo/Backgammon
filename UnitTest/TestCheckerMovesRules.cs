@@ -303,10 +303,20 @@ namespace UnitTest
             //putting one black and one white checker on the bar
             bg = new BackgammonGame(initialGameBoard, fd, 1, 0, 1, 0);
 
-            
+
 
             //With the current setup, white should be able to move to positions 22, 16
             //and black to positions 3 and 9
+
+            HashSet<int> expectedLegalMovesWhite = HashSetFromArray(new int[] { 22, 16 });
+            HashSet<int> actualLegalMovesWhite =
+               bg.GetLegalMovesFor(WHITE, BackgammonGame.WHITE_BAR_ID);
+
+            Console.WriteLine("Expected white moves: " + string.Join(", ", expectedLegalMovesWhite));
+            Console.WriteLine("Actual white moves: " + string.Join(", ", actualLegalMovesWhite));
+
+            Assert.IsTrue(actualLegalMovesWhite.SetEquals(expectedLegalMovesWhite));
+
             HashSet<int> expectedLegalMovesBlack = HashSetFromArray(new int[] { 3, 9 });
             HashSet<int> actualLegalMovesBlack =
                 bg.GetLegalMovesFor(BLACK, BackgammonGame.BLACK_BAR_ID);
@@ -316,12 +326,10 @@ namespace UnitTest
 
             Assert.IsTrue(actualLegalMovesBlack.SetEquals(expectedLegalMovesBlack));
 
+            
 
-            HashSet<int> expectedLegalMovesWhite = HashSetFromArray(new int[] { 22, 16 });
-            HashSet<int> actualLegalMovesWhite =
-               bg.GetLegalMovesFor(WHITE, BackgammonGame.WHITE_BAR_ID);
 
-            Assert.IsTrue(actualLegalMovesWhite.SetEquals(expectedLegalMovesWhite));
+
         }
 
         
@@ -522,7 +530,7 @@ namespace UnitTest
 
             Assert.IsTrue(Enumerable.SequenceEqual(actualResult, expectedResult), "Game boards are not equal");
 
-            Assert.IsTrue(bg.GetGameBoardState().getBlackCheckersOnBar() == 1);
+            Assert.IsTrue(bg.GetGameBoardState().getCheckersOnBar(BLACK) == 1);
         }
 
         //Test that the game board state is updated correctly whenever a move in which a checker is captured is made
@@ -544,7 +552,7 @@ namespace UnitTest
                                                - 4, 0, 0, 0,  -1,  1 };
 
             Assert.IsTrue(Enumerable.SequenceEqual(actualResult, expectedResult), "Game boards are not equal");
-            Assert.IsTrue(bg.GetGameBoardState().getWhiteCheckersOnBar() == 1);
+            Assert.IsTrue(bg.GetGameBoardState().getCheckersOnBar(WHITE) == 1);
         }
 
         [TestMethod]
