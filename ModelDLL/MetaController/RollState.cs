@@ -24,6 +24,7 @@ namespace ModelDLL
                 bg.moves = new List<int>() { i, j };
             }
             bg.NextState();
+            
         }
 
         internal override State NextState()

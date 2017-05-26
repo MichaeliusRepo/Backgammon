@@ -40,24 +40,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AI\BoardEvaluator.cs" />
     <Compile Include="BackgammonGame.cs" />
     <Compile Include="CheckerColor.cs" />
-    <Compile Include="BarPosition.cs" />
+    <Compile Include="AI\GreedyAI.cs" />
     <Compile Include="MetaController\CheckLegalMovesState.cs" />
     <Compile Include="MetaController\States.cs" />
     <Compile Include="MetaController\MoveState.cs" />
     <Compile Include="MetaController\GameFinishedState.cs" />
     <Compile Include="MetaController\RollState.cs" />
     <Compile Include="MetaController\State.cs" />
-    <Compile Include="NaiveAI.cs" />
-    <Compile Include="OverflowBearOffPosition.cs" />
-    <Compile Include="ExactBearOffPosition.cs" />
-    <Compile Include="InvalidPosition.cs" />
-    <Compile Include="NormalPosition.cs" />
-    <Compile Include="Position.cs" />
+    <Compile Include="AI\NaiveAI.cs" />
     <Compile Include="RealDice.cs" />
-    <Compile Include="MoveTreeState.cs" />
-    <Compile Include="GameBoardMover.cs" />
+    <Compile Include="MovementRules\MoveTreeState.cs" />
+    <Compile Include="MovementRules\GameBoardMover.cs" />
     <Compile Include="ViewInterface.cs" />
     <Compile Include="GameBoardState.cs" />
     <Compile Include="FakeDice.cs" />

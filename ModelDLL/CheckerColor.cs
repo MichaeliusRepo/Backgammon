@@ -9,13 +9,18 @@ namespace ModelDLL
 
     public static class CheckerColorExtensions
     {
-        public const int WHITE_BAR_ID = 151357818;
+        /*public const int WHITE_BAR_ID = 151357818;
         public const int BLACK_BAR_ID = 612345638;
         public const int BEAR_OFF_WHITE_ID = 71524733;
-        public const int BEAR_OFF_BLACK_ID = 91241467;
+        public const int BEAR_OFF_BLACK_ID = 9124146;7
+        internal const int OVERFLOW_BEAR_OFF_WHITE_ID = 3967124;
+        internal const int OVERFLOW_BEAR_OFF_BLACK_ID = 5124626;*/
+        public const int WHITE_BAR_ID = 25;
+        public const int BLACK_BAR_ID = 123;
+        public const int BEAR_OFF_WHITE_ID = 0;
+        public const int BEAR_OFF_BLACK_ID =321;
         internal const int OVERFLOW_BEAR_OFF_WHITE_ID = 3967124;
         internal const int OVERFLOW_BEAR_OFF_BLACK_ID = 5124626;
-        
 
         public static int GetBar(this CheckerColor color)
         {

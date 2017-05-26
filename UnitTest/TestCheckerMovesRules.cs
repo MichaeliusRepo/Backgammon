@@ -376,6 +376,9 @@ namespace UnitTest
             HashSet<int> expectedLegalMovesBlack = HashSetFromArray(new int[] { 22, 23, BackgammonGame.BLACK_BEAR_OFF_ID } );
             HashSet<int> actualLegalMovesBlack = bg.GetLegalMovesFor(BLACK, 20);
 
+            Console.WriteLine("Expected black moves: " + string.Join(", ", expectedLegalMovesBlack));
+            Console.WriteLine("Actual black moves: " + string.Join(", ", actualLegalMovesBlack));
+
 
             Assert.IsTrue(expectedLegalMovesBlack.SetEquals(actualLegalMovesBlack));
 
@@ -439,6 +442,9 @@ namespace UnitTest
 
             HashSet<int> expectedBlackMoves = HashSetFromArray(new int[] { 24, BackgammonGame.BLACK_BEAR_OFF_ID });
             HashSet<int> actualBlackMoves = bg.GetLegalMovesFor(BLACK, 20);
+
+            Console.WriteLine("Expected black moves: " + string.Join(", ", expectedBlackMoves));
+            Console.WriteLine("  Actual black moves: " + string.Join(", ", actualBlackMoves));
 
             Assert.IsTrue(expectedBlackMoves.SetEquals(actualBlackMoves));
 
@@ -522,7 +528,7 @@ namespace UnitTest
 
             Assert.IsTrue(Enumerable.SequenceEqual(actualResult, expectedResult), "Game boards are not equal");
 
-            Assert.IsTrue(bg.GetGameBoardState().getBlackCheckersOnBar() == 1);
+            Assert.IsTrue(bg.GetGameBoardState().GetCheckersOnPosition(BLACK.GetBar()) == 1);
         }
 
         //Test that the game board state is updated correctly whenever a move in which a checker is captured is made
@@ -544,7 +550,7 @@ namespace UnitTest
                                                - 4, 0, 0, 0,  -1,  1 };
 
             Assert.IsTrue(Enumerable.SequenceEqual(actualResult, expectedResult), "Game boards are not equal");
-            Assert.IsTrue(bg.GetGameBoardState().getWhiteCheckersOnBar() == 1);
+            Assert.IsTrue(bg.GetGameBoardState().GetCheckersOnPosition(WHITE.GetBar()) == 1);
         }
 
         [TestMethod]

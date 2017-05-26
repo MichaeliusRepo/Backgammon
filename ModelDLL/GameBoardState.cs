@@ -8,196 +8,174 @@ namespace ModelDLL
 {
     public class GameBoardState
     {
+
+
+
+
+
+        /* Important note to understand the code in this code file.
+         * 
+         * Many of the code in the internal classes of the Backgammon game model deals explicitly only with cases where white is concerned. Whenever a request 
+         * regarding the black player is made, the GameBoardState and parameters for the request are transformed, or inverted, so that was was the black player is now
+         * the white player. The problem can then be solved using the code dealing with the white player, and the result is transformed back into what the client expects. 
+         * 
+         * The assumption that we have to deal only cases relating to the white player holds true for all the internal classes in the code file.
+         * 
+         */
+
+
         public const int NUMBER_OF_POSITIONS_ON_BOARD = 24;
         public const int FIRST_POSITION_ON_BOARD = 1;
         public const int NUMBER_OF_CHECKERS_PER_PLAYER = 15;
 
-        private readonly int[] mainBoard;
-        private readonly int whiteCheckersOnBar;
-        private readonly int blackCheckersOnBar;
-        private readonly int whiteCheckersOnTarget;
-        private readonly int blackCheckersOnTarget;
+        private readonly CheckerColor WHITE = CheckerColor.White;
+        private readonly CheckerColor BLACK = CheckerColor.Black;
+
+        private Dictionary<int, int> gameBoard = new Dictionary<int, int>();
 
         public GameBoardState(int[] mainBoard, int whiteCheckersOnBar, int whiteCheckersOnTarget, int blackCheckersOnBar, int blackCheckersOnTarget)
         {
-            this.mainBoard = mainBoard;
-            this.whiteCheckersOnBar = whiteCheckersOnBar;
-            this.blackCheckersOnBar = blackCheckersOnBar;
-            this.whiteCheckersOnTarget = whiteCheckersOnTarget;
-            this.blackCheckersOnTarget = blackCheckersOnTarget;
+            
+            //Checking that both players have exactly 15 checkers on the board
+            int numberOfWhiteCheckers = mainBoard
+                                        .Select(i => Math.Max(i, 0)) //Filtering out all positions that have negative numbers, or black checkers, on them
+                                        .Sum() + whiteCheckersOnBar + whiteCheckersOnTarget;
 
-            int numberOfWhiteCheckers = whiteCheckersOnBar + whiteCheckersOnTarget;
-            int numberOfBlackCheckers = blackCheckersOnBar + blackCheckersOnTarget;
-            foreach(int i in mainBoard)
-            {
-                if (i > 0) numberOfWhiteCheckers += i;
-                else numberOfBlackCheckers += -1 * i;
-            }
+            int numberOfBlackCheckers = mainBoard
+                                         .Select(i => Math.Max(i * -1, 0)) //Filtering out all positions that have positive numbers / white checkers, and making the black checkers count as positive
+                                         .Sum() + blackCheckersOnBar + blackCheckersOnTarget;
 
             if (numberOfWhiteCheckers != NUMBER_OF_CHECKERS_PER_PLAYER ||
                numberOfBlackCheckers != NUMBER_OF_CHECKERS_PER_PLAYER)
             {
                 throw new InvalidOperationException("There is not the expected number of checkers. There are " + numberOfWhiteCheckers
-                     + " white checkers and " + numberOfBlackCheckers + " black checkers");
+                      + " white checkers and " + numberOfBlackCheckers + " black checkers");
             }
-        }
 
-        private GameBoardState(int[] mainBoard, int whiteCheckersOnBar, int whiteCheckersOnTarget, int blackCheckersOnBar, int blackCheckersOnTarget, bool doNotTest)
-        {
-            this.mainBoard = mainBoard;
-            this.whiteCheckersOnBar = whiteCheckersOnBar;
-            this.blackCheckersOnBar = blackCheckersOnBar;
-            this.whiteCheckersOnTarget = whiteCheckersOnTarget;
-            this.blackCheckersOnTarget = blackCheckersOnTarget;
-        }
-
-        internal int NumberOfCheckersOnPosition(CheckerColor color, int position)
-        {
-            int checkers = mainBoard[position-1];
-            if (color == CheckerColor.Black)
+            
+            //Adding all the supplied information to the dictionary gameBoard
+            for (int i = 0; i < mainBoard.Length; i++)
             {
-                checkers *= -1;
+                gameBoard.Add(i + 1, mainBoard[i]);
             }
-            return Math.Max(checkers, 0);
+            gameBoard.Add(WHITE.GetBar(), whiteCheckersOnBar);
+            gameBoard.Add(BLACK.GetBar(), blackCheckersOnBar);
+            gameBoard.Add(WHITE.BearOffPositionID(), whiteCheckersOnTarget);
+            gameBoard.Add(BLACK.BearOffPositionID(), blackCheckersOnTarget);
         }
 
-        internal int NumberOfCheckersInHomeBoard(CheckerColor color)
+        private GameBoardState(Dictionary<int, int> gameBoard)
         {
-            int sum = 0;
-            Tuple<int, int> range = color.HomeBoardRange();
-            for (int i = range.Item1; i <= range.Item2; i++)
-            {
-                sum += NumberOfCheckersOnPosition(color, i);
-            }
-            sum += getCheckersOnTarget(color);
-            return sum;
+            this.gameBoard = gameBoard;
+        }
+           
+        //Returns true if pos is a position in the homeboard of white, or the position white is bearing off to 
+        private Predicate<int> PositionIsInHomeBoard = delegate (int pos)
+        {
+            if (pos >= 1 && pos <= 6) return true;
+            if (pos == CheckerColor.White.BearOffPositionID()) return true;
+            return false;
+        };
+
+        //Returns the number of white checkers in white's home board
+        internal int NumberOfCheckersInHomeBoard()
+        {
+            return  gameBoard
+                    .Where( kv => PositionIsInHomeBoard(kv.Key))  //Select the positions in whites home board
+                    .Select(kv => Math.Max(0, kv.Value))          //Map each key value pair to the number of white checkers (Math.Max in case there are black checkers on the position)
+                    .Sum();                                       //Return the sum
         }
 
-        internal int NumberOfCheckersInHomeBoardFurtherAwayFromBar(CheckerColor color, int position)
+        
+        //Returns the number of white checkers in white's home board, that are at a position greater than the parameter position
+        internal int NumberOfCheckersInHomeBoardFurtherAwayFromBar(int position)
         {
-            if(color == CheckerColor.White)
+            return gameBoard
+                   .Where( kv => PositionIsInHomeBoard(kv.Key))    //Select the positions in white's homeboard
+                   .Where( kv => kv.Key > position)                //Select the positions that are also greater than position
+                   .Select(kv => Math.Max(0, kv.Value))            //Map each key-value pair to the number of white checkers (Math.Max in case of black checkers on the position)
+                   .Sum();                                         //Return the sum
+        }
+
+
+        //TODO COMMENT THE BELOW
+        //ASSUMPTION IS THAT WE ARE ONLY MOVING WHITE CHECKERS!!!!
+        internal GameBoardState MoveChecker(int from, int to)
+        {
+
+            Dictionary<int, int> copy = new Dictionary<int, int>(gameBoard);
+
+            copy[from]--;
+
+            if(copy[to] == -1)
             {
-                int sum = 0;
-                for(int i = 6; i > position; i--)
-                {
-                    sum += NumberOfCheckersOnPosition(color, i);
-                }
-                return sum;
+                copy[to] = 1;
+                copy[BLACK.GetBar()]++;
             }
             else
             {
-                int sum = 0;
-                for(int i = 19; i < position; i++)
-                {
-                    sum += NumberOfCheckersOnPosition(color, i);
-                }
-                return sum;
+                copy[to]++;
             }
-        }
-
-        internal GameBoardState WherePositionsAre(int[] positions)
-        {
-            return new GameBoardState(positions, 
-                                      whiteCheckersOnBar, 
-                                      whiteCheckersOnTarget, 
-                                      blackCheckersOnBar, 
-                                      blackCheckersOnTarget, 
-                                      false); 
-                                    //TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO  
-                                      //this boolean parameter is a hack to avoid testing that the 
-                                      //number of checkers is 15.
-
-        }
-
-        internal GameBoardState WithCheckersOnBar(CheckerColor color, int number)
-        {
-            int updatedWhiteCheckers = (color == CheckerColor.White ? number : this.whiteCheckersOnBar);
-            int updatedBlackCheckers = (color == CheckerColor.Black ? number : this.blackCheckersOnBar);
-
-            return new GameBoardState(getMainBoard(), 
-                                      updatedWhiteCheckers, 
-                                      whiteCheckersOnTarget, 
-                                      updatedBlackCheckers, 
-                                      blackCheckersOnTarget,
-                                      false);
-        }
-
-        internal GameBoardState WhereCheckerIsAddedToPosition(CheckerColor color, int position)
-        {
-            int[] boardCopy = getMainBoard();
-            boardCopy[position - 1] += (color == CheckerColor.White ? 1 : -1);
-            return this.WherePositionsAre(boardCopy);
-        }
-
-        internal GameBoardState WhereCheckerIsRemovedFromPosition(CheckerColor color, int position)
-        {
-            int[] boardCopy = getMainBoard();
-            boardCopy[position - 1] -= (color == CheckerColor.White ? 1 : -1);
-            return this.WherePositionsAre(boardCopy);
-        }
-
-        internal GameBoardState WhereCheckerIsRemovedFromBar(CheckerColor color)
-        {
-            return WithCheckersOnBar(color, getCheckersOnBar(color) - 1);
-        }
-
-        internal GameBoardState WhereCheckerIsAddedToBar(CheckerColor color)
-        {
-            return WithCheckersOnBar(color, getCheckersOnBar(color) + 1);
-        }
-
-        internal GameBoardState WithCheckersOnBearOffPosition(CheckerColor color, int number)
-        {
-            int updatedWhiteCheckers = (color == CheckerColor.White ? number : this.whiteCheckersOnTarget);
-            int updatedBlackCheckers = (color == CheckerColor.Black ? number : this.blackCheckersOnTarget);
-            return new GameBoardState(getMainBoard(), 
-                                      whiteCheckersOnBar, 
-                                      updatedWhiteCheckers,
-                                      blackCheckersOnBar, 
-                                      updatedBlackCheckers,
-                                      false);
-        }
-
-        internal GameBoardState WhereCheckerIsAddedToTarget(CheckerColor color)
-        {
-            return WithCheckersOnBearOffPosition(color, getCheckersOnTarget(color) + 1);
+            return new GameBoardState(copy);
         }
 
         public int[] getMainBoard()
         {
-            int[] copy = new int[mainBoard.Length];
-            Array.Copy(mainBoard, copy, mainBoard.Length);
-            return copy;
+            Predicate<int> isInBoard = i => i >= 1 && i <= 24;
+            return gameBoard
+                   .Where(kv => isInBoard(kv.Key))
+                   .OrderBy(kv => kv.Key)
+                   .Select(kv => kv.Value)
+                   .ToArray();
         }
 
-        public int getWhiteCheckersOnBar()
+        public int GetCheckersOnPosition(int position)
         {
-            return whiteCheckersOnBar;
-        }
-
-        public int getBlackCheckersOnBar()
-        {
-            return blackCheckersOnBar;
+            if (!gameBoard.Keys.Contains(position))
+            {
+                throw new InvalidOperationException("No position '" + position + "' on the game board");
+            }
+            else return gameBoard[position];
         }
 
         public int getCheckersOnBar(CheckerColor color)
         {
-            return (color == CheckerColor.White ? getWhiteCheckersOnBar() : getBlackCheckersOnBar() );
-        }
-
-        public int getWhiteCheckersOnTarget()
-        {
-            return whiteCheckersOnTarget;
-        }
-
-        public int getBlackCheckersOnTarget()
-        {
-            return blackCheckersOnTarget;
+            return GetCheckersOnPosition(color.GetBar());
         }
 
         public int getCheckersOnTarget(CheckerColor color)
         {
-            return (color == CheckerColor.White ? getWhiteCheckersOnTarget() : getBlackCheckersOnTarget());
+            return GetCheckersOnPosition(color.BearOffPositionID());
+        }
+
+        public string Stringify()
+        {
+            var mainBoard = getMainBoard();
+            var s = "";
+            for(int i = 1; i <= 24; i++)
+            {
+                if (mainBoard[i - 1] < 0) s += " ";
+                s += i + " ";
+                if (i < 10) s += " ";
+            }
+            s += "\n";
+            return s + string.Join(", ", mainBoard) + " bar w/b: " + GetCheckersOnPosition(WHITE.GetBar()) + "/" + GetCheckersOnPosition(BLACK.GetBar())
+                                          + " bore off w/b: " + GetCheckersOnPosition(WHITE.BearOffPositionID()) + "/" + GetCheckersOnPosition(BLACK.BearOffPositionID());
+        }
+
+        internal GameBoardState InvertColor()
+        {
+            int[] newBoard = new int[24];
+            var mainBoard = getMainBoard();
+            for(int i = 0; i < 24; i++)
+            {
+                newBoard[i] = mainBoard[mainBoard.Length - 1 - i] * -1;
+            }
+            return new GameBoardState(newBoard,
+                                      getCheckersOnBar(CheckerColor.Black),
+                                      getCheckersOnTarget(CheckerColor.Black),
+                                      getCheckersOnBar(CheckerColor.White),
+                                      getCheckersOnTarget(CheckerColor.White));
         }
     }
 }
