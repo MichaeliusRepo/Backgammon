@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="BackgammonGame.cs" />
     <Compile Include="CheckerColor.cs" />
+    <Compile Include="Control\StateMachine.cs" />
     <Compile Include="MovesCalculator.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="NaiveAI.cs" />

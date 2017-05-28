@@ -8,13 +8,7 @@ using System.Threading.Tasks;
 
 namespace ModelDLL
 {
-    //Player1 is represented by positive numbers, 
-    //Player2 is represented by negative numbers
-
-
-
-
-
+  
     public class BackgammonGame
     {
         public static readonly int[] DefaultGameBoard = new int[] { -2, 0, 0, 0,  0,  5,
@@ -31,10 +25,10 @@ namespace ModelDLL
         public const int MAX_MOVE_DISTANCE_ACCEPTED = 6;
 
 
-        private CheckerColor turnColor;
-        private Dice dice;
+        internal CheckerColor turnColor;
+        internal Dice dice;
         //private GameBoard gameBoard;
-        private List<int> moves;
+        internal List<int> movesLeft;
 
 
         private GameBoardState currentGameBoardState;
@@ -61,15 +55,14 @@ namespace ModelDLL
         private void initialize(int[] gameBoard, Dice dice, int whiteCheckersOnBar, int whiteCheckersBoreOff,
                              int blackCheckersOnBar, int blackCheckersBoreOff, CheckerColor playerToMove)
         {
-            //  this.gameBoard = new ModelDLL.GameBoard(gameBoard, whiteCheckersOnBar, whiteCheckersBoreOff, blackCheckersOnBar, blackCheckersBoreOff);
             this.turnColor = playerToMove;
             this.dice = dice;
             recalculateMoves();
 
             this.currentGameBoardState = new GameBoardState(gameBoard, whiteCheckersOnBar, whiteCheckersBoreOff, blackCheckersOnBar, blackCheckersBoreOff);
         }
-
         //Constructors end
+
 
         public HashSet<int> GetLegalMovesFor(CheckerColor color, int initialPosition)
         {
@@ -81,67 +74,49 @@ namespace ModelDLL
         public List<int> Move(CheckerColor color, int from, int targetPosition)
         {
 
-            //Debug.WriteLine("-------------------------------------------------");
-            //Debug.WriteLine("Moving " + color + " from " + from + " to " + targetPosition);
             if (color != playerToMove())
             {
-                throw new InvalidOperationException();
+                throw new InvalidOperationException(color + " can't move when it is " + color.OppositeColor() + "'s turn");
             }
 
-            MovesCalculator mts = new MovesCalculator(currentGameBoardState, color, from, moves);
-            if (mts.LegalToMoveToPosition(targetPosition))
+            MovesCalculator mts = new MovesCalculator(currentGameBoardState, color, from, movesLeft);
+            if (!mts.LegalToMoveToPosition(targetPosition))
             {
-                MovesCalculator.MoveState resultingState = mts.MoveToPosition(targetPosition);
-                currentGameBoardState = resultingState.state;
-                moves = resultingState.movesLeft;
-                //Debug.WriteLine("Moves left are: " + string.Join(",", moves));
-                //Debug.WriteLine("Done making the move");
-                
-                //Change turns if no moves, or no legal moves left
-                if (moves.Count() == 0)
-                {
-                    Debug.WriteLine("Changing turns as there are no more moves left.");
-                    changeTurns();
-                }
-
-                if(GetMoveableCheckers().Count() == 0)
-                {
-                    Debug.WriteLine("There are still more moves left, but none are legal, so the turn is changed.");
-                    changeTurns();
-                }
-
-
-
-                //Debug.WriteLine("Moveable checkers are:");
-                //Debug.WriteLine(string.Join(",", GetMoveableCheckers()));
-                //Debug.WriteLine("Game board looks like: " + string.Join(",", currentGameBoardState.getMainBoard()));
-                //Debug.WriteLine("Checkers on bar, white/black: " + currentGameBoardState.getCheckersOnBar(WHITE) + "/" + currentGameBoardState.getCheckersOnBar(BLACK));
-                //Debug.WriteLine("Checkers bore off, white/black: " + currentGameBoardState.getCheckersOnTarget(WHITE) +  "/" + currentGameBoardState.getCheckersOnTarget(BLACK));
-
-                //Debug.WriteLine("-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-");
-                return resultingState.movesTaken;
+                throw new InvalidOperationException("Illegal to move " + color + " form " + from + " to " + targetPosition);
             }
-            else
+
+            MovesCalculator.MoveState resultingState = mts.MoveToPosition(targetPosition);
+            currentGameBoardState = resultingState.state;
+            movesLeft = resultingState.movesLeft;
+
+
+            // TODO potentially a problem that turns change before the moves taken are returned
+            // potential stack overflow? 
+
+            if (movesLeft.Count() == 0)
             {
-                throw new InvalidOperationException("The move is illegal");
+                changeTurns();
             }
+
+            if (GetMoveableCheckers().Count() == 0)
+            {
+                changeTurns();
+            }
+            return resultingState.movesTaken;
 
         }
 
-
-        // TODO Doesnt change turns in the case where there are no legal moves left.
-        //Also communicate when turn is changed to view
         private void changeTurns()
         {
             recalculateMoves();
-            turnColor = (turnColor == CheckerColor.White ? CheckerColor.Black : CheckerColor.White);
+            turnColor = turnColor.OppositeColor();
         }
 
 
         //Returns the list of moves that remains to be used
         public List<int> GetMovesLeft()
         {
-            return new List<int>(moves);
+            return new List<int>(movesLeft);
         }
 
 
@@ -180,19 +155,16 @@ namespace ModelDLL
 
         private void recalculateMoves()
         {
-            moves = new List<int>();
+            movesLeft = new List<int>();
             int[] diceValues = dice.RollDice();
             if (diceValues[0] == diceValues[1])
             {
-                moves = new List<int>() { diceValues[0], diceValues[0], diceValues[0], diceValues[0] };
+                movesLeft = new List<int>() { diceValues[0], diceValues[0], diceValues[0], diceValues[0] };
             }
             else
             {
-                moves = new List<int>() { diceValues[0], diceValues[1] };
+                movesLeft = new List<int>() { diceValues[0], diceValues[1] };
             }
-
-            //Debug.WriteLine("Recalculating moves. New moves are:");
-            //Debug.WriteLine(string.Join(",", moves));
 
         }
 

@@ -38,14 +38,14 @@ namespace ModelDLL
 
             //Checking that both players have exactly 15 checkers on the board
             int numberOfWhiteCheckers = mainBoard
-                                        .Select(i => Math.Max(i, 0)) //Filtering out all positions that have negative numbers, or black checkers, on them
+                                        .Where(i => i > 0) //Filtering out all positions that have negative numbers, or black checkers, on them
                                         .Sum() + whiteCheckersOnBar + whiteCheckersOnTarget;
 
             int numberOfBlackCheckers = mainBoard
-                                         .Select(i => Math.Max(i * -1, 0)) //Filtering out all positions that have positive numbers / white checkers, and making the black checkers count as positive
-                                         .Sum() + blackCheckersOnBar + blackCheckersOnTarget;
+                                         .Where(i => i < 0) //Filtering out all positions that have positive numbers / white checkers
+                                         .Sum() * -1        //Making the black checkers count as positive
+                                         + blackCheckersOnBar + blackCheckersOnTarget;
 
-            Console.WriteLine("About to pass exception shit...");
             if (numberOfWhiteCheckers != NUMBER_OF_CHECKERS_PER_PLAYER ||
                numberOfBlackCheckers != NUMBER_OF_CHECKERS_PER_PLAYER)
             {
