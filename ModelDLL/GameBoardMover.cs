@@ -9,32 +9,113 @@ namespace ModelDLL
     class GameBoardMover
     {
 
+        /* Important note to understand the code in this code file.
+         * 
+         * Many of the code in the internal classes of the Backgammon game model deals explicitly only with cases where white is concerned. Whenever a request 
+         * regarding the black player is made, the GameBoardState and parameters for the request are transformed, or inverted, so that was was the black player is now
+         * the white player. The problem can then be solved using the code dealing with the white player, and the result is transformed back into what the client expects. 
+         * 
+         * The assumption that we have to deal only cases relating to the white player holds true for all the internal classes in the code file.
+         * 
+         */
+
+
         private static CheckerColor WHITE = CheckerColor.White;
         private static CheckerColor BLACK = CheckerColor.Black;
 
 
         //Performs a move and returns the resulting state. If the move is illegal, null will be returned instead.
-        public static GameBoardState Move(GameBoardState state, CheckerColor color, int initialPosiion, int distance)
+        internal static GameBoardState Move(GameBoardState state, CheckerColor color, int initialPosition, int distance)
         {
-            int targetPosition = GetAbsolutePositionAfterMove(color, initialPosiion, distance);
-            if (IsLegalMove(state, color, initialPosiion, targetPosition))
+
+            
+
+            //Since moving a checker from the black player is identical to moving a checker from the white player, if the white player's
+            //situation was the same as the black player, the game board and input is inverted so this is the case, and the code for
+            //moving a white checker is reused
+            if (color == BLACK)
             {
-                return MoveChecker(state, color, initialPosiion, targetPosition);
+                //Transforming the input
+                state = state.InvertColor();
+                initialPosition = convertTo(WHITE, initialPosition);
+
+                state = Move(state, WHITE, initialPosition, distance);
+
+                //Returns null if the move is invalid, else transforms the move 
+                //back into the perspective of the black player and returns it.
+                return state == null ? null : state.InvertColor();
+            }
+
+            //The position of the white bar relative to the board is 25, as 24 is the first position
+            //for white when moving from the bar
+            int initialPositionRelativeToBoard = initialPosition == WHITE.GetBar() ? 25 : initialPosition;
+            int targetPosition = initialPositionRelativeToBoard - distance;
+            if (IsLegalMove(state, initialPosition, targetPosition))
+            {
+                //The previous definition of the target position is useful for determining whether or not 
+                //A move is legal. However, we risk getting negative values, for example when 
+                //the white player bears off a checker on position 4 using a die that shows 5
+                //Therefore the /actual/ target position is found using the below method call
+                targetPosition = GetPositionAfterMove(color, initialPosition, distance);
+                return state.MoveChecker(initialPosition, targetPosition);
             }
             else return null;
         }
 
-        //Given a state, color, origin position and target position, checks if the specified move is legal
-        public static bool IsLegalMove(GameBoardState state, CheckerColor color, int from, int targetPosition)
+        //Given a state, an initial position and a target position, returns true if it is legal for the white player
+        //to move a checker from the initial position to the target position, or false if not
+        private static bool IsLegalMove(GameBoardState state, int from, int targetPosition)
         {
-            Position fromPosition = GetPosition(from);
-            Position toPosition = GetPosition(targetPosition);
 
-            return fromPosition.IsLegalToMoveFromHere(state, color, from) &&
-                     toPosition.IsLegalToMoveHere(state, color, from, targetPosition);
+            bool result = IsLegalToMoveFromPosition(state, from) && IsLegalToMoveToPosition(state, from, targetPosition);
+            if (from == 25) Console.WriteLine("Mocing from white bar now.... Legal: " + result);
+            return result;
+        }
+
+        //Given a state and a position, returns true if it is legal for the white player can move a checker from that position
+        private static bool IsLegalToMoveFromPosition(GameBoardState state, int position)
+        {
+            //If the position is the bar, there has to be at least one checker on the bar
+            if (position == WHITE.GetBar())
+            {
+                return state.getCheckersOnBar(WHITE) > 0;
+            }
+            //If not, there cannot be any checkers on the bar, the position has to be on the board, and there has to be at
+            //least one checker on that position
+            else
+            {
+                if (state.getCheckersOnBar(WHITE) > 0) return false;
+                if (position < 1 || position > 24) return false;
+                return state.getMainBoard()[position - 1] > 0;
+            }
         }
 
 
+        //Given a state, an initial position and a target position, returns true if the white player 
+        //can move a checker from the initial position to the target position, or false if not.
+        private static bool IsLegalToMoveToPosition(GameBoardState state, int fromPosition, int toPosition)
+        {
+            //If the target position is between -5 and 0, then the white player is trying to bear off a checker
+            if (toPosition <= 0 && toPosition >= -5) return IsLegalToBearOff(state, fromPosition, toPosition);
+
+            //If not, make sure the position is on the board and that there are less than two enemy checkers there
+            if (toPosition < 1 || toPosition > 24) return false;
+            return state.getMainBoard()[toPosition - 1] > -2;
+        }
+
+        //Given a state, an initial position and a target position, returns true if it is legal for white
+        //to bear off a checker from the initial position to the target position
+        private static bool IsLegalToBearOff(GameBoardState state, int from, int to)
+        {
+            //Check that the home board (including the position white bears off to) is filled with all whites checkers
+            if (state.NumberOfCheckersInHomeBoard() != GameBoardState.NUMBER_OF_CHECKERS_PER_PLAYER) return false;
+            if (to == 0) return true;
+
+            //If the target position is less than 0, then white is for example trying to carry off a checker 
+            //from position 4 using a move of 5. For this to be legal, we must ensure that there are no checkers 
+            //in the home board positiond on a position greater than 4. 
+            return state.NumberOfCheckersInHomeBoardFurtherAwayFromBar(from) == 0;
+        }
 
         //Given a checker color, starting position and a distance to travel, returns the position 
         //that the checker will move to, from the perspective of the client.
@@ -42,105 +123,36 @@ namespace ModelDLL
         //at the bear off position
         internal static int GetPositionAfterMove(CheckerColor color, int from, int distance)
         {
-            int pos = GetAbsolutePositionAfterMove(color, from, distance);
-
-            if (pos == WHITE.OverflowBearOffID())
+            if (color == BLACK)
+            {
+                int equivalentWhitePosition = GetPositionAfterMove(WHITE, convertTo(WHITE, from), distance);
+                return convertTo(BLACK, equivalentWhitePosition);
+            }
+            if (from == WHITE.GetBar()) from = 25;
+            int pos = from - distance;
+            if (pos <= 0)
             {
                 return WHITE.BearOffPositionID();
             }
-            if(pos == BLACK.OverflowBearOffID())
-            {
-                return BLACK.BearOffPositionID();
-            }
-            return pos;
+            else return pos;
         }
 
 
-        // Performs the specified move, and returns the resulting game board state
-        // Throws an exception if the move is illegal. 
-        static GameBoardState MoveChecker(GameBoardState state, CheckerColor color, int from, int to)
+        //Given a position and a color, assumes the position is with regards to the other color and 
+        //converts it to the perspective of the given color
+        private static int convertTo(CheckerColor color, int i)
         {
-            if (!IsLegalMove(state, color, from, to))
+            if(color == BLACK)
             {
-                throw new InvalidOperationException("The specified move is illegal");
+                if (i == WHITE.GetBar()) return BLACK.GetBar();
+                if (i == WHITE.BearOffPositionID()) return BLACK.BearOffPositionID();
+                return 25 - i;
             }
 
-            Position fromPosition = GetPosition(from);
-            Position toPosition = GetPosition(to);
 
-            GameBoardState temporaryState = fromPosition.MoveCheckerFromHere(state, color, from);
-            return toPosition.MoveCheckerHere(temporaryState, color, to);
-        }
-
-        
-
-        private static int GetAbsolutePositionAfterMove(CheckerColor color, int initialPosition, int distance)
-        {
-
-            int pos = initialPosition + color.ChangeInPositionDueToTravelDistance(distance);
-            if (IsBar(initialPosition))
-            {
-                return color.BarPositionWithRegardsToBoard() + color.ChangeInPositionDueToTravelDistance(distance);
-            }
-            if (pos == WHITE.BearOffPositionWithRegardsToBoard() ||
-               pos == BLACK.BearOffPositionWithRegardsToBoard())
-            {
-                return color.BearOffPositionID();
-            }
-            else if (pos < WHITE.BearOffPositionWithRegardsToBoard() ||
-                     pos > BLACK.BearOffPositionWithRegardsToBoard())
-            {
-                return color.OverflowBearOffID();
-            }
-            else
-            {
-                return pos;
-            }
-        }
-
-        //Based on the id of the position, returns an instance of the corresponding Position class
-        private static Position GetPosition(int position)
-        {
-            //If the position is one directly on the board, between 1 nad 24, return a normal position
-            if(position >= GameBoardState.FIRST_POSITION_ON_BOARD &&
-               position <= GameBoardState.NUMBER_OF_POSITIONS_ON_BOARD)
-            {
-                return new NormalPosition();
-            }
-
-            //Return a bar position if the position ID is that of a bar
-            else if(IsBar(position))
-            {
-                return new BarPosition();
-            }
-
-            //return an exact bear off position if the position corresponds exactly to that of the bar (i.e., that a checker on position 4 does not try to 
-            //bear off using a move of distance 6.
-            else if(IsBearOffPosition(position))
-            {
-                return new ExactBearOffPosition();
-            }
-            //Return an "overflow" bear off position if the position is past the exact bear off position, for instance when a checker on position 4
-            //tries to bear off using a move of distance 6
-            else if(position == WHITE.OverflowBearOffID() || position == BLACK.OverflowBearOffID())
-            {
-                return new OverflowBearOffPosition();
-            }
-            //If none of the above applies, the position is invalid. Return an invalid position.
-            else
-            {
-                return new InvalidPosition();
-            }
-        }
-
-        private static bool IsBearOffPosition(int position)
-        {
-            return position == BLACK.BearOffPositionID() || position == WHITE.BearOffPositionID();
-        }
-
-        private static bool IsBar(int position)
-        {
-            return position == WHITE.GetBar() || position == BLACK.GetBar();
+            if (i == color.OppositeColor().GetBar()) return color.GetBar();
+            if (i == color.OppositeColor().BearOffPositionID()) return color.BearOffPositionID();
+            return 25 - i;
         }
     }
 }
