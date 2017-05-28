@@ -106,17 +106,9 @@ namespace ModelDLL
 
             Dictionary<int, int> copy = new Dictionary<int, int>(gameBoard);
 
-
-            if (from == BLACK.GetBar())
-            {
-                Console.WriteLine("-----------------------------------------------");
-                Console.WriteLine("Moving from white bar");
-                Console.WriteLine("Checkers on white bar is now: " + copy[from]);
-                Console.WriteLine("Checkers on the resulting position is now: " + copy[to]);
-            }
-
             copy[from]--;
 
+            //If enemy checker on position to move to, capture that checker
             if (copy[to] == -1)
             {
                 copy[to] = 1;
@@ -125,14 +117,6 @@ namespace ModelDLL
             else
             {
                 copy[to]++;
-            }
-
-            if (from == BLACK.GetBar())
-            {
-                Console.WriteLine("Moving from white bar");
-                Console.WriteLine("Checkers on white bar is now: " + copy[from]);
-                Console.WriteLine("Checkers on the resulting position is now: " + copy[to]);
-                Console.WriteLine("-----------------------------------------------");
             }
             return new GameBoardState(copy);
         }

@@ -73,7 +73,7 @@ namespace ModelDLL
 
         public HashSet<int> GetLegalMovesFor(CheckerColor color, int initialPosition)
         {
-            MoveTreeState root = new MoveTreeState(currentGameBoardState, color, initialPosition, GetMovesLeft());
+            MovesCalculator root = new MovesCalculator(currentGameBoardState, color, initialPosition, GetMovesLeft());
             return root.GetReachablePositions();
 
         }
@@ -88,12 +88,12 @@ namespace ModelDLL
                 throw new InvalidOperationException();
             }
 
-            MoveTreeState mts = new MoveTreeState(currentGameBoardState, color, from, moves);
+            MovesCalculator mts = new MovesCalculator(currentGameBoardState, color, from, moves);
             if (mts.LegalToMoveToPosition(targetPosition))
             {
-                MoveTreeState resultingState = mts.MoveToPosition(targetPosition);
-                currentGameBoardState = resultingState.GetState();
-                moves = resultingState.GetMovesLeft();
+                MovesCalculator.MoveState resultingState = mts.MoveToPosition(targetPosition);
+                currentGameBoardState = resultingState.state;
+                moves = resultingState.movesLeft;
                 //Debug.WriteLine("Moves left are: " + string.Join(",", moves));
                 //Debug.WriteLine("Done making the move");
                 
@@ -110,7 +110,7 @@ namespace ModelDLL
                     changeTurns();
                 }
 
-                
+
 
                 //Debug.WriteLine("Moveable checkers are:");
                 //Debug.WriteLine(string.Join(",", GetMoveableCheckers()));
@@ -119,7 +119,7 @@ namespace ModelDLL
                 //Debug.WriteLine("Checkers bore off, white/black: " + currentGameBoardState.getCheckersOnTarget(WHITE) +  "/" + currentGameBoardState.getCheckersOnTarget(BLACK));
 
                 //Debug.WriteLine("-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-");
-                return resultingState.GetMovesTaken();
+                return resultingState.movesTaken;
             }
             else
             {
