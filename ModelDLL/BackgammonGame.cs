@@ -16,6 +16,8 @@ namespace ModelDLL
                                             5, 0, 0, 0, -3,  0,
                                            -5, 0, 0, 0,  0,  2 };
 
+        private static readonly GameBoardState defaultGameBoardState = new GameBoardState(DefaultGameBoard, 0, 0, 0, 0);
+
         private const CheckerColor WHITE = CheckerColor.White;
         private const CheckerColor BLACK = CheckerColor.Black;
         public static readonly int WHITE_BAR_ID = WHITE.GetBar();
@@ -32,6 +34,10 @@ namespace ModelDLL
 
 
         private GameBoardState currentGameBoardState;
+
+        private PlayerInterface whitePlayer;
+        private PlayerInterface blackPlayer; 
+
 
 
         //Constructors
@@ -60,9 +66,28 @@ namespace ModelDLL
             recalculateMoves();
 
             this.currentGameBoardState = new GameBoardState(gameBoard, whiteCheckersOnBar, whiteCheckersBoreOff, blackCheckersOnBar, blackCheckersBoreOff);
+            
+            whitePlayer = new PlayerInterface(this, WHITE, null);
+            blackPlayer = new PlayerInterface(this, BLACK, null);
         }
         //Constructors end
 
+        public PlayerInterface ConnectPlayer(CheckerColor color, Player player)
+        {
+            var pi = color == WHITE ? whitePlayer : blackPlayer;
+            if (pi.HasPlayer())
+            {
+                return null;
+            }
+            pi.SetPlayerIfNull(player);
+            player.ConnectPlayerInterface(pi);
+            return pi;
+        }
+
+        public void StartGame()
+        {
+            (turnColor == WHITE ? whitePlayer : blackPlayer).MakeMove();
+        }
 
         public HashSet<int> GetLegalMovesFor(CheckerColor color, int initialPosition)
         {
@@ -71,7 +96,7 @@ namespace ModelDLL
 
         }
 
-        public List<int> Move(CheckerColor color, int from, int targetPosition)
+        public void Move(CheckerColor color, int from, int targetPosition)
         {
 
             if (color != playerToMove())
@@ -93,23 +118,62 @@ namespace ModelDLL
             // TODO potentially a problem that turns change before the moves taken are returned
             // potential stack overflow? 
 
+
+            NotifyView(color, from, targetPosition);
+            if (IsGameOver())
+            {
+                //Console.WriteLine("Game is over!! Terminating");
+                return;
+            }
+
             if (movesLeft.Count() == 0)
             {
                 changeTurns();
             }
-
-            if (GetMoveableCheckers().Count() == 0)
+            else if (GetMoveableCheckers().Count() == 0)
             {
                 changeTurns();
             }
-            return resultingState.movesTaken;
 
+            (turnColor == WHITE ? whitePlayer : blackPlayer).MakeMove();
+            
+        }
+
+        private void NotifyView(CheckerColor color, int from, int to) 
+        {
+
+            // Console.WriteLine("----------------------------------------------\n" + 
+            //                  "Moving " + color + " from " + from + " to " + to + ". Moves left are: " + string.Join(",", movesLeft) + "\n" + currentGameBoardState.Stringify() + "\n--------------------------------------------------");
+            // var s = Console.ReadLine();
+
+
+            //Console.WriteLine("----------------------------------------------\n" +  currentGameBoardState.Stringify() + "\n--------------------------------------------------");
+
+            //TODO Implement this
+        }
+
+        public void Reset()
+        {
+            this.currentGameBoardState = defaultGameBoardState;
+            turnColor = WHITE;
         }
 
         private void changeTurns()
         {
             recalculateMoves();
             turnColor = turnColor.OppositeColor();
+
+            if (GetMoveableCheckers().Count() == 0)
+            {
+                changeTurns();
+            }
+           
+            
+        }
+
+        private bool IsGameOver()
+        {
+            return currentGameBoardState.getCheckersOnTarget(WHITE) == 15 || currentGameBoardState.getCheckersOnTarget(BLACK) == 15;
         }
 
 

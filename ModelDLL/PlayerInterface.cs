@@ -16,6 +16,11 @@ namespace ModelDLL
             this.player = player;
         }
 
+        internal bool HasPlayer()
+        {
+            return player != null;
+        }
+
         public void SetPlayerIfNull(Player player)
         {
             if(this.player == null)
@@ -59,8 +64,8 @@ namespace ModelDLL
 
         public List<int> move(int intialPosition, int targetPosition)
         {
-            
-            return bg.Move(this.color, intialPosition, targetPosition);
+            bg.Move(this.color, intialPosition, targetPosition);
+            return new List<int>();
         }
 
         public void move(int from, List<int> moves)
@@ -72,16 +77,21 @@ namespace ModelDLL
             }
         }
 
-        void TurnStarted()
+        internal void TurnStarted()
         {
             if (player != null)
                 player.TurnStarted();
         }
 
-        void TurnEnded()
+        internal void TurnEnded()
         {
             if (player != null)
                 player.TurnEnded();
+        }
+
+        internal void MakeMove()
+        {
+            if (player != null) player.MakeMove();
         }
 
     }
