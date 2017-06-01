@@ -23,22 +23,25 @@ namespace ModelDLL
         {
             initialMoveState = new MoveState(state, color, fromPosition, moves, new List<int>());
 
+
+            //THE PARAMETERS IN THE METHODS BELOW  (GenerateMoveStatesForPosition) are experimental!!
+
             //Initialises the set of reachable states given the starting GameBoardState, position and moves
-            IEnumerable<MoveState> tmp1 = initialMoveState.GenerateMoveStates();
+            IEnumerable<MoveState> tmp1 = initialMoveState.GenerateMoveStatesForPosition();
             while(tmp1.Count() > 0)
             {
                 reachableStates.AddRange(tmp1); //Adds all the states in tmp1 to the reachable states
 
                 tmp1 = tmp1
                     //Maps every state 'a' in tmp1 to a list that contains the states that are reachable from 'a'
-                    .Select(s => s.GenerateMoveStates())
+                    .Select(s => s.GenerateMoveStatesForPosition())
                     //Concatenates all the lists, yielding a new set of reachable states
                     .Aggregate((a, b) => a.Concat(b));   
                                                                 
             }
         }
 
-        internal HashSet<int> GetReachablePositions()
+        internal IEnumerable<int> GetReachablePositions()
         {
             //Maps each reachable state 'a' to the position the checker on the initial position
             //is moved to in order for the resulting state to be 'a'
@@ -73,6 +76,23 @@ namespace ModelDLL
 
         }
 
+        internal static IEnumerable<int> GetMoveableCheckers(GameBoardState state, CheckerColor color, List<int> moves)
+        {
+            HashSet<int> output = new HashSet<int>();
+            if(new MovesCalculator(state, color, color.GetBar(), moves).GetReachablePositions().Count() > 0){
+                output.Add(color.GetBar());
+            }
+            for(int i = 1; i <= 24; i++)
+            {
+                if(new MovesCalculator(state, color, i, moves).GetReachablePositions().Count() > 0)
+                {
+                    output.Add(i);
+                }
+            }
+            return output;
+        }
+
+
         internal class MoveState
         {
             internal List<int> movesTaken;
@@ -91,7 +111,7 @@ namespace ModelDLL
                 this.movesTaken = movesTaken;
             }
 
-            internal IEnumerable<MoveState> GenerateMoveStates()
+            internal IEnumerable<MoveState> GenerateMoveStatesForPosition()
             {
                 List<MoveState> output = new List<MoveState>();
 

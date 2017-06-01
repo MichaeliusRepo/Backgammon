@@ -29,6 +29,11 @@ namespace ModelDLL
             }
         }
 
+        public CheckerColor MyColor()
+        {
+            return color;
+        }
+
         public bool IsMyTurn()
         {
             return bg.playerToMove() == color;
@@ -77,6 +82,24 @@ namespace ModelDLL
             }
         }
 
+        internal IEnumerable<Node> GetFinalStates()
+        {
+            if (!IsMyTurn())
+            {
+                throw new InvalidOperationException("Player " + color + " tried to get all final states when not his turn");
+            }
+            else return bg.GetFinalStates();
+        }
+
+        internal void MoveTo(Node finalState)
+        {
+            if (!IsMyTurn())
+            {
+                throw new InvalidOperationException("Player " + color + " tried to move to  final state when not his turn");
+            }
+            else bg.MoveToFinalState(color, finalState);
+        }
+
         internal void TurnStarted()
         {
             if (player != null)
@@ -90,6 +113,7 @@ namespace ModelDLL
         }
 
         internal void MakeMove()
+
         {
             if (player != null) player.MakeMove();
         }

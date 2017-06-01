@@ -13,7 +13,7 @@ namespace ModelDLL
         {
 
             BackgammonGame bg = new BackgammonGame(BackgammonGame.DefaultGameBoard, new RealDice());
-            Player naiWhite = new NaiveAI(null);
+            Player naiWhite = new GreedyAI(null);
             bg.ConnectPlayer(CheckerColor.White, naiWhite);
 
             Player naiBlack = new NaiveAI(null);
