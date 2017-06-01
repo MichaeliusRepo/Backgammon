@@ -16,12 +16,22 @@ namespace ModelDLL
             this.player = player;
         }
 
+        internal bool HasPlayer()
+        {
+            return player != null;
+        }
+
         public void SetPlayerIfNull(Player player)
         {
             if(this.player == null)
             {
                 this.player = player;
             }
+        }
+
+        public CheckerColor MyColor()
+        {
+            return color;
         }
 
         public bool IsMyTurn()
@@ -59,8 +69,8 @@ namespace ModelDLL
 
         public List<int> move(int intialPosition, int targetPosition)
         {
-            
-            return bg.Move(this.color, intialPosition, targetPosition);
+            bg.Move(this.color, intialPosition, targetPosition);
+            return new List<int>();
         }
 
         public void move(int from, List<int> moves)
@@ -72,16 +82,40 @@ namespace ModelDLL
             }
         }
 
-        void TurnStarted()
+        internal IEnumerable<Node> GetFinalStates()
+        {
+            if (!IsMyTurn())
+            {
+                throw new InvalidOperationException("Player " + color + " tried to get all final states when not his turn");
+            }
+            else return bg.GetFinalStates();
+        }
+
+        internal void MoveTo(Node finalState)
+        {
+            if (!IsMyTurn())
+            {
+                throw new InvalidOperationException("Player " + color + " tried to move to  final state when not his turn");
+            }
+            else bg.MoveToFinalState(color, finalState);
+        }
+
+        internal void TurnStarted()
         {
             if (player != null)
                 player.TurnStarted();
         }
 
-        void TurnEnded()
+        internal void TurnEnded()
         {
             if (player != null)
                 player.TurnEnded();
+        }
+
+        internal void MakeMove()
+
+        {
+            if (player != null) player.MakeMove();
         }
 
     }

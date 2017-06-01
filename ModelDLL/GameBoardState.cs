@@ -27,11 +27,41 @@ namespace ModelDLL
         public const int NUMBER_OF_POSITIONS_ON_BOARD = 24;
         public const int FIRST_POSITION_ON_BOARD = 1;
         public const int NUMBER_OF_CHECKERS_PER_PLAYER = 15;
+        public static readonly GameBoardState DefaultGameBoardState = new GameBoardState(BackgammonGame.DefaultGameBoard, 0, 0, 0, 0);
 
         private readonly CheckerColor WHITE = CheckerColor.White;
         private readonly CheckerColor BLACK = CheckerColor.Black;
 
         private Dictionary<int, int> gameBoard = new Dictionary<int, int>();
+
+        private static readonly int MaximumNumberOfMoves = 4;
+
+        private static readonly List<List<int>> AllRolledTwice = new List<List<int>>() {
+                new List<int>() { 1,2 },
+                new List<int>() { 1,3 },
+                new List<int>() { 1,4 },
+                new List<int>() { 1,5 },
+                new List<int>() { 1,6 },
+                new List<int>() { 2,3 },
+                new List<int>() { 2,4 },
+                new List<int>() { 2,5 },
+                new List<int>() { 2,6 },
+                new List<int>() { 3,4 },
+                new List<int>() { 3,5 },
+                new List<int>() { 3,6 },
+                new List<int>() { 4,5 },
+                new List<int>() { 4,6 },
+                new List<int>() { 5,6 }
+        };
+
+        private static readonly List<List<int>> AllRolledOnce = new List<List<int>>() {
+            new List<int>() {1,1,1,1},
+            new List<int>() {2,2,2,2},
+            new List<int>() {3,3,3,3},
+            new List<int>() {4,4,4,4},
+            new List<int>() {5,5,5,5},
+            new List<int>() {6,6,6,6}
+        };
 
         public GameBoardState(int[] mainBoard, int whiteCheckersOnBar, int whiteCheckersOnTarget, int blackCheckersOnBar, int blackCheckersOnTarget)
         {
@@ -63,6 +93,26 @@ namespace ModelDLL
             gameBoard.Add(BLACK.GetBar(), blackCheckersOnBar);
             gameBoard.Add(WHITE.BearOffPositionID(), whiteCheckersOnTarget);
             gameBoard.Add(BLACK.BearOffPositionID(), blackCheckersOnTarget);
+        }
+
+        internal int pip(CheckerColor color)
+        {
+            if(color == BLACK)
+            {
+                return this.InvertColor().pip(WHITE);
+            }
+
+            return gameBoard.Where(kv => kv.Key >= 1 && kv.Key <= 24).Where(kv => kv.Value > 0).Select(kv => kv.Key * kv.Value).Sum() + getCheckersOnBar(WHITE)*25;
+        }
+
+        internal int capturableCheckers(CheckerColor color)
+        {
+            if(color == BLACK)
+            {
+                return InvertColor().capturableCheckers(WHITE);
+            }
+
+            return gameBoard.Where(kv => kv.Key >= 1 && kv.Key <= 24).Where(kv => kv.Value == 1).Count();
         }
 
         private GameBoardState(Dictionary<int, int> gameBoard)
@@ -121,14 +171,111 @@ namespace ModelDLL
             return new GameBoardState(copy);
         }
 
+        private double ProbabilityOfWhiteCapturing()
+        {
+            return InvertColor().ProbabilityOfWhiteGettingCaptured();
+        }
+
+        public double ProbabilityOfWhiteGettingCaptured()
+        {
+          
+
+            if (getCheckersOnBar(BLACK) > 0)
+             {
+                  return ProbabilityOfWhiteGettingCapturedIfBlackHasCheckersOnBar();
+             }
+
+            return ProbabilityOfWhiteGettingCaptured(AllRolledTwice, AllRolledOnce);
+        }
+
+        private Predicate<int> IsInMainBoard = delegate (int i) { return i >= 1 && i <= 24; };
+
+        private double ProbabilityOfWhiteGettingCaptured(List<List<int>> movesThatAppearTwiceLeft, List<List<int>> movesThatAppearOnceLeft)
+        {
+            //A subset of the game board excluding the bars and target positions
+            IEnumerable<KeyValuePair<int, int>> mainBoard = gameBoard.Where(kv => IsInMainBoard(kv.Key));
+
+
+            //The positions of the capturable white checkers/the white checkers that are standing alone
+            IEnumerable<int> capturable = mainBoard.Where(kv => kv.Value == 1).Select(kv => kv.Key);
+
+            //If no checkers are captruable, then the probability is zero
+            if (capturable.Count() == 0) return 0;
+
+
+            //The positions of the black checkers on the board
+            IEnumerable<int> blackCheckers = mainBoard.Where(kv => kv.Value < 0).Select(kv => kv.Key);
+
+
+            double a = movesThatAppearTwiceLeft.Where(moves => BlackCapturesGivenMoves(capturable, blackCheckers, moves)).Count() * 2.0 / 36;
+            double b = movesThatAppearOnceLeft.Where(moves => BlackCapturesGivenMoves(capturable, blackCheckers, moves)).Count() / 36.0;
+
+            return a + b;
+        }
+
+        private double ProbabilityOfWhiteGettingCapturedIfBlackHasCheckersOnBar()
+        {
+            var allRolledWtwice = AllRolledTwice.Where(movesTMP => BlackCapturesGivenMoves(movesTMP));
+            double a = allRolledWtwice.Count() * 2.0 / 36;
+
+            var allRolledOnce = AllRolledOnce.Where(movesTMP => BlackCapturesGivenMoves(movesTMP));
+            double b = allRolledOnce.Count() / 36.0;
+
+
+            return a + b;
+        }
+       
+        //Given a collection of positions describing where there are white checkers that are capturable,
+        //the positions of the black checkers and a list of moves, determines whether or not at least one 
+        //white checker can be captured by a black checker
+        private bool BlackCapturesGivenMoves(IEnumerable<int> capturable, IEnumerable<int> blackCheckers, List<int> moves)
+        {
+            //Gets all the positions that are reachable for the black checkers
+            var blackReachable = blackCheckers
+
+                                //Creates a collection of collections of ints. 
+                                //Each of the ints represent a position that a black checker can get to
+                                .Select(p => new MovesCalculator(this, BLACK, p, moves).GetReachablePositions()) 
+
+                                //Combines the multiple collections in the previous line into one collection
+                                .Aggregate((a, b) => a.Concat(b));
+
+
+            //Finding the positions that appear in both the capturable white checkers
+            //and the reachable positions for black
+            var checkersBlackCanCapture = blackReachable.Intersect(capturable);
+
+            //Returns true if there is at least one such position
+            return checkersBlackCanCapture.Count() > 0;
+
+        }
+
+        private bool BlackCapturesGivenMoves(List<int> moves)
+        {
+            //var finalStates = MovesCalculator.GetFinalStates(this, BLACK, moves);
+            //var finalStates = new FinalStatesCalculator(new List<GameBoardState>() { this }, BLACK, moves).Calculate();
+            var finalStates = FinalStatesCalculator2.AllReachableStatesTree(this, BLACK, moves).GetFinalStates().Select(node => node.state);
+           
+            
+            // Console.WriteLine("Number of final states: " + finalStates.Count());
+            //Console.WriteLine(string.Join(",", finalStates.Select(s => s.Stringify() + "\n\n\n")));
+            return BlackCaptured(finalStates);
+        }
+
+        private bool BlackCaptured(IEnumerable<GameBoardState> states)
+        {
+            return states.Where(s => s.getCheckersOnBar(WHITE) > this.getCheckersOnBar(WHITE)).Count() > 0;
+        }
+
+
+
         public int[] getMainBoard()
         {
-            int[] mainBoard = new int[24];
-            for(int i = 1; i <= 24; i++)
-            {
-                mainBoard[i - 1] = gameBoard[i];
-            }
-            return mainBoard;
+            return gameBoard
+                .Where(kv => IsInMainBoard(kv.Key))
+                .OrderBy(kv => kv.Key)
+                .Select(kv => kv.Value)
+                .ToArray();
 
         }
 
@@ -180,5 +327,7 @@ namespace ModelDLL
                                       getCheckersOnBar   (WHITE),
                                       getCheckersOnTarget(WHITE));
         }
+
+        
     }
 }

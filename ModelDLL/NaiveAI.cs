@@ -16,6 +16,11 @@ namespace ModelDLL
             this.pi = playerInterface;
         }
 
+        public void ConnectPlayerInterface(PlayerInterface playerInterface)
+        {
+            pi = playerInterface;
+        }
+
         public void TurnEnded()
         {
             Debug.WriteLine("Turn ended for naive ai");
@@ -31,6 +36,14 @@ namespace ModelDLL
                 positionToMoveTo = pi.GetLegalMovesForChecker(checkerToMove).ElementAt(0);
                 pi.move(checkerToMove, positionToMoveTo);
             }
+        }
+
+        public void MakeMove()
+        {
+            int checkerToMove = pi.GetMoveableCheckers().ElementAt(0);
+            int positionToMoveTo = pi.GetLegalMovesForChecker(checkerToMove).ElementAt(0);
+            pi.move(checkerToMove, positionToMoveTo);
+
         }
     }
 }
