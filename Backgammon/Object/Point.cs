@@ -19,7 +19,7 @@ namespace Backgammon.Object
         private Image Image = new Image() { Path = "Images/Glow", Effects = "FadeEffect", IsActive = false, Scale = new Vector2(1.4f, 1.4f) };
         internal Vector2 ReceivingPosition { get; private set; }
 
-        // Modifies Y distance (if < 5) between checkers
+        // Modifies Y distance between checkers
         private readonly static float checkerDistance = 33; // other values could be [25,50]
 
         // Modifies Y distance for glow effect.

@@ -98,16 +98,14 @@ namespace Backgammon.Object
         {
             if (color == CheckerColor.White)
                 return WhiteOnBoard;
-            else
-                return BlackOnBoard;
+            return BlackOnBoard;
         }
 
         private Point GetBearOffPoint(CheckerColor color)
         {
             if (color == CheckerColor.White)
                 return WhiteBoreOff;
-            else
-                return WhiteBoreOff;
+            return BlackBoreOff;
         }
 
         private void HighlightImage(Checker c)
@@ -125,8 +123,12 @@ namespace Backgammon.Object
         }
 
         public bool CheckerWasCaptured(CheckerColor playerColor, int to)
-        {
-            return (Points[to].GetAmount() == 1 && Points[to].GetTopChecker().Color != playerColor);
+        { // When bearing off checkers, ArrayOutOfBoundsException may occur.
+            try
+            { // But a checker cannot be captured when moving off the board in one move. Thus, it is OK to return false.
+                return (Points[to].GetAmount() == 1 && Points[to].GetTopChecker().Color != playerColor);
+            }
+            catch (Exception e) { return false; }
         }
 
         internal int GetClickedPoint()
@@ -155,7 +157,7 @@ namespace Backgammon.Object
             from.SendToPoint(to);
         }
 
-        public void BearOff(CheckerColor color,int from)
+        public void BearOff(CheckerColor color, int from)
         {
             MoveChecker(Points[from], GetBearOffPoint(color));
         }
@@ -163,10 +165,6 @@ namespace Backgammon.Object
         public void Capture(int at)
         {
             MoveChecker(Points[at], GetPointOnBoard(Points[at].GetTopChecker().Color));
-            //if (Points[at].GetTopChecker().Color == CheckerColor.White)
-            //    MoveChecker(Points[at], WhiteOnBoard);
-            //else
-            //    MoveChecker(Points[at], BlackOnBoard);
         }
 
         public int GetAmountOfCheckersAtPoint(int i)
@@ -181,8 +179,8 @@ namespace Backgammon.Object
         {
             WhiteOnBoard = new Point(new Vector2(midX, topY), new List<Checker>());
             BlackOnBoard = new Point(new Vector2(midX, botY), new List<Checker>());
-            WhiteBoreOff = new Point(new Vector2(41, botY), new List<Checker>());
-            BlackBoreOff = new Point(new Vector2(41, topY), new List<Checker>());
+            WhiteBoreOff = new Point(new Vector2(1060, botY), new List<Checker>());
+            BlackBoreOff = new Point(new Vector2(1060, topY), new List<Checker>());
 
             // Added dummy point to remove zero-indexing
             Points = new List<Point>() { new Point(Vector2.Zero, new List<Checker>()),

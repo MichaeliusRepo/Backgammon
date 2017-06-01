@@ -92,7 +92,7 @@ namespace ModelDLL
         internal int NumberOfCheckersInHomeBoardFurtherAwayFromBar(int position)
         {
             return gameBoard
-                   .Where(kv => PositionIsInHomeBoard(kv.Key))    //Select the positions in white's homeboard
+                   .Where(kv => kv.Key >= 1 && kv.Key <= 6)    //Select the positions in white's homeboard
                    .Where(kv => kv.Key > position)                //Select the positions that are also greater than position
                    .Select(kv => Math.Max(0, kv.Value))            //Map each key-value pair to the number of white checkers (Math.Max in case of black checkers on the position)
                    .Sum();                                         //Return the sum

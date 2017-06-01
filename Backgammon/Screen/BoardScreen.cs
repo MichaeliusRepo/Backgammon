@@ -13,30 +13,18 @@ using ModelDLL;
 
 namespace Backgammon.Screen
 {
-    /* 0) Re-sync with game logic
-    *  Checkers on board: Create a point representing the stack.
-    *  Create animation to put stuff on board.
-    *  Create animation for capturing checkers.
-    * 
-    *  1) Add Dice Roll Graphics
-    *  2) Display Pips
-    *  3) Implement Splash Screen
-    *  4) Implement Option Screen
-    *  Options screen:
-* - Audio
-* - Pips
-* - Type of game (PvP, PvE, AIvAI, online)
-* - Player color
-    * */
-
-    /// <summary>
-    /// Get Game Board()
-    /// PlayerToMove() returns CheckerColor
-    /// Get Movable Checkers()
-    /// Get Legal Moves For Checker (int position)
-    ///  Move (int from, int to)
-    ///  Get#Checkers on Bar(CheckerColor color) returns int 
-    /// </summary>
+    /*
+        * 
+        *  1) Add Dice Roll Graphics
+        *  2) Display Pips
+        *  3) Implement Splash Screen
+        *  4) Implement Option Screen
+        *  Options screen:
+    * - Audio
+    * - Pips
+    * - Type of game (PvP, PvE, AIvAI, online)
+    * - Player color
+        * */
 
     public class BoardScreen : GameScreen
     {
@@ -93,17 +81,10 @@ namespace Backgammon.Screen
             Console.WriteLine(CurrentPlayer);
             Console.WriteLine("Dice Rolls: " + string.Join(", ", getDice));
             MovableCheckers = ViewInterface.GetMoveableCheckers();
-            //Console.WriteLine("Movable Checkers: " + string.Join(", ", MovableCheckers));
             board.GlowPoints(MovableCheckers);
-            //Console.WriteLine(string.Join(", ", ViewInterface.GetGameBoardState().getMainBoard()));
 
             if (MovableCheckers.Contains(CurrentPlayer.GetBar()))
                 PickChecker(CurrentPlayer.GetBar());
-            //if (MovableCheckers.Count == 0)
-            //{
-            //    Console.WriteLine("No possible moves for " + CurrentPlayer);
-            //    Console.WriteLine("GAME IS STUCK :,-(");
-            //}
         }
 
         private void PickChecker(int pointIndex)
@@ -139,7 +120,7 @@ namespace Backgammon.Screen
                 to += 25;
             if (board.CheckerWasCaptured(CurrentPlayer, to))
                 board.Capture(to);
-            if (CanBearOff())
+            if (CanBearOff() && SetOfMoves.Count == 1)
                 board.BearOff(CurrentPlayer, SelectedPoint);
             else if (NotOnBar())
                 board.MoveChecker(SelectedPoint, to);
@@ -155,30 +136,24 @@ namespace Backgammon.Screen
             if (State == GameState.PickChecker)
                 PlayerTurn();
             if (State == GameState.PickDestination)
-                //if (CanBearOff())
-                //    MoveChecker(BearOffTo());
-                //else
                 board.GlowPoints(PossibleDestinations);
-            //Console.WriteLine(SelectedPoint + " can move to " + string.Join(", ", PossibleDestinations));
         }
 
         private bool CanBearOff()
         {
-            foreach (int i in PossibleDestinations)
-                if (i > 25) return true;
-            return false;
+            return PossibleDestinations.Contains(BackgammonGame.BLACK_BEAR_OFF_ID) || PossibleDestinations.Contains(BackgammonGame.WHITE_BEAR_OFF_ID);
         }
 
         private int BearOffTo()
         {
-            foreach (int i in PossibleDestinations)
-                if (i > 25) return i;
-            throw new Exception();
+            if (CurrentPlayer == CheckerColor.White)
+                return BackgammonGame.WHITE_BEAR_OFF_ID;
+            return BackgammonGame.BLACK_BEAR_OFF_ID;
         }
 
         private bool NotOnBar()
         {
-            return SelectedPoint <= 24;
+            return !(SelectedPoint.Equals(BackgammonGame.BLACK_BAR_ID) || SelectedPoint.Equals(BackgammonGame.WHITE_BAR_ID));
         }
 
         public override void Update(GameTime gameTime)
