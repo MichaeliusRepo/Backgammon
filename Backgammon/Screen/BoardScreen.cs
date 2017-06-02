@@ -25,6 +25,10 @@ namespace Backgammon.Screen
     * - Pips
     * - Type of game (PvP, PvE, AIvAI, online)
     * - Player color
+    * 
+    * 
+    * 
+    * 
         * */
 
     public class BoardScreen : GameScreen
@@ -45,17 +49,17 @@ namespace Backgammon.Screen
             base.LoadContent();
             Image.LoadContent();
 
-            //int[] gameBoard = BackgammonGame.DefaultGameBoard;
-            int[] gameBoard = Board.TestBoard3;
+            int[] gameBoard = BackgammonGame.DefaultGameBoard;
+            //int[] gameBoard = Board.TestBoard5;
 
-            //Model = new BackgammonGame(gameBoard, new RealDice());
-            Model = new BackgammonGame(gameBoard, new FakeDice(new int[] { 1, 6 }));
+            Model = new BackgammonGame(gameBoard, new RealDice());
+            //Model = new BackgammonGame(gameBoard, new FakeDice(new int[] { 6, 6, 6, 6 }), 0, 0, 0, 0);
             board = new Board(gameBoard);
             ViewInterface = new ViewInterface(Model);
             WhitePlayer = new PlayerInterface(Model, White, null);
-            Player nai = new NaiveAI(BlackPlayer);
+            //Player nai = new NaiveAI(BlackPlayer);
             BlackPlayer = new PlayerInterface(Model, Black, nai);
-            //BlackPlayer = new PlayerInterface(Model, Black, null);
+            BlackPlayer = new PlayerInterface(Model, Black, null);
 
             SetState(GameState.PickChecker);
         }
@@ -71,7 +75,8 @@ namespace Backgammon.Screen
             int[] motherboard = Model.GetGameBoardState().getMainBoard();
             for (int i = 0; i < motherboard.Length; i++)
                 if (board.GetAmountOfCheckersAtPoint(i + 1) != motherboard[i])
-                    throw new Exception("View was found to be inconsistent with model.");
+                    throw new Exception("View was found to be inconsistent with model. \n"
+                        + board.GetAmountOfCheckersAtPoint(i + 1) + " != " + motherboard[i]);
         }
 
         private void PlayerTurn()
@@ -90,23 +95,23 @@ namespace Backgammon.Screen
                 PickChecker(CurrentPlayer.GetBar());
         }
 
-        private void PickChecker(int pointIndex)
+        private void PickChecker(int clickedPoint)
         {
-            SelectedPoint = pointIndex;
+            SelectedPoint = clickedPoint;
             if (NotOnBar())
-                board.HighlightChecker(pointIndex);
+                board.HighlightChecker(clickedPoint);
             else
                 board.HighlightChecker(CurrentPlayer);
-            PossibleDestinations = ViewInterface.GetLegalMovesForCheckerAtPosition(pointIndex);
+            PossibleDestinations = ViewInterface.GetLegalMovesForCheckerAtPosition(clickedPoint);
             SetState(GameState.PickDestination);
         }
 
-        private void MoveChecker(int pointIndex)
+        private void MoveChecker(int clickedPoint)
         {
             if (CurrentPlayer == White)
-                SetOfMoves = WhitePlayer.move(SelectedPoint, pointIndex);
+                SetOfMoves = WhitePlayer.move(SelectedPoint, clickedPoint);
             else
-                SetOfMoves = BlackPlayer.move(SelectedPoint, pointIndex);
+                SetOfMoves = BlackPlayer.move(SelectedPoint, clickedPoint);
             board.StopGlowPoints();
             board.RemoveCheckerHighlight();
             SetState(GameState.Animating);
@@ -123,10 +128,10 @@ namespace Backgammon.Screen
                 to += 25;
             if (board.CheckerWasCaptured(CurrentPlayer, to))
                 board.Capture(to);
-            if (CanBearOff() && SetOfMoves.Count == 1)
-                board.BearOff(CurrentPlayer, SelectedPoint);
-            else if (NotOnBar())
+            if (NotOnBar() && OnBoard(to))
                 board.MoveChecker(SelectedPoint, to);
+            else if (CanBearOff() && SetOfMoves.Count == 1)
+                board.BearOff(CurrentPlayer, SelectedPoint);
             else
                 board.MoveChecker(CurrentPlayer, to);
             SelectedPoint = to;
@@ -140,6 +145,11 @@ namespace Backgammon.Screen
                 PlayerTurn();
             if (State == GameState.PickDestination)
                 board.GlowPoints(PossibleDestinations);
+        }
+
+        private bool OnBoard(int i)
+        {
+            return (i > 0 && i < 25);
         }
 
         private bool CanBearOff()
@@ -161,7 +171,7 @@ namespace Backgammon.Screen
 
         public override void Update(GameTime gameTime)
         {
-            int pointIndex = board.GetClickedPoint();
+            int clickedPoint = board.GetClickedPoint();
             switch (State)
             {
                 case GameState.Animating:
@@ -173,16 +183,16 @@ namespace Backgammon.Screen
                     break;
 
                 case GameState.PickChecker:
-                    if (MovableCheckers.Contains(pointIndex))
-                        PickChecker(pointIndex);
+                    if (MovableCheckers.Contains(clickedPoint))
+                        PickChecker(clickedPoint);
                     break;
 
                 case GameState.PickDestination:
-                    if (pointIndex == SelectedPoint && NotOnBar()) // Cancel selected checker
+                    if (clickedPoint == SelectedPoint && NotOnBar()) // Cancel selected checker
                         SetState(GameState.PickChecker);
-                    else if (PossibleDestinations.Contains(pointIndex))
-                        MoveChecker(pointIndex);
-                    else if (pointIndex > 24 && PossibleDestinations.Contains(CurrentPlayer.BearOffPositionID()))
+                    else if (PossibleDestinations.Contains(clickedPoint))
+                        MoveChecker(clickedPoint);
+                    else if (clickedPoint > 24 && PossibleDestinations.Contains(CurrentPlayer.BearOffPositionID()))
                         MoveChecker(BearOffTo());
                     break;
             }
