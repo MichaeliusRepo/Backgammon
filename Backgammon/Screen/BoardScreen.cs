@@ -123,14 +123,20 @@ namespace Backgammon.Screen
                 to += 25;
             if (board.CheckerWasCaptured(CurrentPlayer, to))
                 board.Capture(to);
-            if (CanBearOff() && SetOfMoves.Count == 1)
-                board.BearOff(CurrentPlayer, SelectedPoint);
-            else if (NotOnBar())
+            if (NotOnBar() && OnBoard(to))
                 board.MoveChecker(SelectedPoint, to);
+            else if (CanBearOff() && SetOfMoves.Count == 1)
+                board.BearOff(CurrentPlayer, SelectedPoint);
+            
             else
                 board.MoveChecker(CurrentPlayer, to);
             SelectedPoint = to;
             SetOfMoves.RemoveAt(0);
+        }
+
+        private bool OnBoard(int i)
+        {
+            return i > 0 && i < 25;
         }
 
         private void SetState(GameState setTo)

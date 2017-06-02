@@ -124,9 +124,15 @@ namespace Backgammon.Object
 
         public bool CheckerWasCaptured(CheckerColor playerColor, int to)
         {
-            if (to > Points.Count || to < 1) // Bearing off checkers incur ArrayOutOfBoundsException
-                return false; // But capturing checkers cannot occur when bearing off anyway.
-            return (Points[to].GetAmount() == 1 && Points[to].GetTopChecker().Color != playerColor);
+            try
+            {
+                return (Points[to].GetAmount() == 1 && Points[to].GetTopChecker().Color != playerColor);
+            }
+            catch(Exception e)
+            {
+                return false;
+            }
+            
         }
 
         internal int GetClickedPoint()

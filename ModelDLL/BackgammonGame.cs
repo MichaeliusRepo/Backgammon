@@ -158,7 +158,7 @@ namespace ModelDLL
             currentGameBoardState = resultingState.state;
             movesLeft = resultingState.movesLeft;
 
-            List<int> movesMade = resultingState.positionsBeenAt;
+            List<int> movesMade = resultingState.movesTaken;
 
 
             // TODO potentially a problem that turns change before the moves taken are returned
