@@ -20,13 +20,21 @@ namespace Backgammon.Object
         internal Vector2 ReceivingPosition { get; private set; }
 
         // Modifies Y distance between checkers
-        private readonly static float checkerDistance = 33; // other values could be [25,50]
+        private float checkerDistance = 33; // other values could be [25,50]
+        private readonly static float bearoffCheckerDistance = 16; // This is for checkers who bore off.
 
         // Modifies Y distance for glow effect.
         private readonly static float YModifier = 110;
 
         // Do not modify.
         private readonly static float MiddleY = 720 / 2;
+
+        internal void ShortenCheckerDistance()
+        {
+            if (checkerDistance == 33)
+                checkerDistance = bearoffCheckerDistance;
+            else throw new Exception("Why modify the checker distance twice?");
+        }
 
         internal int GetAmount()
         {
@@ -36,6 +44,12 @@ namespace Backgammon.Object
         internal Rectangle GetBounds()
         {
             return Image.GetBounds();
+        }
+
+        internal Point(Vector2 Position, List<Checker> Checkers, bool BearOff) : this(Position, Checkers)
+        {
+            if (BearOff)
+                ShortenCheckerDistance();
         }
 
         internal Point(Vector2 Position, List<Checker> Checkers)

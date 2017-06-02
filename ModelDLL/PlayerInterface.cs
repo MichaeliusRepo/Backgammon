@@ -69,7 +69,7 @@ namespace ModelDLL
 
         public List<int> move(int intialPosition, int targetPosition)
         {
-            bg.Move(this.color, intialPosition, targetPosition);
+            return bg.Move(this.color, intialPosition, targetPosition);
             return new List<int>();
         }
 

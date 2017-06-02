@@ -132,7 +132,7 @@ namespace ModelDLL
 
         }
 
-        public void Move(CheckerColor color, int from, int targetPosition)
+        public List<int> Move(CheckerColor color, int from, int targetPosition)
         {
 
             if (color != playerToMove())
@@ -153,6 +153,8 @@ namespace ModelDLL
             currentGameBoardState = resultingState.state;
             movesLeft = resultingState.movesLeft;
 
+            List<int> movesMade = resultingState.movesTaken;
+
 
             // TODO potentially a problem that turns change before the moves taken are returned
             // potential stack overflow? 
@@ -162,7 +164,7 @@ namespace ModelDLL
             if (IsGameOver())
             {
                 Console.WriteLine("Game is over!! Terminating");
-                return;
+                return new List<int>();
             }
 
             if (movesLeft.Count() == 0)
@@ -174,7 +176,9 @@ namespace ModelDLL
                 changeTurns();
             }
 
-            (turnColor == WHITE ? whitePlayer : blackPlayer).MakeMove();
+            //(turnColor == WHITE ? whitePlayer : blackPlayer).MakeMove();
+            return movesMade;
+
             
         }
 
@@ -185,7 +189,7 @@ namespace ModelDLL
             //Console.WriteLine("Moving " + color + " from " + from +  " to " + to);
 
 
-            Console.WriteLine("MOves made: " + numberOfMovesMade);
+            Console.WriteLine("Moves made: " + numberOfMovesMade);
             Console.WriteLine("----------------------------------------------\n" + 
                               "Moving " + color + " from " + from + " to " + to + ". Moves left are: " + string.Join(",", movesLeft) + "\n" + currentGameBoardState.Stringify() + 
                               "\n--------------------------------------------------");

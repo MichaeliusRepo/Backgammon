@@ -21,7 +21,7 @@ namespace Backgammon.Object
         private Vector2 FinalPosition;
         private Point TargetPoint = null;
 
-        internal bool moving { get; private set; }
+        internal bool Moving { get; private set; }
 
         // Modify this value to change checker size
         private readonly static Vector2 Size = new Vector2(0.08f, 0.08f);
@@ -66,7 +66,7 @@ namespace Backgammon.Object
             Vector2 DeltaPosition = NewPosition - Position;
             DeltaHalfDistance = Vector2.Distance(Position, FinalPosition) / 2;
             Acceleration = new Vector2(DeltaPosition.X / (Time * Time), DeltaPosition.Y / (Time * Time));
-            moving = true;
+            Moving = true;
         }
 
         private void MoveByDeltaTime(float DeltaTime)
@@ -83,7 +83,7 @@ namespace Backgammon.Object
             if (Timer >= Second) // Moving animations last exactly a second.
             {
                 Position = FinalPosition;
-                moving = false;
+                Moving = false;
                 Acceleration = Velocity = Vector2.Zero;
                 if (TargetPoint != null)
                 {
@@ -96,7 +96,7 @@ namespace Backgammon.Object
 
         internal void Update(GameTime gameTime)
         {
-            if (moving)
+            if (Moving)
                 MoveByDeltaTime((float)gameTime.ElapsedGameTime.TotalSeconds);
             Image.Update(gameTime);
         }

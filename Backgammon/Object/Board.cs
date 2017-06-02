@@ -123,12 +123,10 @@ namespace Backgammon.Object
         }
 
         public bool CheckerWasCaptured(CheckerColor playerColor, int to)
-        { // When bearing off checkers, ArrayOutOfBoundsException may occur.
-            try
-            { // But a checker cannot be captured when moving off the board in one move. Thus, it is OK to return false.
-                return (Points[to].GetAmount() == 1 && Points[to].GetTopChecker().Color != playerColor);
-            }
-            catch (Exception e) { return false; }
+        {
+            if (to > Points.Count || to < 1) // Bearing off checkers incur ArrayOutOfBoundsException
+                return false; // But capturing checkers cannot occur when bearing off anyway.
+            return (Points[to].GetAmount() == 1 && Points[to].GetTopChecker().Color != playerColor);
         }
 
         internal int GetClickedPoint()
@@ -179,8 +177,8 @@ namespace Backgammon.Object
         {
             WhiteOnBoard = new Point(new Vector2(midX, topY), new List<Checker>());
             BlackOnBoard = new Point(new Vector2(midX, botY), new List<Checker>());
-            WhiteBoreOff = new Point(new Vector2(1060, botY), new List<Checker>());
-            BlackBoreOff = new Point(new Vector2(1060, topY), new List<Checker>());
+            WhiteBoreOff = new Point(new Vector2(1060, botY), new List<Checker>(), true);
+            BlackBoreOff = new Point(new Vector2(1060, topY), new List<Checker>(), true);
 
             // Added dummy point to remove zero-indexing
             Points = new List<Point>() { new Point(Vector2.Zero, new List<Checker>()),
@@ -217,7 +215,7 @@ namespace Backgammon.Object
 
         internal void Update(GameTime gameTime)
         {
-            if (InAnimation && !movingChecker.moving)
+            if (InAnimation && !movingChecker.Moving)
                 InAnimation = false;
             Image.Update(gameTime);
             foreach (Point p in Points)

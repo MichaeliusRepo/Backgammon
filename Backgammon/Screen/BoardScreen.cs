@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using ModelDLL;
+using static ModelDLL.CheckerColor;
 
 namespace Backgammon.Screen
 {
@@ -51,8 +52,10 @@ namespace Backgammon.Screen
             Model = new BackgammonGame(gameBoard, new FakeDice(new int[] { 1, 6 }));
             board = new Board(gameBoard);
             ViewInterface = new ViewInterface(Model);
-            WhitePlayer = new PlayerInterface(Model, CheckerColor.White, null);
-            BlackPlayer = new PlayerInterface(Model, CheckerColor.Black, null);
+            WhitePlayer = new PlayerInterface(Model, White, null);
+            Player nai = new NaiveAI(BlackPlayer);
+            BlackPlayer = new PlayerInterface(Model, Black, nai);
+            //BlackPlayer = new PlayerInterface(Model, Black, null);
 
             SetState(GameState.PickChecker);
         }
@@ -100,7 +103,7 @@ namespace Backgammon.Screen
 
         private void MoveChecker(int pointIndex)
         {
-            if (CurrentPlayer == CheckerColor.White)
+            if (CurrentPlayer == White)
                 SetOfMoves = WhitePlayer.move(SelectedPoint, pointIndex);
             else
                 SetOfMoves = BlackPlayer.move(SelectedPoint, pointIndex);
@@ -111,7 +114,7 @@ namespace Backgammon.Screen
 
         private void MoveCheckerAnimation()
         {
-            if (CurrentPlayer == CheckerColor.White)
+            if (CurrentPlayer == White)
                 SetOfMoves[0] = -SetOfMoves[0];
             int to = SetOfMoves[0];
             if (NotOnBar())
@@ -146,7 +149,7 @@ namespace Backgammon.Screen
 
         private int BearOffTo()
         {
-            if (CurrentPlayer == CheckerColor.White)
+            if (CurrentPlayer == White)
                 return BackgammonGame.WHITE_BEAR_OFF_ID;
             return BackgammonGame.BLACK_BEAR_OFF_ID;
         }

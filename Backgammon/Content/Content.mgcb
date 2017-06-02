@@ -13,7 +13,7 @@
 
 #---------------------------------- Content ---------------------------------#
 
-#begin Images/Backgammons.jpg
+#begin Images/SplashScreen.png
 /importer:TextureImporter
 /processor:TextureProcessor
 /processorParam:ColorKeyColor=255,0,255,255
@@ -23,7 +23,7 @@
 /processorParam:ResizeToPowerOfTwo=False
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
-/build:Images/Backgammons.jpg
+/build:Images/SplashScreen.png
 
 #begin EB Garamond 12.spritefont
 /importer:FontDescriptionImporter

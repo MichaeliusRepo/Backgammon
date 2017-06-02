@@ -13,7 +13,7 @@ namespace Backgammon.Screen
 {
     public class SplashScreen : GameScreen
     {
-        public Image Image = new Image() { Path = "Images/Backgammons" , Position = new Vector2(540, 360)};
+        public Image Image = new Image() { Path = "Images/SplashScreen", Position = new Vector2(540, 360)};
 
         public override void LoadContent()
         {
@@ -32,7 +32,7 @@ namespace Backgammon.Screen
             base.Update(gameTime);
             Image.Update(gameTime);
 
-            if (InputManager.Instance.KeyPressed(Keys.Enter, Keys.Z))
+            if (InputManager.Instance.KeyPressed(Keys.Enter) || InputManager.Instance.MouseLeftPressed())
                 //ScreenManager.Instance.ChangeScreens("SettingsScreen");
                 ScreenManager.Instance.ChangeScreens("BoardScreen");
         }
