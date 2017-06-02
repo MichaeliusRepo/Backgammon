@@ -11,6 +11,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using ModelDLL;
 using static ModelDLL.CheckerColor;
+using System.Diagnostics;
 
 namespace Backgammon.Screen
 {
@@ -31,7 +32,7 @@ namespace Backgammon.Screen
     * 
         * */
 
-    public class BoardScreen : GameScreen
+    public class BoardScreen : GameScreen, Player
     {
         private Image Image = new Image { Path = "Images/Board", Position = new Vector2(540, 360) };
         private Board board;
@@ -58,10 +59,12 @@ namespace Backgammon.Screen
             ViewInterface = new ViewInterface(Model);
             WhitePlayer = new PlayerInterface(Model, White, null);
             //Player nai = new NaiveAI(BlackPlayer);
-            BlackPlayer = new PlayerInterface(Model, Black, nai);
             BlackPlayer = new PlayerInterface(Model, Black, null);
+            BlackPlayer = new PlayerInterface(Model, Black, null);
+            
 
             SetState(GameState.PickChecker);
+            Model.RunGame();
         }
 
         public override void UnloadContent()
@@ -205,6 +208,17 @@ namespace Backgammon.Screen
         {
             Image.Draw(spriteBatch);
             board.Draw(spriteBatch);
+        }
+
+        public void MakeMove()
+        {
+            Debug.WriteLine("Control is handed to you");
+        }
+
+        public void ConnectPlayerInterface(PlayerInterface playerInterface)
+        {
+            Console.WriteLine("WANTS TO CONNECT PLAYER INTERFACE IN VIEW.");
+           //throw new NotImplementedException();
         }
 
         private enum GameState

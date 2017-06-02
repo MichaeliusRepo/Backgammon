@@ -78,7 +78,7 @@ namespace ModelDLL
         {
             this.turnColor = playerToMove;
             this.dice = dice;
-            //recalculateMoves();
+            recalculateMoves();
 
             this.currentGameBoardState = new GameBoardState(gameBoard, whiteCheckersOnBar, whiteCheckersBoreOff, blackCheckersOnBar, blackCheckersBoreOff);
             
@@ -306,12 +306,12 @@ namespace ModelDLL
 
         public void RunGame()
         {
-            while(state != GameOver)
+            while(state != GameOver && state != MoveWhite && state !=  MoveBlack)
             {
                 Execute();
             }
             //Execute once more for game over
-            Execute();
+            //Execute();
         }
 
         private void Execute()
@@ -330,9 +330,6 @@ namespace ModelDLL
 
                 case MoveWhite:
                     whitePlayer.MakeMove();
-                    //Do work;
-                    //change state;
-                    //TurnEnded when called should change the state
                     this.state = CheckGameOverWhite;
                     break;
 
@@ -353,7 +350,6 @@ namespace ModelDLL
 
                 case MoveBlack:
                     blackPlayer.MakeMove();
-                    //turn ended should change the state;
                     this.state = CheckGameOverBlack;
                     break;
 
@@ -363,7 +359,7 @@ namespace ModelDLL
                     break;
 
                 case GameOver:
-                    Console.WriteLine("GAME IS OVER!!");
+                    Console.WriteLine("Game is now over :) ");
                     break;
             }
         }

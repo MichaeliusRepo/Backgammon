@@ -8,8 +8,6 @@ namespace ModelDLL
 {
     public interface Player
     {
-        void TurnStarted();
-        void TurnEnded();
         void MakeMove();
         void ConnectPlayerInterface(PlayerInterface playerInterface);
     }

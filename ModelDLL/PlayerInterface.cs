@@ -100,17 +100,6 @@ namespace ModelDLL
             else bg.MoveToFinalState(color, finalState);
         }
 
-        internal void TurnStarted()
-        {
-            if (player != null)
-                player.TurnStarted();
-        }
-
-        internal void TurnEnded()
-        {
-            if (player != null)
-                player.TurnEnded();
-        }
 
         internal void MakeMove()
 
