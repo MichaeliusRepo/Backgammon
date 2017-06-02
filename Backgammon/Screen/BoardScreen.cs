@@ -54,8 +54,8 @@ namespace Backgammon.Screen
             ViewInterface = new ViewInterface(Model);
             WhitePlayer = new PlayerInterface(Model, White, null);
             Player nai = new NaiveAI(BlackPlayer);
-            BlackPlayer = new PlayerInterface(Model, Black, nai);
-            //BlackPlayer = new PlayerInterface(Model, Black, null);
+            //BlackPlayer = new PlayerInterface(Model, Black, nai);
+            BlackPlayer = new PlayerInterface(Model, Black, null);
 
             SetState(GameState.PickChecker);
         }

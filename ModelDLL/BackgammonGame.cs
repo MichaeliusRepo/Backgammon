@@ -178,7 +178,7 @@ namespace ModelDLL
 
 
             NotifyView(color, from, targetPosition);
-            /*if (IsGameOver())
+            if (IsGameOver())
             {
                 Console.WriteLine("Game is over!! Terminating");
                 return new List<int>();
@@ -193,7 +193,7 @@ namespace ModelDLL
                 changeTurns();
             }
 
-            //(turnColor == WHITE ? whitePlayer : blackPlayer).MakeMove();*/
+            /*//(turnColor == WHITE ? whitePlayer : blackPlayer).MakeMove();*/
 
             int fromPos = from;
             foreach(int position in movesMade)
@@ -306,12 +306,12 @@ namespace ModelDLL
 
         public void RunGame()
         {
-            while(state != GameOver && state != MoveWhite && state !=  MoveBlack)
+            /*while(state != GameOver && state != MoveWhite && state !=  MoveBlack)
             {
                 Execute();
             }
             //Execute once more for game over
-            //Execute();
+            //Execute();*/
         }
 
         private void Execute()

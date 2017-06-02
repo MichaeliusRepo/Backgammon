@@ -107,5 +107,9 @@ namespace ModelDLL
             if (player != null) player.MakeMove();
         }
 
+        public List<Turn> GetAndFlushTurnHistory()
+        {
+            return bg.GetTurnHistory();
+        }
     }
 }
