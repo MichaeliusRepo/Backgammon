@@ -21,7 +21,7 @@ namespace ModelDLL
 
         internal MovesCalculator(GameBoardState state, CheckerColor color, int fromPosition, List<int> moves)
         {
-            initialMoveState = new MoveState(state, color, fromPosition, moves, new List<int>());
+            initialMoveState = new MoveState(state, color, fromPosition, moves, new List<int>(), new List<int>());
 
 
             //THE PARAMETERS IN THE METHODS BELOW  (GenerateMoveStatesForPosition) are experimental!!
@@ -100,15 +100,17 @@ namespace ModelDLL
             internal CheckerColor color;
             internal GameBoardState state;
             internal int position;
+            internal List<int> positionsBeenAt;
 
             internal MoveState(GameBoardState state, CheckerColor color, int position, 
-                              List<int> movesLeft, List<int> movesTaken)
+                              List<int> movesLeft, List<int> movesTaken, List<int> positionsBeenAt)
             {
                 this.state = state;
                 this.color = color;
                 this.position = position;
                 this.movesLeft = movesLeft;
                 this.movesTaken = movesTaken;
+                this.positionsBeenAt = positionsBeenAt;
             }
 
             internal IEnumerable<MoveState> GenerateMoveStatesForPosition()
@@ -123,7 +125,7 @@ namespace ModelDLL
                     {
                         int positionAfterMove = GameBoardMover.GetPositionAfterMove(color, position, move);
                         var newMoveState = new MoveState(newState, color, positionAfterMove,
-                                                        movesLeft.Without(move), movesTaken.With(move));
+                                                        movesLeft.Without(move), movesTaken.With(move), positionsBeenAt.With(positionAfterMove));
                         output.Add(newMoveState);
                     }
                 }

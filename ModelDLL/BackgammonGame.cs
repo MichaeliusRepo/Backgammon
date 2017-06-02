@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static ModelDLL.BackgammonGame.GameState;
+
 
 
 namespace ModelDLL
@@ -11,7 +13,8 @@ namespace ModelDLL
   
     public class BackgammonGame
     {
-        public static readonly int[] DefaultGameBoard = new int[] { -2, 0, 0, 0,  0,  5,
+        public static readonly int[] DefaultGameBoard = new int[] {
+                                           -2, 0, 0, 0,  0,  5,
                                             0, 3, 0, 0,  0, -5,
                                             5, 0, 0, 0, -3,  0,
                                            -5, 0, 0, 0,  0,  2 };
@@ -37,7 +40,9 @@ namespace ModelDLL
         private GameBoardState currentGameBoardState;
 
         private PlayerInterface whitePlayer;
-        private PlayerInterface blackPlayer; 
+        private PlayerInterface blackPlayer;
+
+        private GameState state = ChangeTurnToWhite;
 
 
 
@@ -153,7 +158,7 @@ namespace ModelDLL
             currentGameBoardState = resultingState.state;
             movesLeft = resultingState.movesLeft;
 
-            List<int> movesMade = resultingState.movesTaken;
+            List<int> movesMade = resultingState.positionsBeenAt;
 
 
             // TODO potentially a problem that turns change before the moves taken are returned
@@ -220,6 +225,12 @@ namespace ModelDLL
             
         }
 
+        private void changeTurns(CheckerColor color)
+        {
+            recalculateMoves();
+            turnColor = color;
+        }
+
         private bool IsGameOver()
         {
             return currentGameBoardState.getCheckersOnTarget(WHITE) == 15 || currentGameBoardState.getCheckersOnTarget(BLACK) == 15;
@@ -269,6 +280,27 @@ namespace ModelDLL
             return this.turnColor;
         }
 
+
+        private void Execute()
+        {
+            switch (this.state)
+            {
+
+            }
+        }
+
+        internal enum GameState
+        {
+            ChangeTurnToWhite,
+            CheckLegalMovesWhite,
+            MoveWhite,
+            CheckGameOverWhite,
+            ChangeTurnToBlack,
+            CheckLegalMovesBlack,
+            MoveBlack,
+            CheckGameOverBlack,
+            GameOver
+        }
     }
 }
 
