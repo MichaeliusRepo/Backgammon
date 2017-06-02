@@ -49,15 +49,10 @@ namespace Backgammon.Object
                                             0, 0, 0, 0, 0,  -1,
                                            -2, -3, -3, -2, -2, -2 };
 
-        public static readonly int[] TestBoard4 = new int[] {3, 3, 3, 3, 3, -3,
-                                                              -4,  -4,  -3,  0,  0,  0,
+        public static readonly int[] TestBoard4 = new int[] {-3, -3, -3, -3, -3,  4,
+                                                              4,  4,  3,  0,  0,  0,
                                                               0,  0,  0,  0,  0,  0,
-                                                              0,  0,  0,  0,  0,  -1 };
-
-        public static readonly int[] TestBoard5 = new int[] {8,7,0,0,0,0,
-                                                              0,0,0,0,0,0,
-                                                              0,  0,  0,  0,  0,  0,
-                                                              0,0,0,0,-7,-8 };
+                                                              0,  0,  0,  0,  0,  0 };
 
         public Board(int[] board)
         {
@@ -133,7 +128,11 @@ namespace Backgammon.Object
             {
                 return (Points[to].GetAmount() == 1 && Points[to].GetTopChecker().Color != playerColor);
             }
-            catch (ArgumentOutOfRangeException) { return false; }
+            catch(Exception e)
+            {
+                return false;
+            }
+            
         }
 
         internal int GetClickedPoint()
