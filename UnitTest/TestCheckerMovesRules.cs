@@ -561,7 +561,8 @@ namespace UnitTest
             fd.SetReturnValues(new int[] {3,1});
             bg = new BackgammonGame(initialGameBoard, fd);
 
-            bg.Move(WHITE, 6, 2);
+            List<int> positionsVisited = bg.Move(WHITE, 6, 2);
+
 
             int[] expectedGameBoard = new int[] { -2, 1, 0, 0,  0,  4,
                                                    0, 3, 0, 0,  0, -5,
@@ -571,6 +572,13 @@ namespace UnitTest
             int[] actualGameBoard = bg.GetGameBoardState().getMainBoard();
 
             Assert.IsTrue(Enumerable.SequenceEqual(expectedGameBoard, actualGameBoard));
+
+            List<int> expectedPositionsVisited1 = new List<int>() { 5, 2 };
+            List<int> expectedPositionsVisited2 = new List<int>() { 3, 2 };
+
+            bool matches = Enumerable.SequenceEqual(expectedPositionsVisited1, positionsVisited) || Enumerable.SequenceEqual(expectedPositionsVisited2, positionsVisited);
+            Console.WriteLine(string.Join(",", positionsVisited));
+            Assert.IsTrue(matches);
         }
 
         [TestMethod]
