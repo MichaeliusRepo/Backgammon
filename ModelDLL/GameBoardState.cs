@@ -328,6 +328,22 @@ namespace ModelDLL
                                       getCheckersOnTarget(WHITE));
         }
 
-        
+        public string GetXML()
+        {
+            string output = "<board>";
+            int[] mainBoard = getMainBoard();
+            for(int i = 0; i < mainBoard.Length-1; i++)
+            {
+                output += mainBoard[i] + " ";
+            }
+            output += mainBoard[mainBoard.Length - 1] + "</board>";
+            output += "<whiteBar>" + GetCheckersOnPosition(WHITE.GetBar()) + "</whiteBar>";
+            output += "<whiteHome>" + GetCheckersOnPosition(WHITE.BearOffPositionID()) + "</whiteHome>";
+            output += "<blackBar>" + GetCheckersOnPosition(BLACK.GetBar()) + "</blackBar>";
+            output += "<blackHome>" + GetCheckersOnPosition(BLACK.BearOffPositionID()) + "</blackHome>";
+
+
+            return output;
+        }
     }
 }
