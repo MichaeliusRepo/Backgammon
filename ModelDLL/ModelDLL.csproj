@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="BackgammonGame.cs" />
     <Compile Include="CheckerColor.cs" />
+    <Compile Include="Move.cs" />
     <Compile Include="FinalStatesCalculator2.cs" />
     <Compile Include="FinalStatesCalculator.cs" />
     <Compile Include="Control\StateMachine.cs" />

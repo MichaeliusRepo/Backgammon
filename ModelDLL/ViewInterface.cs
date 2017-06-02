@@ -41,6 +41,11 @@ namespace ModelDLL
             return bg.GetMovesLeft();
         }
 
+        public List<Turn> GetAndFlushTurnHistory()
+        {
+            return bg.GetTurnHistory();
+        }
+
 
     }
 }

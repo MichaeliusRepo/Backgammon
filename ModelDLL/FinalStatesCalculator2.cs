@@ -25,7 +25,7 @@ namespace ModelDLL
         private static int nodesCreated = 0;
 
         internal readonly GameBoardState state;
-        internal readonly Move moveMadeToGetHere;
+        internal readonly FinalStateMove moveMadeToGetHere;
         internal readonly Node parent;
         internal readonly List<int> movesLeft;
         internal readonly List<Node> children = new List<Node>();
@@ -33,7 +33,7 @@ namespace ModelDLL
 
         private readonly int NodeID;
 
-        internal Node(GameBoardState state, CheckerColor color, Move moveMadeToGetHere, Node parent, List<int> movesLeft)
+        internal Node(GameBoardState state, CheckerColor color, FinalStateMove moveMadeToGetHere, Node parent, List<int> movesLeft)
         {
 
             
@@ -53,7 +53,7 @@ namespace ModelDLL
             var moveable = MovesCalculator.GetMoveableCheckers(state, color, movesLeft);
 
             GameBoardState tmpState = null;
-            Move tmpMove = null;
+            FinalStateMove tmpMove = null;
             Node tmpNode = null;
 
 
@@ -65,7 +65,7 @@ namespace ModelDLL
                     tmpState = GameBoardMover.Move(state, color, position, move);
                     if (tmpState != null)
                     {
-                        tmpMove = new ModelDLL.Move(position, move);
+                        tmpMove = new ModelDLL.FinalStateMove(position, move);
                         tmpNode = new ModelDLL.Node(tmpState, color, tmpMove, this, movesLeft.Without(move));
                         children.Add(tmpNode);
                     }
@@ -81,7 +81,7 @@ namespace ModelDLL
                         tmpState = GameBoardMover.Move(state, color, position, move);
                         if (tmpState != null)
                         {
-                            tmpMove = new ModelDLL.Move(position, move);
+                            tmpMove = new ModelDLL.FinalStateMove(position, move);
                             tmpNode = new ModelDLL.Node(tmpState, color, tmpMove, this, movesLeft.Without(move));
                             children.Add(tmpNode);
                         }
@@ -112,9 +112,9 @@ namespace ModelDLL
             }
         }
 
-        internal List<Move> MovesMade()
+        internal List<FinalStateMove> MovesMade()
         {
-            List<Move> output = new List<Move>();
+            List<FinalStateMove> output = new List<FinalStateMove>();
             Node current = this;
             while(current.parent != null)
             {
@@ -138,12 +138,12 @@ namespace ModelDLL
         }
     }
 
-    class Move
+    class FinalStateMove
     {
         internal readonly int from;
         internal readonly int distance;
 
-        public Move(int from, int distance)
+        public FinalStateMove(int from, int distance)
         {
             this.from = from;
             this.distance = distance;

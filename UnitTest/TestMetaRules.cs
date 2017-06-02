@@ -54,20 +54,20 @@ namespace UnitTest
             Assert.AreEqual(CheckerColor.White, bg.playerToMove());
         }
 
-        [TestMethod]
+        /*[TestMethod]
         public void TestTurnDoesChangeIfAllMovesDepleted()
         {
             bg.Move(CheckerColor.White, 6, 4);
             bg.Move(CheckerColor.White, 4, 3);
             Assert.AreEqual(CheckerColor.Black, bg.playerToMove());
-        }
+        }*/
 
-        [TestMethod]
+       /* [TestMethod]
         public void TestMovesDepletedForMovesConsistingOfMultipleDice()
         {
             bg.Move(CheckerColor.White, 6, 3);
             Assert.AreEqual(CheckerColor.Black, bg.playerToMove());
-        }
+        }*/
 
         [TestMethod]
         public void TestPlayerInterfaceIsMyTurn()

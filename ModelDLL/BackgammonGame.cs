@@ -29,6 +29,13 @@ namespace ModelDLL
         public static readonly int BLACK_BEAR_OFF_ID = BLACK.BearOffPositionID();
         public const int MAX_MOVE_DISTANCE_ACCEPTED = 6;
 
+        internal List<Turn> GetTurnHistory()
+        {
+            var tmp = turnHistory;
+            turnHistory = new List<Turn>();
+            return tmp;
+        }
+
         private int numberOfMovesMade = 0;
 
 
@@ -36,6 +43,8 @@ namespace ModelDLL
         internal Dice dice;
         internal List<int> movesLeft;
 
+        private Turn currentTurn = new Turn();
+        private List<Turn> turnHistory = new List<Turn>();
 
         private GameBoardState currentGameBoardState;
 
@@ -69,12 +78,15 @@ namespace ModelDLL
         {
             this.turnColor = playerToMove;
             this.dice = dice;
-            recalculateMoves();
+            //recalculateMoves();
 
             this.currentGameBoardState = new GameBoardState(gameBoard, whiteCheckersOnBar, whiteCheckersBoreOff, blackCheckersOnBar, blackCheckersBoreOff);
             
             whitePlayer = new PlayerInterface(this, WHITE, null);
             blackPlayer = new PlayerInterface(this, BLACK, null);
+
+            state = playerToMove == WHITE ? ChangeTurnToWhite : ChangeTurnToBlack;
+
         }
         //Constructors end
 
@@ -120,8 +132,8 @@ namespace ModelDLL
             currentGameBoardState = finalState.state;
             movesLeft = new List<int>();
 
-            List<Move> movesMade = finalState.MovesMade();
-            foreach(Move move in movesMade)
+            List<FinalStateMove> movesMade = finalState.MovesMade();
+            foreach(FinalStateMove move in movesMade)
             {
                 //TODO REMOVE THIS
                 numberOfMovesMade++;
@@ -166,7 +178,7 @@ namespace ModelDLL
 
 
             NotifyView(color, from, targetPosition);
-            if (IsGameOver())
+            /*if (IsGameOver())
             {
                 Console.WriteLine("Game is over!! Terminating");
                 return new List<int>();
@@ -181,7 +193,15 @@ namespace ModelDLL
                 changeTurns();
             }
 
-            //(turnColor == WHITE ? whitePlayer : blackPlayer).MakeMove();
+            //(turnColor == WHITE ? whitePlayer : blackPlayer).MakeMove();*/
+
+            int fromPos = from;
+            foreach(int position in movesMade)
+            {
+                currentTurn.moves.Add(new Move(color, from, position));
+                fromPos = position;
+            }
+
             return movesMade;
 
             
@@ -227,8 +247,12 @@ namespace ModelDLL
 
         private void changeTurns(CheckerColor color)
         {
+            this.turnHistory.Add(currentTurn);
             recalculateMoves();
             turnColor = color;
+
+            currentTurn = new Turn();
+            currentTurn.dice = this.movesLeft;
         }
 
         private bool IsGameOver()
@@ -280,14 +304,71 @@ namespace ModelDLL
             return this.turnColor;
         }
 
+        public void RunGame()
+        {
+            while(state != GameOver)
+            {
+                Execute();
+            }
+            //Execute once more for game over
+            Execute();
+        }
 
         private void Execute()
         {
             switch (this.state)
             {
+                case ChangeTurnToWhite:
+                    changeTurns(WHITE);
+                    this.state = CheckLegalMovesWhite;
+                    break;
 
+                case CheckLegalMovesWhite:
+                    if (GetMoveableCheckers().Count() == 0) this.state = ChangeTurnToBlack;
+                    else this.state = MoveWhite;
+                    break;
+
+                case MoveWhite:
+                    whitePlayer.MakeMove();
+                    //Do work;
+                    //change state;
+                    //TurnEnded when called should change the state
+                    this.state = CheckGameOverWhite;
+                    break;
+
+                case CheckGameOverWhite:
+                    if (IsGameOver()) this.state = GameOver;
+                    else this.state = CheckLegalMovesWhite;
+                    break;
+
+                case ChangeTurnToBlack:
+                    changeTurns(BLACK);
+                    this.state = CheckLegalMovesBlack;
+                    break;
+
+                case CheckLegalMovesBlack:
+                    if (GetMoveableCheckers().Count() == 0) this.state = ChangeTurnToWhite;
+                    else this.state = MoveBlack;
+                    break;
+
+                case MoveBlack:
+                    blackPlayer.MakeMove();
+                    //turn ended should change the state;
+                    this.state = CheckGameOverBlack;
+                    break;
+
+                case CheckGameOverBlack:
+                    if (IsGameOver()) this.state = GameOver;
+                    else this.state = CheckLegalMovesBlack;
+                    break;
+
+                case GameOver:
+                    Console.WriteLine("GAME IS OVER!!");
+                    break;
             }
         }
+
+
 
         internal enum GameState
         {
