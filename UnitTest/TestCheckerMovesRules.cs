@@ -573,12 +573,6 @@ namespace UnitTest
 
             Assert.IsTrue(Enumerable.SequenceEqual(expectedGameBoard, actualGameBoard));
 
-            List<int> expectedPositionsVisited1 = new List<int>() { 5, 2 };
-            List<int> expectedPositionsVisited2 = new List<int>() { 3, 2 };
-
-            bool matches = Enumerable.SequenceEqual(expectedPositionsVisited1, positionsVisited) || Enumerable.SequenceEqual(expectedPositionsVisited2, positionsVisited);
-            Console.WriteLine(string.Join(",", positionsVisited));
-            Assert.IsTrue(matches);
         }
 
         [TestMethod]

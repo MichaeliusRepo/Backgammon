@@ -80,6 +80,8 @@ namespace ModelDLL
             this.dice = dice;
             recalculateMoves();
 
+            this.currentTurn.dice = new List<int>(movesLeft);
+
             this.currentGameBoardState = new GameBoardState(gameBoard, whiteCheckersOnBar, whiteCheckersBoreOff, blackCheckersOnBar, blackCheckersBoreOff);
             
             whitePlayer = new PlayerInterface(this, WHITE, null);
@@ -177,6 +179,16 @@ namespace ModelDLL
             // potential stack overflow? 
 
 
+            int fromPos = from;
+            foreach (int distance in movesMade)
+            {
+                int toPos = GameBoardMover.GetPositionAfterMove(color, fromPos, distance);
+                currentTurn.moves.Add(new Move(color, fromPos, toPos));
+                fromPos = toPos;
+            }
+
+
+
             NotifyView(color, from, targetPosition);
             if (IsGameOver())
             {
@@ -195,14 +207,9 @@ namespace ModelDLL
 
             (turnColor == WHITE ? whitePlayer : blackPlayer).MakeMove();
 
-            int fromPos = from;
-            foreach(int position in movesMade)
-            {
-                currentTurn.moves.Add(new Move(color, from, position));
-                fromPos = position;
-            }
+            
 
-            (turnColor == WHITE ? whitePlayer : blackPlayer).MakeMove();
+
 
             return movesMade;
 
@@ -236,8 +243,9 @@ namespace ModelDLL
 
         private void changeTurns()
         {
-            recalculateMoves();
+            //recalculateMoves();
             turnColor = turnColor.OppositeColor();
+            changeTurns(turnColor);
 
             if (GetMoveableCheckers().Count() == 0)
             {

@@ -57,6 +57,7 @@
     <Compile Include="UnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestMetaRules.cs" />
+    <Compile Include="TestGamePlayCorrectly.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ModelDLL\ModelDLL.csproj">

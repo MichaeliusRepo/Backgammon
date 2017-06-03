@@ -18,6 +18,16 @@ namespace ModelDLL
             this.from = from;
             this.to = to;
         }
+
+        public override string ToString()
+        {
+            return "Move: " + (color == CheckerColor.White ? "W" : "B") + " from " + from + " to " + to;
+        }
+
+        public string DebugString()
+        {
+            return (color == CheckerColor.White ? "W" : "B") + " " + from + " " + to;
+        }
     }
 
     public class Turn
