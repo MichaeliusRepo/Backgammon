@@ -60,7 +60,33 @@ namespace Backgammon.Screen
             ViewInterface = new ViewInterface(Model);
 
             WhiteInterface = new PlayerInterface(Model, White, null);
-            BlackInterface = new PlayerInterface(Model, Black, new NaiveAI(BlackInterface));
+
+            /* My mistake. The player interface was connected to BackgammonGame, 
+             * but the opposite wasn't true.
+               In BackgammonGame there is a method that looks like this:
+            
+            public PlayerInterface ConnectPlayer(CheckerColor color, Player player)
+            {
+                var pi = color == WHITE ? whitePlayer : blackPlayer;
+                if (pi.HasPlayer())
+                {
+                    return null;
+                }
+                pi.SetPlayerIfNull(player);
+                player.ConnectPlayerInterface(pi);
+                return pi;
+             }
+
+               Use it like this:
+             */
+
+            NaiveAI nai = new NaiveAI(null);
+            BlackInterface = Model.ConnectPlayer(Black, nai);
+
+            //Now the backgammon game creates a new player interface, connects the player to 
+            //the player interface and returns the playerinterface
+
+
             SetState(GameState.PickChecker);
         }
 

@@ -202,6 +202,8 @@ namespace ModelDLL
                 fromPos = position;
             }
 
+            (turnColor == WHITE ? whitePlayer : blackPlayer).MakeMove();
+
             return movesMade;
 
             
