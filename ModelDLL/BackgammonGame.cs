@@ -29,8 +29,8 @@ namespace ModelDLL
         public static readonly int BLACK_BEAR_OFF_ID = BLACK.BearOffPositionID();
         public const int MAX_MOVE_DISTANCE_ACCEPTED = 6;
 
-        internal List<Turn> GetTurnHistory()
-        {
+        public List<Turn> GetTurnHistory()
+        { // My name is Michaelius the Courageous, and I demand you make this method public.
             var tmp = turnHistory;
             turnHistory = new List<Turn>();
             return tmp;
@@ -193,7 +193,7 @@ namespace ModelDLL
                 changeTurns();
             }
 
-            /*//(turnColor == WHITE ? whitePlayer : blackPlayer).MakeMove();*/
+            (turnColor == WHITE ? whitePlayer : blackPlayer).MakeMove();
 
             int fromPos = from;
             foreach(int position in movesMade)

@@ -128,11 +128,7 @@ namespace Backgammon.Object
             {
                 return (Points[to].GetAmount() == 1 && Points[to].GetTopChecker().Color != playerColor);
             }
-            catch(Exception e)
-            {
-                return false;
-            }
-            
+            catch (ArgumentOutOfRangeException) { return false; }
         }
 
         internal int GetClickedPoint()
