@@ -19,8 +19,9 @@ namespace Backgammon.Object
         private readonly static float pointDistance = 76;
 
         // Modify algorithm's distance of points.
-        private readonly static float midX = 540;
-        private readonly static float leftX = 82;
+        internal readonly static float midX = 1080 / 2;
+        internal readonly static float midY = 720 / 2;
+        internal readonly static float leftX = 82;
         private readonly static float topY = 92;
         private readonly static float rightX = midX + leftX;
         private readonly static float botY = 720 + 6 - topY;

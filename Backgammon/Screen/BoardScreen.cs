@@ -14,22 +14,21 @@ using static ModelDLL.CheckerColor;
 
 namespace Backgammon.Screen
 {
-    /*
-        * 
-        *  1) Add Dice Roll Graphics
-        *  2) Display Pips
-        *  3) Implement Splash Screen
-        *  4) Implement Option Screen
-        *  Options screen:
-    * - Audio
-    * - Pips
-    * - Type of game (PvP, PvE, AIvAI, online)
-    * - Player color
-        * */
+    /*  1) Add Dice Roll Graphics
+    *  2) Display Pips
+    *  3) Implement Splash Screen
+    *  4) Implement Option Screen
+    *  Options screen:
+* - Audio
+* - Pips
+* - Type of game (PvP, PvE, AIvAI, online)
+* - Player color
+    * */
 
     public class BoardScreen : GameScreen
     {
         private Image Image = new Image { Path = "Images/Board", Position = new Vector2(540, 360) };
+        private List<Image> DiceImages = new List<Image>();
         private Board board;
         private BackgammonGame Model;
         private ViewInterface ViewInterface;
@@ -40,11 +39,17 @@ namespace Backgammon.Screen
         private List<int> MovableCheckers, PossibleDestinations;
         private int SelectedPoint;
         private List<int> SetOfMoves;
+        private List<int> DiceRollsLeft;
+        private float[] DiceXPositions = { Board.midX - 4 * Board.leftX, Board.midX - 2 * Board.leftX,
+            Board.midX + 2 * Board.leftX, Board.midX + 4 * Board.leftX };
+        private float DiceScale = 0.50f;
 
         public override void LoadContent()
         {
             base.LoadContent();
             Image.LoadContent();
+            foreach (Image DiceImage in DiceImages)
+                DiceImage.LoadContent();
 
             int[] gameBoard = BackgammonGame.DefaultGameBoard;
             //int[] gameBoard = Board.TestBoard3;
@@ -63,6 +68,8 @@ namespace Backgammon.Screen
         {
             base.UnloadContent();
             Image.UnloadContent();
+            foreach (Image DiceImage in DiceImages)
+                DiceImage.UnloadContent();
         }
 
         private void SetAI(CheckerColor color, bool enabled)
@@ -90,11 +97,12 @@ namespace Backgammon.Screen
         {
             CheckInconsistencies();
             CurrentPlayer = ViewInterface.GetNextPlayerToMove();
+            DiceRollsLeft = ViewInterface.GetMoves();
+            GenerateDiceImages();
 
-            List<int> getDice = ViewInterface.GetMoves();
             board.RemoveCheckerHighlight();
             Console.WriteLine(CurrentPlayer);
-            Console.WriteLine("Dice Rolls: " + string.Join(", ", getDice));
+            Console.WriteLine("Dice Rolls: " + string.Join(", ", DiceRollsLeft));
             MovableCheckers = ViewInterface.GetMoveableCheckers();
             board.GlowPoints(MovableCheckers);
 
@@ -177,6 +185,24 @@ namespace Backgammon.Screen
             return !(SelectedPoint.Equals(BackgammonGame.BLACK_BAR_ID) || SelectedPoint.Equals(BackgammonGame.WHITE_BAR_ID));
         }
 
+        private void GenerateDiceImages()
+        {
+            foreach (Image DiceImage in DiceImages)
+                DiceImage.UnloadContent();
+            DiceImages.Clear();
+
+            for (int i = 0; i < DiceRollsLeft.Count; i++)
+                DiceImages.Add(new Image()
+                {
+                    Path = "Images/" + DiceRollsLeft[i],
+                    Scale = new Vector2(DiceScale, DiceScale),
+                    Position = new Vector2(DiceXPositions[i], Board.midY)
+                });
+
+            foreach (Image DiceImage in DiceImages)
+                DiceImage.LoadContent();
+        }
+
         public override void Update(GameTime gameTime)
         {
             int clickedPoint = board.GetClickedPoint();
@@ -207,12 +233,16 @@ namespace Backgammon.Screen
             base.Update(gameTime);
             Image.Update(gameTime);
             board.Update(gameTime);
+            foreach (Image DiceImage in DiceImages)
+                DiceImage.Update(gameTime);
         }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
             Image.Draw(spriteBatch);
             board.Draw(spriteBatch);
+            foreach (Image DiceImage in DiceImages)
+                DiceImage.Draw(spriteBatch);
         }
 
         private enum GameState
