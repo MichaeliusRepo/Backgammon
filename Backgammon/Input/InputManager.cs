@@ -9,14 +9,14 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Backgammon.Input
 {
-    public class InputManager
+    internal class InputManager
     {
         KeyboardState currentKeyState, prevKeyState;
         MouseState currentMouseState, prevMouseState;
 
         private static InputManager instance;
 
-        public static InputManager Instance
+        internal static InputManager Instance
         {
             get
             {
@@ -37,12 +37,12 @@ namespace Backgammon.Input
             }
         }
 
-        public bool IsWithinBounds(Rectangle bounds)
+        internal bool IsWithinBounds(Rectangle bounds)
         {
             return bounds.Contains(GetMousePosition());
         }
 
-        public bool WasClicked(Rectangle bounds)
+        internal bool WasClicked(Rectangle bounds)
         {
             return MouseLeftPressed() && IsWithinBounds(bounds);
         }
@@ -52,12 +52,12 @@ namespace Backgammon.Input
             return currentMouseState.Position;
         }
 
-        public bool MouseLeftPressed()
+        internal bool MouseLeftPressed()
         {
             return (currentMouseState.LeftButton == ButtonState.Released && prevMouseState.LeftButton == ButtonState.Pressed);
         }
 
-        public bool KeyPressed(params Keys[] keys)
+        internal bool KeyPressed(params Keys[] keys)
         {
             foreach (Keys key in keys)
                 if (currentKeyState.IsKeyDown(key) && prevKeyState.IsKeyUp(key))
@@ -65,7 +65,7 @@ namespace Backgammon.Input
             return false;
         }
 
-        public bool KeyUp(params Keys[] keys)
+        internal bool KeyUp(params Keys[] keys)
         {
             foreach (Keys key in keys)
                 if (currentKeyState.IsKeyUp(key) && prevKeyState.IsKeyDown(key))
@@ -73,7 +73,7 @@ namespace Backgammon.Input
             return false;
         }
 
-        public bool KeyDown(params Keys[] keys)
+        internal bool KeyDown(params Keys[] keys)
         {
             foreach (Keys key in keys)
                 if (currentKeyState.IsKeyDown(key))

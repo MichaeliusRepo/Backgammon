@@ -1,4 +1,5 @@
 ﻿using Backgammon.Input;
+using Backgammon.Audio;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -9,61 +10,60 @@ using System.Threading.Tasks;
 
 namespace Backgammon.Screen
 {
-    public class Button
+    internal class Button
     {
-        private Image Image;
-        private Image Highlighted;
+        private Image Off;
+        private Image On;
         private Vector2 Position;
-        public bool Triggered { get; private set; }
+        internal bool Triggered { get; private set; }
+        internal bool SwitchedOn => On.IsActive;
 
-        public Button(Image Image, Image Highlighted, Vector2 Position)
+        internal Button(Image Off, Image On, Vector2 Position)
         {
-            this.Image = Image;
-            this.Position = Image.Position = Highlighted.Position = Position;
-            this.Highlighted = Highlighted;
+            this.Off = Off;
+            this.On = On;
+            this.Position = Off.Position = On.Position = Position;
+            On.IsActive = false;
         }
 
-        public Button(Image Image, Vector2 Position)
+        internal Button(Vector2 Position, bool Enabled) : this(Position)
         {
-            this.Image = Image;
-            this.Position = Image.Position = Position;
+            On.IsActive = true;
         }
 
-        protected void LoadContent()
+        internal Button(Vector2 Position)
         {
-            Image.LoadContent();
-            if (Highlighted != null)
-                Highlighted.LoadContent();
+            this.Position = Position;
+            Off = new Image() { Path = "Images/Off", Position = Position };
+            On = new Image() { Path = "Images/On", Position = Position, IsActive = false };
         }
 
-        protected void UnloadContent()
+        public void LoadContent()
         {
-            Image.UnloadContent();
-            if (Highlighted != null)
-                Highlighted.UnloadContent();
+            Off.LoadContent();
+            On.LoadContent();
         }
 
-        protected void Update(GameTime gameTime)
+        public void UnloadContent()
         {
-            Triggered = WasClicked();
+            Off.UnloadContent();
+            On.UnloadContent();
         }
 
-        protected void Draw(SpriteBatch spriteBatch)
+        public void Update(GameTime gameTime)
         {
-            if (HoveredOver())
-                Highlighted.Draw(spriteBatch);
-            else
-                Image.Draw(spriteBatch);
+            Triggered = InputManager.Instance.WasClicked(Off.GetBounds());
+            if (Triggered)
+            {
+                On.IsActive = !On.IsActive;
+                AudioManager.Instance.PlaySound("MenuClick");
+            }
         }
 
-        private bool WasClicked()
+        public void Draw(SpriteBatch spriteBatch)
         {
-            return InputManager.Instance.WasClicked(Image.GetBounds());
-        }
-
-        private bool HoveredOver()
-        {
-            return (Highlighted != null && InputManager.Instance.IsWithinBounds(Image.GetBounds()));
+            if (On.IsActive) On.Draw(spriteBatch);
+            else Off.Draw(spriteBatch);
         }
     }
 }

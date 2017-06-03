@@ -56,6 +56,7 @@
     <Compile Include="Screen\GameScreen.cs" />
     <Compile Include="Screen\Image.cs" />
     <Compile Include="Screen\Effects\ImageEffect.cs" />
+    <Compile Include="Screen\OptionScreen.cs" />
     <Compile Include="Screen\ScreenManager.cs" />
     <Compile Include="Screen\SplashScreen.cs" />
   </ItemGroup>

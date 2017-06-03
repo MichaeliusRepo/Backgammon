@@ -11,9 +11,9 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Backgammon.Screen
 {
-    public class SplashScreen : GameScreen
+    internal class SplashScreen : GameScreen
     {
-        public Image Image = new Image() { Path = "Images/SplashScreen", Position = new Vector2(540, 360)};
+        internal Image Image = new Image() { Path = "Images/SplashScreen", Position = new Vector2(540, 360)};
 
         public override void LoadContent()
         {
@@ -33,8 +33,8 @@ namespace Backgammon.Screen
             Image.Update(gameTime);
 
             if (InputManager.Instance.KeyPressed(Keys.Enter) || InputManager.Instance.MouseLeftPressed())
-                //ScreenManager.Instance.ChangeScreens("SettingsScreen");
-                ScreenManager.Instance.ChangeScreens("BoardScreen");
+                ScreenManager.Instance.ChangeScreens("OptionScreen");
+            //ScreenManager.Instance.ChangeScreens("BoardScreen");
         }
 
         public override void Draw(SpriteBatch spriteBatch)

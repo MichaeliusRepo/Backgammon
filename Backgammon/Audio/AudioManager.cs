@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Backgammon.Audio
 {
-    public class AudioManager
+    internal class AudioManager
     {
         private Dictionary<string, SoundEffect> SoundFX = new Dictionary<string, SoundEffect>();
         private ContentManager Content;
@@ -18,7 +18,7 @@ namespace Backgammon.Audio
 
         private static AudioManager instance;
 
-        public static AudioManager Instance
+        internal static AudioManager Instance
         {
             get
             {
@@ -30,7 +30,7 @@ namespace Backgammon.Audio
 
         private AudioManager() { } // Remove default public constructor
 
-        public void ToggleAudio()
+        internal void ToggleAudio()
         {
             if (MediaPlayer.State == MediaState.Stopped)
                 MediaPlayer.Play(Music);
@@ -38,12 +38,12 @@ namespace Backgammon.Audio
                 MediaPlayer.Stop();
         }
 
-        public bool AudioMuted()
+        internal bool AudioMuted()
         {
             return MediaPlayer.State == MediaState.Stopped;
         }
 
-        public void PlaySound(string name)
+        internal void PlaySound(string name)
         { // Overload parameters at Play() are Volume, Pitch, Pan
             if (!AudioMuted())
                 SoundFX[name].Play();

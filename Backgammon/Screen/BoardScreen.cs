@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using Backgammon.Audio;
 using Backgammon.Input;
 using Backgammon.Object;
 using Microsoft.Xna.Framework;
@@ -14,123 +14,76 @@ using static ModelDLL.CheckerColor;
 
 namespace Backgammon.Screen
 {
-    /*  1) Add Dice Roll Graphics
+    /*
     *  2) Display Pips
-    *  3) Implement Splash Screen
-    *  4) Implement Option Screen
-    *  Options screen:
-* - Audio
-* - Pips
-* - Type of game (PvP, PvE, AIvAI, online)
-* - Player color
     * */
 
-    public class BoardScreen : GameScreen
+    internal class BoardScreen : GameScreen
     {
+        #region Fields
+
         private Image Image = new Image { Path = "Images/Board", Position = new Vector2(540, 360) };
         private List<Image> DiceImages = new List<Image>();
-        private Board board;
+
+        private Board Board;
         private BackgammonGame Model;
         private ViewInterface ViewInterface;
         private PlayerInterface WhiteInterface, BlackInterface;
-        private Player WhiteAI, BlackAI;
+        private bool WhiteAI => OptionScreen.WhiteAI.SwitchedOn;
+        private bool BlackAI => OptionScreen.BlackAI.SwitchedOn;
         internal static CheckerColor CurrentPlayer { get; private set; }
         private GameState State = GameState.PickChecker;
-        private List<int> MovableCheckers, PossibleDestinations;
+
+        private List<int> MovableCheckers, PossibleDestinations, SetOfMoves, DiceRollsLeft;
         private int SelectedPoint;
-        private List<int> SetOfMoves;
-        private List<int> DiceRollsLeft;
+
         private float[] DiceXPositions = { Board.midX - 4 * Board.leftX, Board.midX - 2 * Board.leftX,
             Board.midX + 2 * Board.leftX, Board.midX + 4 * Board.leftX };
         private float DiceScale = 0.8f;
 
-        public override void LoadContent()
+        #endregion
+
+        #region Auxilary Methods
+
+        private PlayerInterface SetAI(CheckerColor color, bool enabled)
         {
-            base.LoadContent();
-            Image.LoadContent();
-            foreach (Image DiceImage in DiceImages)
-                DiceImage.LoadContent();
-
-            int[] gameBoard = BackgammonGame.DefaultGameBoard;
-            //int[] gameBoard = Board.TestBoard3;
-
-            Model = new BackgammonGame(gameBoard, new RealDice());
-            //Model = new BackgammonGame(gameBoard, new FakeDice(new int[] { 1, 6 }));
-            board = new Board(gameBoard);
-            ViewInterface = new ViewInterface(Model);
-
-            WhiteInterface = new PlayerInterface(Model, White, null);
-
-            /* My mistake. The player interface was connected to BackgammonGame, 
-             * but the opposite wasn't true.
-               In BackgammonGame there is a method that looks like this:
-            
-            public PlayerInterface ConnectPlayer(CheckerColor color, Player player)
-            {
-                var pi = color == WHITE ? whitePlayer : blackPlayer;
-                if (pi.HasPlayer())
-                {
-                    return null;
-                }
-                pi.SetPlayerIfNull(player);
-                player.ConnectPlayerInterface(pi);
-                return pi;
-             }
-
-               Use it like this:
-             */
-
-            NaiveAI nai = new NaiveAI(null);
-            BlackInterface = Model.ConnectPlayer(Black, nai);
-
-            //Now the backgammon game creates a new player interface, connects the player to 
-            //the player interface and returns the playerinterface
-
-
-            SetState(GameState.PickChecker);
+            if (enabled) return Model.ConnectPlayer(color, new NaiveAI(null));
+            else return new PlayerInterface(Model, color, null);
         }
 
-        public override void UnloadContent()
+        private void BeginTurn()
         {
-            base.UnloadContent();
-            Image.UnloadContent();
-            foreach (Image DiceImage in DiceImages)
-                DiceImage.UnloadContent();
+            CurrentPlayer = ViewInterface.GetNextPlayerToMove();
+            DiceRollsLeft = ViewInterface.GetMoves();
+            GenerateDiceImages();
+            Board.RemoveCheckerHighlight();
+
+            var turns = Model.GetTurnHistory();
+            if (turns.Count != 0)
+                throw new Exception();
+            //AIMove(turns);
+            PlayerTurn();
         }
 
-        private void SetAI(CheckerColor color, bool enabled)
+        private void AIMove(List<Turn> turns)
         {
-            if (enabled)
-                if (color == White)
-                    WhiteAI = new NaiveAI(WhiteInterface);
-                else
-                    BlackAI = new NaiveAI(BlackInterface);
-            else if (color == White)
-                WhiteAI = null;
-            else
-                BlackAI = null;
+            throw new NotImplementedException("dam son you did it");
         }
 
         private void CheckInconsistencies()
         {
             int[] motherboard = Model.GetGameBoardState().getMainBoard();
             for (int i = 0; i < motherboard.Length; i++)
-                if (board.GetAmountOfCheckersAtPoint(i + 1) != motherboard[i])
-                    throw new Exception("View was found to be inconsistent with model.");
+                if (Board.GetAmountOfCheckersAtPoint(i + 1) != motherboard[i])
+                    throw new Exception("View was found to be inconsistent with model. \n" +
+                                            Board.GetAmountOfCheckersAtPoint(i + 1) + " != " + motherboard[i]);
         }
 
         private void PlayerTurn()
         {
-            CheckInconsistencies();
-            CurrentPlayer = ViewInterface.GetNextPlayerToMove();
-            DiceRollsLeft = ViewInterface.GetMoves();
-            GenerateDiceImages();
-
-            board.RemoveCheckerHighlight();
-            Console.WriteLine(CurrentPlayer);
-            Console.WriteLine("Dice Rolls: " + string.Join(", ", DiceRollsLeft));
+            //CheckInconsistencies();
             MovableCheckers = ViewInterface.GetMoveableCheckers();
-            board.GlowPoints(MovableCheckers);
+            Board.GlowPoints(MovableCheckers);
 
             if (MovableCheckers.Contains(CurrentPlayer.GetBar()))
                 PickChecker(CurrentPlayer.GetBar());
@@ -138,11 +91,12 @@ namespace Backgammon.Screen
 
         private void PickChecker(int clickedPoint)
         {
+            AudioManager.Instance.PlaySound("MenuClick");
             SelectedPoint = clickedPoint;
             if (NotOnBar())
-                board.HighlightChecker(clickedPoint);
+                Board.HighlightChecker(clickedPoint);
             else
-                board.HighlightChecker(CurrentPlayer);
+                Board.HighlightChecker(CurrentPlayer);
             PossibleDestinations = ViewInterface.GetLegalMovesForCheckerAtPosition(clickedPoint);
             SetState(GameState.PickDestination);
         }
@@ -153,8 +107,8 @@ namespace Backgammon.Screen
                 SetOfMoves = WhiteInterface.move(SelectedPoint, clickedPoint);
             else
                 SetOfMoves = BlackInterface.move(SelectedPoint, clickedPoint);
-            board.StopGlowPoints();
-            board.RemoveCheckerHighlight();
+            Board.StopGlowPoints();
+            Board.RemoveCheckerHighlight();
             SetState(GameState.Animating);
         }
 
@@ -167,15 +121,15 @@ namespace Backgammon.Screen
                 to += SelectedPoint;
             else if (to < 0)
                 to += 25;
-            if (board.CheckerWasCaptured(CurrentPlayer, to))
-                board.Capture(to);
+            if (Board.CheckerWasCaptured(CurrentPlayer, to))
+                Board.Capture(to);
             if (NotOnBar() && OnBoard(to))
-                board.MoveChecker(SelectedPoint, to);
+                Board.MoveChecker(SelectedPoint, to);
             else if (CanBearOff() && SetOfMoves.Count == 1)
-                board.BearOff(CurrentPlayer, SelectedPoint);
+                Board.BearOff(CurrentPlayer, SelectedPoint);
 
             else
-                board.MoveChecker(CurrentPlayer, to);
+                Board.MoveChecker(CurrentPlayer, to);
             SelectedPoint = to;
             SetOfMoves.RemoveAt(0);
         }
@@ -189,9 +143,9 @@ namespace Backgammon.Screen
         {
             State = setTo;
             if (State == GameState.PickChecker)
-                PlayerTurn();
+                BeginTurn();
             if (State == GameState.PickDestination)
-                board.GlowPoints(PossibleDestinations);
+                Board.GlowPoints(PossibleDestinations);
         }
 
         private bool CanBearOff()
@@ -228,14 +182,79 @@ namespace Backgammon.Screen
             foreach (Image DiceImage in DiceImages)
                 DiceImage.LoadContent();
         }
+        #endregion
+
+        #region Framework Methods
+
+        public override void LoadContent()
+        {
+            base.LoadContent();
+            Image.LoadContent();
+            foreach (Image DiceImage in DiceImages)
+                DiceImage.LoadContent();
+
+            int[] gameBoard = BackgammonGame.DefaultGameBoard;
+            //int[] gameBoard = Board.TestBoard3;
+
+            Model = new BackgammonGame(gameBoard, new RealDice());
+            //Model = new BackgammonGame(gameBoard, new FakeDice(new int[] { 1, 6 }));
+            Board = new Board(gameBoard);
+            ViewInterface = new ViewInterface(Model);
+            WhiteInterface = SetAI(White, WhiteAI);
+            BlackInterface = SetAI(Black, BlackAI);
+
+            //WhiteInterface = new PlayerInterface(Model, White, null);
+
+            /* My mistake. The player interface was connected to BackgammonGame, 
+             * but the opposite wasn't true.
+               In BackgammonGame there is a method that looks like this:
+            
+            public PlayerInterface ConnectPlayer(CheckerColor color, Player player)
+            {
+                var pi = color == WHITE ? whitePlayer : blackPlayer;
+                if (pi.HasPlayer())
+                {
+                    return null;
+                }
+                pi.SetPlayerIfNull(player);
+                player.ConnectPlayerInterface(pi);
+                return pi;
+             }
+
+               Use it like this:
+             */
+
+            //NaiveAI nai = new NaiveAI(null);
+            //BlackInterface = Model.ConnectPlayer(Black, nai);
+
+            //Now the backgammon game creates a new player interface, connects the player to 
+            //the player interface and returns the playerinterface
+
+            // Thanks mate.
+
+            SetState(GameState.PickChecker);
+        }
+
+        public override void UnloadContent()
+        {
+            base.UnloadContent();
+            Image.UnloadContent();
+            foreach (Image DiceImage in DiceImages)
+                DiceImage.UnloadContent();
+        }
+
+
 
         public override void Update(GameTime gameTime)
         {
-            int clickedPoint = board.GetClickedPoint();
+            if (InputManager.Instance.KeyPressed(Keys.M)) AudioManager.Instance.ToggleAudio();
+
+            int clickedPoint = Board.GetClickedPoint();
+
             switch (State)
             {
                 case GameState.Animating:
-                    if (!board.InAnimation)
+                    if (!Board.InAnimation)
                         if (SetOfMoves.Count != 0)
                             MoveCheckerAnimation();
                         else
@@ -248,8 +267,11 @@ namespace Backgammon.Screen
                     break;
 
                 case GameState.PickDestination:
-                    if (clickedPoint == SelectedPoint && NotOnBar()) // Cancel selected checker
+                    if (clickedPoint == SelectedPoint && NotOnBar())
+                    { // Cancel selected checker
                         SetState(GameState.PickChecker);
+                        AudioManager.Instance.PlaySound("MenuClick");
+                    }
                     else if (PossibleDestinations.Contains(clickedPoint))
                         MoveChecker(clickedPoint);
                     else if (clickedPoint > 24 && PossibleDestinations.Contains(CurrentPlayer.BearOffPositionID()))
@@ -258,7 +280,7 @@ namespace Backgammon.Screen
             }
             base.Update(gameTime);
             Image.Update(gameTime);
-            board.Update(gameTime);
+            Board.Update(gameTime);
             foreach (Image DiceImage in DiceImages)
                 DiceImage.Update(gameTime);
         }
@@ -266,10 +288,12 @@ namespace Backgammon.Screen
         public override void Draw(SpriteBatch spriteBatch)
         {
             Image.Draw(spriteBatch);
-            board.Draw(spriteBatch);
+            Board.Draw(spriteBatch);
             foreach (Image DiceImage in DiceImages)
                 DiceImage.Draw(spriteBatch);
         }
+
+        #endregion
 
         private enum GameState
         {

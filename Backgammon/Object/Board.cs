@@ -13,7 +13,7 @@ using Backgammon.Input;
 
 namespace Backgammon.Object
 {
-    public class Board
+    internal class Board
     {
         // Modify this value for X distance between points
         private readonly static float pointDistance = 76;
@@ -31,38 +31,38 @@ namespace Backgammon.Object
         private Checker movingChecker;
 
         private List<Point> Points { get; set; }
-        public bool InAnimation { get; private set; }
+        internal bool InAnimation { get; private set; }
         private Point WhiteOnBoard, BlackOnBoard, WhiteBoreOff, BlackBoreOff;
 
         // Tests
-        public static readonly int[] TestBoard1 = new int[] { -5, 1, 1, 1,  1,  1,
+        internal static readonly int[] TestBoard1 = new int[] { -5, 1, 1, 1,  1,  1,
                                             1, 0, 0, 0,  0, 0,
                                             -10, 0, 0, 0, 0,  0,
                                            0, 0, 0, 0,  0,  9 };
 
-        public static readonly int[] TestBoard2 = new int[] { -15, 2, 2, 2,  3,  3,
+        internal static readonly int[] TestBoard2 = new int[] { -15, 2, 2, 2,  3,  3,
                                             3, 0, 0, 0,  0, 0,
                                             0, 0, 0, 0, 0,  0,
                                            0, 0, 0, 0,  0,  0 };
 
-        public static readonly int[] TestBoard3 = new int[] { 2, 2, 2, 3,  3,  2,
+        internal static readonly int[] TestBoard3 = new int[] { 2, 2, 2, 3,  3,  2,
                                             1, 0, 0, 0, 0, 0,
                                             0, 0, 0, 0, 0,  -1,
                                            -2, -3, -3, -2, -2, -2 };
 
-        public static readonly int[] TestBoard4 = new int[] {-3, -3, -3, -3, -3,  4,
+        internal static readonly int[] TestBoard4 = new int[] {-3, -3, -3, -3, -3,  4,
                                                               4,  4,  3,  0,  0,  0,
                                                               0,  0,  0,  0,  0,  0,
                                                               0,  0,  0,  0,  0,  0 };
 
-        public Board(int[] board)
+        internal Board(int[] board)
         {
             gameBoard = board;
             CreatePoints();
             Image.LoadContent();
         }
 
-        public void GlowPoints(List<int> list)
+        internal void GlowPoints(List<int> list)
         {
             for (int i = 1; i < Points.Count; i++)
                 Points[i].Glow(list.Contains(i));
@@ -79,18 +79,18 @@ namespace Backgammon.Object
             return false;
         }
 
-        public void StopGlowPoints()
+        internal void StopGlowPoints()
         {
             GlowPoints(new List<int>());
         }
 
-        public void HighlightChecker(int i)
+        internal void HighlightChecker(int i)
         {
             Checker c = Points[i].GetTopChecker();
             HighlightImage(c);
         }
 
-        public void HighlightChecker(CheckerColor color)
+        internal void HighlightChecker(CheckerColor color)
         {
             HighlightImage(GetPointOnBoard(color).GetTopChecker());
         }
@@ -118,12 +118,12 @@ namespace Backgammon.Object
             Image.Position = c.Position;
         }
 
-        public void RemoveCheckerHighlight()
+        internal void RemoveCheckerHighlight()
         {
             Image.IsActive = false;
         }
 
-        public bool CheckerWasCaptured(CheckerColor playerColor, int to)
+        internal bool CheckerWasCaptured(CheckerColor playerColor, int to)
         {
             try
             {
@@ -140,17 +140,17 @@ namespace Backgammon.Object
             return -1;
         }
 
-        public void MoveChecker(int from, int to)
+        internal void MoveChecker(int from, int to)
         {
             MoveChecker(Points[from], Points[to]);
         }
 
-        public void MoveChecker(CheckerColor color, int to)
+        internal void MoveChecker(CheckerColor color, int to)
         {
             MoveChecker(GetPointOnBoard(color), Points[to]);
         }
 
-        public void MoveChecker(Point from, Point to)
+        internal void MoveChecker(Point from, Point to)
         {
             AudioManager.Instance.PlaySound("Checker");
             InAnimation = true;
@@ -158,17 +158,17 @@ namespace Backgammon.Object
             from.SendToPoint(to);
         }
 
-        public void BearOff(CheckerColor color, int from)
+        internal void BearOff(CheckerColor color, int from)
         {
             MoveChecker(Points[from], GetBearOffPoint(color));
         }
 
-        public void Capture(int at)
+        internal void Capture(int at)
         {
             MoveChecker(Points[at], GetPointOnBoard(Points[at].GetTopChecker().Color));
         }
 
-        public int GetAmountOfCheckersAtPoint(int i)
+        internal int GetAmountOfCheckersAtPoint(int i)
         {
             int value = Points[i].GetAmount();
             if (value != 0 && Points[i].GetTopChecker().Color == CheckerColor.Black)

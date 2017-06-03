@@ -12,21 +12,21 @@ using System.Xml.Serialization;
 
 namespace Backgammon.Screen
 {
-    public class ScreenManager
+    internal class ScreenManager
     {
-        public Vector2 Dimension { private set; get; }
-        public ContentManager Content { private set; get; }
+        internal Vector2 Dimension { private set; get; }
+        internal ContentManager Content { private set; get; }
 
         GameScreen currentScreen, newScreen;
-        public GraphicsDevice GraphicsDevice;
-        public SpriteBatch SpriteBatch;
+        internal GraphicsDevice GraphicsDevice;
+        internal SpriteBatch SpriteBatch;
 
-        public Image Image = new Image() { Path= "Images/FadeImage", Effects = "FadeEffect", Scale = new Vector2(1080, 720) };
-        public bool IsTransitioning { get; private set; }
+        internal Image Image = new Image() { Path= "Images/FadeImage", Effects = "FadeEffect", Scale = new Vector2(1080, 720) };
+        internal bool IsTransitioning { get; private set; }
 
         // Make a singleton class
         private static ScreenManager instance;
-        public static ScreenManager Instance
+        internal static ScreenManager Instance
         {
             get
             {
@@ -36,7 +36,7 @@ namespace Backgammon.Screen
             }
         }
 
-        public void ChangeScreens(string screenName)
+        internal void ChangeScreens(string screenName)
         {
             newScreen = (GameScreen)Activator.CreateInstance(Type.GetType(("Backgammon.Screen." + screenName)));
             Image.IsActive = true;
