@@ -42,7 +42,7 @@ namespace Backgammon.Screen
         private List<int> DiceRollsLeft;
         private float[] DiceXPositions = { Board.midX - 4 * Board.leftX, Board.midX - 2 * Board.leftX,
             Board.midX + 2 * Board.leftX, Board.midX + 4 * Board.leftX };
-        private float DiceScale = 0.50f;
+        private float DiceScale = 0.8f;
 
         public override void LoadContent()
         {
