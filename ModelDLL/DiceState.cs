@@ -14,5 +14,15 @@ namespace ModelDLL
         {
             this.diceValues = dicevalues;
         }
+
+        public bool IsDiceState()
+        {
+            return true;
+        }
+
+        public bool IsMove()
+        {
+            return false;
+        }
     }
 }

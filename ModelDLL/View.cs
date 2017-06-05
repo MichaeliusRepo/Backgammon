@@ -13,6 +13,7 @@ namespace ModelDLL
 
     public interface Change
     {
-
+        bool IsMove();
+        bool IsDiceState();
     }
 }

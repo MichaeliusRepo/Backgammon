@@ -31,6 +31,8 @@ namespace ModelDLL
 
         private List<View> obserers = new List<View>();
 
+        private List<Change> Changes;
+
         public List<Change> GetChanges()
         {
             return new List<Change>();

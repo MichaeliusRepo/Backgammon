@@ -33,6 +33,16 @@ namespace ModelDLL
         {
             return (color == CheckerColor.White ? "W" : "B") + " " + from + " " + to;
         }
+
+        public bool IsMove()
+        {
+            return true;
+        }
+
+        public bool IsDiceState()
+        {
+            return false;
+        }
     }
 
     public class Turn
