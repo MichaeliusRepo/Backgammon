@@ -6,13 +6,28 @@ using System.Threading.Tasks;
 
 namespace ModelDLL
 {
-    class DiceState : Change
+    public class DiceState : Change
     {
-        public int[] diceValues;
+        private int[] diceValues;
 
         public DiceState(int[] dicevalues)
         {
             this.diceValues = dicevalues;
+        }
+
+        public int[] GetDiceValues()
+        {
+            return new List<int>(diceValues).ToArray();
+        }
+
+        public DiceState AsDiceState()
+        {
+            return this;
+        }
+
+        public Move AsMove()
+        {
+            throw new InvalidOperationException("Tried to cast Move into DiceState");
         }
 
         public bool IsDiceState()

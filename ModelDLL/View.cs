@@ -15,5 +15,10 @@ namespace ModelDLL
     {
         bool IsMove();
         bool IsDiceState();
+
+        //These throws exception if the object is not of the correct type. 
+        //Use above methods to check before converting
+        Move AsMove();
+        DiceState AsDiceState();
     }
 }

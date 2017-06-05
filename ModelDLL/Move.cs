@@ -43,6 +43,16 @@ namespace ModelDLL
         {
             return false;
         }
+
+        public Move AsMove()
+        {
+            return this;
+        }
+
+        public DiceState AsDiceState()
+        {
+            throw new InvalidOperationException("Tried to cast Move into DiceState");
+        }
     }
 
     public class Turn

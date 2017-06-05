@@ -34,12 +34,28 @@ namespace UnitTest
         }
 
         [TestMethod]
+        public void TestChangesContainsInitialMovesWhenGameStartesWhite()
+        {
+            bg = new BackgammonGame(BackgammonGame.DefaultGameBoard, fd);
+            var changes = bg.GetChanges();
+            Assert.AreEqual(1, changes.Count());
+            Assert.IsTrue(changes[0].IsDiceState());
+           
+            Assert.AreEqual(changes)
+        }
+
+        [TestMethod]
         public void TestGetMoveHistoryWorksCorrectlyOneTurnOnly()
         {
             bg.Move(White, 6, 4);
             bg.Move(White, 6, 5);
 
             Assert.AreEqual(Black, bg.playerToMove());
+
+
+            var changes = bg.GetChanges();
+            Assert.AreEqual(3, changes.Count());
+
 
             List<Turn> history = bg.GetTurnHistory();
             Assert.AreEqual(1, history.Count());
