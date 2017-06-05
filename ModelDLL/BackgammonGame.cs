@@ -198,6 +198,7 @@ namespace ModelDLL
             }
 
             MovesCalculator.MoveState resultingState = mts.MoveToPosition(targetPosition);
+            var originalGameBoardState = currentGameBoardState;
             currentGameBoardState = resultingState.state;
            // movesLeft = resultingState.movesLeft;
 
@@ -207,7 +208,8 @@ namespace ModelDLL
             // TODO potentially a problem that turns change before the moves taken are returned
             // potential stack overflow? 
 
-            
+            List<int> positionsLandedOn = resultingState.positionsBeenAt;
+
 
             int fromPos = from;
             foreach (int distance in movesMade)
@@ -217,6 +219,22 @@ namespace ModelDLL
                 currentTurn.moves.Add(move);
                 fromPos = toPos;
                 Changes.Add(move);
+
+                if(color == WHITE)
+                {
+                    if(originalGameBoardState.GetCheckersOnPosition(toPos) == -1)
+                    {
+                        Changes.Add(new Move(BLACK, toPos, BLACK.GetBar()));
+                    }
+                }
+                else
+                {
+                    if (originalGameBoardState.GetCheckersOnPosition(toPos) == 1)
+                    {
+                        Changes.Add(new Move(WHITE, toPos, WHITE.GetBar()));
+                    }
+                }
+
                 movesLeft = movesLeft.Without(distance);
                 if(movesLeft.Count() > 0)
                 {

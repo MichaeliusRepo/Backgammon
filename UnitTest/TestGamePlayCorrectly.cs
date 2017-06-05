@@ -385,6 +385,75 @@ namespace UnitTest
             Assert.IsTrue(arrayEqual(new int[] { 4, 4, 4, 4 }, c5.AsDiceState().GetDiceValues()));
         }
 
+        [TestMethod]
+        public void TestThatIfBlackCheckerIsCapturedAChangeShowsItIsMovedToTheBar()
+        {
+            int[] mainBoard = new int[] {
+                                           -1, 0, -1, 0,  0,  5,
+                                            0, 3, 0, 0,  0, -5,
+                                            5, 0, 0, 0, -3,  0,
+                                           -5, 0, 0, 0,  0,  2 };
+            fd.SetReturnValues(ar(1, 3));
+            bg = new BackgammonGame(mainBoard, fd);
+            bg.Move(White, 6, 3);
+
+            var changes = bg.GetChanges();
+            Assert.AreEqual(4, changes.Count());
+
+            var c1 = changes[0];
+            var c2 = changes[1];
+            var c3 = changes[2];
+            var c4 = changes[3];
+
+            Assert.IsTrue(c1.IsDiceState(), "c1 is not dice state");
+            Assert.IsTrue(c2.IsMove(), "c2 is not move");
+            Assert.IsTrue(c3.IsMove());
+            Assert.IsTrue(c4.IsDiceState(), "c3 is not dice state");
+
+
+            Assert.IsTrue(arrayEqual(ar(1, 3), c1.AsDiceState().GetDiceValues()), "Expected 1,3 but got " + string.Join(",", c1.AsDiceState().GetDiceValues()));
+            Assert.AreEqual("w 6 3", c2.AsMove().DebugString());
+            Assert.AreEqual("b 3 " + Black.GetBar(), c3.AsMove().DebugString());
+            Assert.IsTrue(arrayEqual(new int[] { 1 }, c4.AsDiceState().GetDiceValues()));
+
+
+        }
+
+        [TestMethod]
+        public void TestThatIfWhiteCheckerIsCapturedAChangeShowsItIsMovedToTheBar()
+        {
+            int[] mainBoard = new int[] {
+                                           -2, 0, 0, 0,  0,  5,
+                                            0, 3, 0, 0,  0, -5,
+                                            5, 0, 0, 0, -3,  0,
+                                           -5, 0, 0, 1,  0,  1 };
+            fd.SetReturnValues(ar(1, 3));
+            bg = new BackgammonGame(mainBoard, fd, 0, 0, 0, 0, Black);
+            bg.Move(Black, 19, 22);
+
+            var changes = bg.GetChanges();
+            Assert.AreEqual(4, changes.Count());
+
+            var c1 = changes[0];
+            var c2 = changes[1];
+            var c3 = changes[2];
+            var c4 = changes[3];
+
+            Assert.IsTrue(c1.IsDiceState(), "c1 is not dice state");
+            Assert.IsTrue(c2.IsMove(), "c2 is not move");
+            Assert.IsTrue(c3.IsMove());
+            Assert.IsTrue(c4.IsDiceState(), "c3 is not dice state");
+
+
+            Assert.IsTrue(arrayEqual(ar(1, 3), c1.AsDiceState().GetDiceValues()), "Expected 1,3 but got " + string.Join(",", c1.AsDiceState().GetDiceValues()));
+            Assert.AreEqual("b 19 22", c2.AsMove().DebugString());
+            Assert.AreEqual("w 22 " + White.GetBar(), c3.AsMove().DebugString());
+            Assert.IsTrue(arrayEqual(new int[] { 1 }, c4.AsDiceState().GetDiceValues()));
+        }
+
+
+
+        //Below here is obsolete
 
         [TestMethod]
         public void TestGetMoveHistoryWorksCorrectlyOneTurnOnly()
