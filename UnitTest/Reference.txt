@@ -1,0 +1,54 @@
+﻿[TestMethod]
+        public void JSON()
+        {
+            DataContractJsonSerializer x = new DataContractJsonSerializer(typeof(TestClass));
+            TestClass test = new TestClass();
+            MemoryStream stream1 = new MemoryStream();
+            x.WriteObject(stream1, test);
+            stream1.Position = 0;
+            StreamReader sr = new StreamReader(stream1);
+            Console.WriteLine("JSON form of Person object: ");
+            string json = sr.ReadToEnd();
+
+            Console.WriteLine(json);
+
+
+            MemoryStream stream2 = new MemoryStream();
+            stream2.Write(Encoding.ASCII.GetBytes(json), 0, json.Length);
+            stream2.Position = 0;
+            var t = (TestClass)x.ReadObject(stream2);
+
+            t.PrintObject();
+
+            Assert.IsFalse(true);
+
+        }
+
+ [DataContract]
+    internal class TestClass
+    {
+        [DataMember]
+        public int whiteHome = 1;
+
+        [DataMember]
+        public int whiteBar = 0;
+
+        [DataMember]
+        public int blackHome = 3;
+
+        [DataMember]
+        public int blackBar = 2;
+
+        [DataMember]
+        public int[] board = new int[] { 1, 23, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24 };
+
+        [DataMember]
+        public Move[] moves = new Move[] { new Move(CheckerColor.Black, 5, 7), new Move(CheckerColor.White, 7,3) };
+
+        internal void PrintObject()
+        {
+            var str = String.Format("WhiteBar: {0} WhiteHoem: {1} BlackBar: {2} BlackHome: {3} \n Board: {4} \n Moves {5}", whiteBar, whiteHome, blackBar, blackHome,
+                string.Join(", ", board), string.Join(",", moves.Select(move => move.DebugString()) ));
+            Console.WriteLine(str);
+        }
+    }
