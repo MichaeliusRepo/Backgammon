@@ -88,7 +88,10 @@ namespace Backgammon.Screen
                 DiceRollsLeft = t.dice;
                 GenerateDiceImages();
 
-                // Define 1) SetOfMoves (distance) and 2) SelectedPoint (starting pos)
+                // Define 1) SetOfMoves (distance) and 2) SelectedPoint (starting pos) and 3) PossibleDestintions
+                PossibleDestinations.Clear();
+                PossibleDestinations.Add(m.to);
+
                 SelectedPoint = m.from;
                 var subtraction = (SelectedPoint == CurrentPlayer.GetBar()) ? 0 : SelectedPoint;
                 if (m.to == CurrentPlayer.BearOffPositionID())
@@ -154,7 +157,7 @@ namespace Backgammon.Screen
         {
             if (CurrentPlayer == White)
                 SetOfMoves = WhiteInterface.move(SelectedPoint, clickedPoint);
-            else
+            else // SetOfMoves is empty when the move wins the game :,((((((
                 SetOfMoves = BlackInterface.move(SelectedPoint, clickedPoint);
             Board.StopGlowPoints();
             Board.RemoveCheckerHighlight();
@@ -244,8 +247,8 @@ namespace Backgammon.Screen
             //int[] gameBoard = BackgammonGame.DefaultGameBoard;
             int[] gameBoard = Board.TestBoard3;
 
-            Model = new BackgammonGame(gameBoard, new RealDice());
-            //Model = new BackgammonGame(gameBoard, new FakeDice(new int[] { 1, 6 }));
+            //Model = new BackgammonGame(gameBoard, new RealDice());
+            Model = new BackgammonGame(gameBoard, new FakeDice(new int[] { 2, 3 }));
             Board = new Board(gameBoard);
             ViewInterface = new ViewInterface(Model);
             WhiteInterface = SetAI(White, WhiteAI);
