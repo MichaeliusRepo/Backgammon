@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework;
 using ModelDLL;
 using Microsoft.Xna.Framework.Graphics;
 using Backgammon.Input;
+using static ModelDLL.CheckerColor;
 
 namespace Backgammon.Object
 {
@@ -67,8 +68,8 @@ namespace Backgammon.Object
             for (int i = 1; i < Points.Count; i++)
                 Points[i].Glow(list.Contains(i));
             bool canBearOff = NotOnBoard(list);
-            WhiteBoreOff.Glow(canBearOff && BoardScreen.CurrentPlayer == CheckerColor.White);
-            BlackBoreOff.Glow(canBearOff && BoardScreen.CurrentPlayer == CheckerColor.Black);
+            WhiteBoreOff.Glow(canBearOff && BoardScreen.CurrentPlayer == White);
+            BlackBoreOff.Glow(canBearOff && BoardScreen.CurrentPlayer == Black);
         }
 
         private bool NotOnBoard(List<int> list)
@@ -97,14 +98,14 @@ namespace Backgammon.Object
 
         private Point GetPointOnBoard(CheckerColor color)
         {
-            if (color == CheckerColor.White)
+            if (color == White)
                 return WhiteOnBoard;
             return BlackOnBoard;
         }
 
         private Point GetBearOffPoint(CheckerColor color)
         {
-            if (color == CheckerColor.White)
+            if (color == White)
                 return WhiteBoreOff;
             return BlackBoreOff;
         }
@@ -171,9 +172,18 @@ namespace Backgammon.Object
         internal int GetAmountOfCheckersAtPoint(int i)
         {
             int value = Points[i].GetAmount();
-            if (value != 0 && Points[i].GetTopChecker().Color == CheckerColor.Black)
+            if (value != 0 && Points[i].GetTopChecker().Color == Black)
                 return -value;
             return value;
+        }
+
+        internal CheckerColor GetColorAtPoint(int i)
+        {
+            if (i == BackgammonGame.BLACK_BAR_ID || i == BackgammonGame.BLACK_BEAR_OFF_ID)
+                return Black;
+            if (i == BackgammonGame.WHITE_BAR_ID || i == BackgammonGame.WHITE_BEAR_OFF_ID)
+                return White;
+            return Points[i].GetTopChecker().Color;
         }
 
         private void CreatePoints()
@@ -205,11 +215,11 @@ namespace Backgammon.Object
         private List<Checker> GetCheckers(int i)
         {
             int amountOfCheckers = gameBoard[i - 1]; // Game logic uses zero indexing :,-(
-            CheckerColor checkerColor = CheckerColor.Black;
+            CheckerColor checkerColor = Black;
             if (amountOfCheckers < 0)
                 amountOfCheckers *= -1; // make positive for use in loop
             else
-                checkerColor = CheckerColor.White;
+                checkerColor = White;
             List<Checker> checkers = new List<Checker>();
             for (int k = 0; k < amountOfCheckers; k++)
                 checkers.Add(new Checker(checkerColor));

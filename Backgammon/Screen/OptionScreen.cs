@@ -31,7 +31,7 @@ namespace Backgammon.Screen
             ShowPips = new Button(new Vector2(200, 400), true);
             WhiteAI = new Button(new Vector2(600, 200));
             BlackAI = new Button(new Vector2(600, 400), true);
-            Buttons = new List<Button>() { AudioMuted, ShowPips, WhiteAI, BlackAI};
+            Buttons = new List<Button>() { AudioMuted, ShowPips, WhiteAI, BlackAI };
         }
 
         public override void LoadContent()
@@ -53,16 +53,13 @@ namespace Backgammon.Screen
 
         public override void Update(GameTime gameTime)
         {
+            if (AudioMuted.Triggered) AudioManager.Instance.ToggleAudio();
+            if (InputManager.Instance.KeyPressed(Keys.Enter)) ScreenManager.Instance.ChangeScreens("BoardScreen");
+
             base.Update(gameTime);
             Image.Update(gameTime);
-
             foreach (Button b in Buttons)
                 b.Update(gameTime);
-
-            if (AudioMuted.Triggered) AudioManager.Instance.ToggleAudio();
-
-            if (InputManager.Instance.KeyPressed(Keys.Enter))
-                ScreenManager.Instance.ChangeScreens("BoardScreen");
         }
 
         public override void Draw(SpriteBatch spriteBatch)

@@ -33,10 +33,9 @@ namespace Backgammon.Screen
         private bool BlackAI => OptionScreen.BlackAI.SwitchedOn;
         internal static CheckerColor CurrentPlayer { get; private set; }
         private GameState State = GameState.PickChecker;
-
+        private List<Turn> TurnHistory = new List<Turn>();
         private List<int> MovableCheckers, PossibleDestinations, SetOfMoves, DiceRollsLeft;
         private int SelectedPoint;
-
         private float[] DiceXPositions = { Board.midX - 4 * Board.leftX, Board.midX - 2 * Board.leftX,
             Board.midX + 2 * Board.leftX, Board.midX + 4 * Board.leftX };
         private float DiceScale = 0.8f;
@@ -54,34 +53,84 @@ namespace Backgammon.Screen
         private void BeginTurn()
         {
             CurrentPlayer = ViewInterface.GetNextPlayerToMove();
-            DiceRollsLeft = ViewInterface.GetMoves();
-            GenerateDiceImages();
             Board.RemoveCheckerHighlight();
 
-            var turns = Model.GetTurnHistory();
-            if (turns.Count != 0)
-                throw new Exception();
-            //AIMove(turns);
-            PlayerTurn();
+            GetTurnHistory();
+            if (TurnHistory.Count != 0) AIMove();
+            else PlayerTurn();
         }
 
-        private void AIMove(List<Turn> turns)
+        private void GetTurnHistory()
         {
-            throw new NotImplementedException("dam son you did it");
+            if (!WhiteAI && !BlackAI) return;
+            var history = Model.GetTurnHistory();
+            if (history.Count == 0 || (WhiteAI && BlackAI)) return;
+            TurnHistory = history;
+            foreach (Turn t in new List<Turn>(TurnHistory))
+                foreach (Move m in t.moves)
+                    if (m.color == CurrentPlayer && !AIEnabled(CurrentPlayer))
+                        TurnHistory.Remove(t);
         }
 
-        private void CheckInconsistencies()
+        private bool AIEnabled(CheckerColor c)
+        {
+            return (c == White) ? WhiteAI : BlackAI;
+        }
+
+        private void AIMove()
+        {
+            Turn t = TurnHistory[0];
+            if (t.moves.Count != 0)
+            {
+                Move m = t.moves[0];
+                t.moves.RemoveAt(0);
+                CurrentPlayer = Board.GetColorAtPoint(m.from); // Code relies on knowing player color.
+                DiceRollsLeft = t.dice;
+                GenerateDiceImages();
+
+                // Define 1) SetOfMoves (distance) and 2) SelectedPoint (starting pos)
+                SelectedPoint = m.from;
+                var subtraction = (SelectedPoint == CurrentPlayer.GetBar()) ? 0 : SelectedPoint;
+                if (m.to == CurrentPlayer.BearOffPositionID())
+                    SetOfMoves.Add(6); // Checker is bearing off anyway
+                else
+                    SetOfMoves.Add(Math.Abs(m.to - subtraction));
+                SetState(GameState.Animating);
+            }
+            else
+            {
+                TurnHistory.RemoveAt(0);
+                BeginTurn();
+            }
+
+        }
+
+        private bool BoardIsInconsistent()
         {
             int[] motherboard = Model.GetGameBoardState().getMainBoard();
             for (int i = 0; i < motherboard.Length; i++)
                 if (Board.GetAmountOfCheckersAtPoint(i + 1) != motherboard[i])
-                    throw new Exception("View was found to be inconsistent with model. \n" +
-                                            Board.GetAmountOfCheckersAtPoint(i + 1) + " != " + motherboard[i]);
+                {
+                    Console.WriteLine("View was found to be inconsistent with model. \n" +
+                        Board.GetAmountOfCheckersAtPoint(i + 1) + " != " + motherboard[i]);
+                    return true;
+                }
+            return false;
+        }
+
+        private void CheckInconsistency()
+        {
+            int[] motherboard = Model.GetGameBoardState().getMainBoard();
+            for (int i = 0; i < motherboard.Length; i++)
+                if (Board.GetAmountOfCheckersAtPoint(i + 1) != motherboard[i])
+                    throw new Exception();
         }
 
         private void PlayerTurn()
         {
-            //CheckInconsistencies();
+            //CheckInconsistency();
+            DiceRollsLeft = ViewInterface.GetMoves();
+            GenerateDiceImages();
             MovableCheckers = ViewInterface.GetMoveableCheckers();
             Board.GlowPoints(MovableCheckers);
 
@@ -127,7 +176,6 @@ namespace Backgammon.Screen
                 Board.MoveChecker(SelectedPoint, to);
             else if (CanBearOff() && SetOfMoves.Count == 1)
                 Board.BearOff(CurrentPlayer, SelectedPoint);
-
             else
                 Board.MoveChecker(CurrentPlayer, to);
             SelectedPoint = to;
@@ -193,8 +241,8 @@ namespace Backgammon.Screen
             foreach (Image DiceImage in DiceImages)
                 DiceImage.LoadContent();
 
-            int[] gameBoard = BackgammonGame.DefaultGameBoard;
-            //int[] gameBoard = Board.TestBoard3;
+            //int[] gameBoard = BackgammonGame.DefaultGameBoard;
+            int[] gameBoard = Board.TestBoard3;
 
             Model = new BackgammonGame(gameBoard, new RealDice());
             //Model = new BackgammonGame(gameBoard, new FakeDice(new int[] { 1, 6 }));
@@ -242,8 +290,6 @@ namespace Backgammon.Screen
             foreach (Image DiceImage in DiceImages)
                 DiceImage.UnloadContent();
         }
-
-
 
         public override void Update(GameTime gameTime)
         {
