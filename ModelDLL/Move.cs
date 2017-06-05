@@ -31,7 +31,7 @@ namespace ModelDLL
 
         public string DebugString()
         {
-            return (color == CheckerColor.White ? "W" : "B") + " " + from + " " + to;
+            return (color == CheckerColor.White ? "w" : "b") + " " + from + " " + to;
         }
 
         public bool IsMove()

@@ -29,18 +29,30 @@ namespace ModelDLL
         public static readonly int BLACK_BEAR_OFF_ID = BLACK.BearOffPositionID();
         public const int MAX_MOVE_DISTANCE_ACCEPTED = 6;
 
-        private List<View> obserers = new List<View>();
+        private List<View> observers = new List<View>();
 
-        private List<Change> Changes;
+        private List<Change> Changes = new List<Change>();
+
+
+        
 
         public List<Change> GetChanges()
         {
-            return new List<Change>();
+            return new List<Change>(Changes);
         }
 
         public void ConnectView(View view)
         {
-            this.obserers.Add(view);
+            this.observers.Add(view);
+        }
+
+        internal void NotifyViews()
+        {
+            foreach (var observer in observers)
+            {
+                observer.NotifyView();
+            }
+            Changes = new List<Change>();
         }
 
         public List<Turn> GetTurnHistory()
@@ -93,6 +105,9 @@ namespace ModelDLL
             this.turnColor = playerToMove;
             this.dice = dice;
             recalculateMoves();
+
+            //No need for this, as it is done in recalculate moves
+            //this.Changes.Add(new DiceState(movesLeft.ToArray()));
 
             this.currentTurn.dice = new List<int>(movesLeft);
 
@@ -184,7 +199,7 @@ namespace ModelDLL
 
             MovesCalculator.MoveState resultingState = mts.MoveToPosition(targetPosition);
             currentGameBoardState = resultingState.state;
-            movesLeft = resultingState.movesLeft;
+           // movesLeft = resultingState.movesLeft;
 
             List<int> movesMade = resultingState.movesTaken;
 
@@ -192,13 +207,21 @@ namespace ModelDLL
             // TODO potentially a problem that turns change before the moves taken are returned
             // potential stack overflow? 
 
+            
 
             int fromPos = from;
             foreach (int distance in movesMade)
             {
                 int toPos = GameBoardMover.GetPositionAfterMove(color, fromPos, distance);
-                currentTurn.moves.Add(new Move(color, fromPos, toPos));
+                var move = new Move(color, fromPos, toPos);
+                currentTurn.moves.Add(move);
                 fromPos = toPos;
+                Changes.Add(move);
+                movesLeft = movesLeft.Without(distance);
+                if(movesLeft.Count() > 0)
+                {
+                    Changes.Add(new DiceState(movesLeft.ToArray()));
+                }
             }
 
 
@@ -315,6 +338,7 @@ namespace ModelDLL
             {
                 movesLeft = new List<int>() { diceValues[0], diceValues[1] };
             }
+            Changes.Add(new DiceState(movesLeft.ToArray()));
 
         }
 
