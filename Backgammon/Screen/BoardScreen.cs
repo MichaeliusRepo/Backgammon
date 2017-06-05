@@ -18,7 +18,7 @@ namespace Backgammon.Screen
     *  2) Display Pips
     * */
 
-    internal class BoardScreen : GameScreen
+    internal class BoardScreen : GameScreen, View
     {
         #region Fields
 
@@ -244,6 +244,10 @@ namespace Backgammon.Screen
             foreach (Image DiceImage in DiceImages)
                 DiceImage.LoadContent();
 
+
+            //Throws not implemented error
+            NotifyView();
+
             //int[] gameBoard = BackgammonGame.DefaultGameBoard;
             int[] gameBoard = Board.TestBoard3;
 
@@ -340,6 +344,11 @@ namespace Backgammon.Screen
             Board.Draw(spriteBatch);
             foreach (Image DiceImage in DiceImages)
                 DiceImage.Draw(spriteBatch);
+        }
+
+        public void NotifyView()
+        {
+            throw new NotImplementedException();
         }
 
         #endregion

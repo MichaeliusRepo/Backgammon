@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace ModelDLL
 {
     [DataContractAttribute]
-    public class Move
+    public class Move : Change
     {
         [DataMember]
         public readonly CheckerColor color;

@@ -29,6 +29,18 @@ namespace ModelDLL
         public static readonly int BLACK_BEAR_OFF_ID = BLACK.BearOffPositionID();
         public const int MAX_MOVE_DISTANCE_ACCEPTED = 6;
 
+        private List<View> obserers = new List<View>();
+
+        public List<Change> GetChanges()
+        {
+            return new List<Change>();
+        }
+
+        public void ConnectView(View view)
+        {
+            this.obserers.Add(view);
+        }
+
         public List<Turn> GetTurnHistory()
         { // My name is Michaelius the Courageous, and I demand you make this method public.
             var tmp = turnHistory;
@@ -205,7 +217,7 @@ namespace ModelDLL
                 changeTurns();
             }
 
-            (turnColor == WHITE ? whitePlayer : blackPlayer).MakeMove();
+            //(turnColor == WHITE ? whitePlayer : blackPlayer).MakeMove();
 
             return movesMade;
 
