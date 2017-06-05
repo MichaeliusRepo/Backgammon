@@ -1,15 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace ModelDLL
 {
+    [DataContractAttribute]
     public class Move
     {
+        [DataMember]
         public readonly CheckerColor color;
+        [DataMember]
         public readonly int from;
+        [DataMember]
         public readonly int to;
 
         internal Move(CheckerColor color, int from, int to)

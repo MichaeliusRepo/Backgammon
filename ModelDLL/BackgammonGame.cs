@@ -207,10 +207,6 @@ namespace ModelDLL
 
             (turnColor == WHITE ? whitePlayer : blackPlayer).MakeMove();
 
-            
-
-
-
             return movesMade;
 
             
