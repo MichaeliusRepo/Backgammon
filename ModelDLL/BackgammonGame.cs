@@ -194,7 +194,7 @@ namespace ModelDLL
             Changes.AddRange(resultingState.changes);
             NotifyAllViews();
 
-            List<int> movesMade = resultingState.movesTaken;
+            
           
             NotifyView(color, from, targetPosition);
             if (IsGameOver())
@@ -212,7 +212,7 @@ namespace ModelDLL
                 changeTurns();
             }
 
-            return movesMade;
+            return new List<int>();
 
             
         }
