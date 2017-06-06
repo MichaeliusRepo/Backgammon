@@ -36,9 +36,9 @@ namespace Backgammon.Screen
         private GameState State;
         private List<int> MovableCheckers, PossibleDestinations;
         private int SelectedPoint;
-        private float[] DiceXPositions = { Board.midX - 4 * Board.leftX, Board.midX - 2 * Board.leftX,
+        private static readonly float[] DiceXPositions = { Board.midX - 4 * Board.leftX, Board.midX - 2 * Board.leftX,
             Board.midX + 2 * Board.leftX, Board.midX + 4 * Board.leftX };
-        private float DiceScale = 0.8f;
+        private static readonly float DiceScale = 0.8f;
         private int[] DiceRolls;
         private List<Change> NotifyPropertyChanged = new List<Change>();
 

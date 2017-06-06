@@ -135,7 +135,12 @@ namespace Backgammon.Object
         {
             foreach (Point p in Points)
                 if (InputManager.Instance.WasClicked(p.GetBounds()))
-                    return Points.IndexOf(p);
+                    if (p.Equals(WhiteBar)) return White.GetBar();
+                    else if (p.Equals(WhiteBearOff)) return White.BearOffPositionID();
+                    else if (p.Equals(BlackBar)) return Black.GetBar();
+                    else if (p.Equals(BlackBearOff)) return Black.BearOffPositionID();
+                    else
+                        return Points.IndexOf(p);
             return -1;
         }
 
