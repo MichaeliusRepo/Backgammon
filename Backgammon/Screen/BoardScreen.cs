@@ -25,7 +25,6 @@ namespace Backgammon.Screen
         private Image Image = new Image { Path = "Images/Board", Position = new Vector2(540, 360) };
         private List<Image> DiceImages = new List<Image>();
 
-
         private Board Board;
         private BackgammonGame Model;
         private ViewInterface ViewInterface;
@@ -40,7 +39,7 @@ namespace Backgammon.Screen
             Board.midX + 2 * Board.leftX, Board.midX + 4 * Board.leftX };
         private float DiceScale = 0.8f;
         private int[] DiceRolls;
-        private List<Change> NotifyPropertyChanged; // = new List<Change>();
+        private List<Change> NotifyPropertyChanged = new List<Change>();
 
         #endregion
 
@@ -48,18 +47,10 @@ namespace Backgammon.Screen
 
         public void NotifyView()
         {
-            NotifyPropertyChanged = Model.GetChanges();
-            if (NotifyPropertyChanged.Count != 0)
-                State = GameState.Animating;
-            else
-                Console.WriteLine("Model notified View but returned no changes.");
+            NotifyPropertyChanged.AddRange(Model.GetChanges());
+            if (NotifyPropertyChanged.Count != 0) State = GameState.Animating;
+            else throw new Exception("Model notified View but returned no changes.");
         }
-
-        //private PlayerInterface SetAI(CheckerColor color, bool enabled)
-        //{
-        //    if (enabled) return Model.ConnectPlayer(color, new NaiveAI(null));
-        //    else return new PlayerInterface(Model, color, null);
-        //}
 
         private void Instantiate()
         {
@@ -69,16 +60,15 @@ namespace Backgammon.Screen
             ViewInterface = new ViewInterface(Model);
             WhiteInterface = new PlayerInterface(Model, White, null);
             BlackInterface = new PlayerInterface(Model, Black, null);
+            Model.ConnectView(this);
+            //NotifyView();
         }
 
         private void PlayAnimation(Change c)
         {
             NotifyPropertyChanged.Remove(c);
-
-            if (c is DiceState)
-                AnimateDice(c as DiceState);
-            else if (c is Move)
-                AnimateCheckers(c as Move);
+            if (c is DiceState) AnimateDice(c as DiceState);
+            else if (c is Move) AnimateCheckers(c as Move);
             else throw new Exception("Unrecognized change type returned.");
         }
 
@@ -122,7 +112,7 @@ namespace Backgammon.Screen
 
         private void BeginTurn()
         {
-            CheckInconsistency();
+            //CheckInconsistency();
             //CurrentPlayer = ViewInterface.GetNextPlayerToMove();
             Board.RemoveCheckerHighlight();
             Board.StopGlowPoints();
@@ -283,6 +273,12 @@ namespace Backgammon.Screen
         }
 
         #region The Great Garbage Can
+
+        //private PlayerInterface SetAI(CheckerColor color, bool enabled)
+        //{
+        //    if (enabled) return Model.ConnectPlayer(color, new NaiveAI(null));
+        //    else return new PlayerInterface(Model, color, null);
+        //}
 
         //private void GetTurnHistory()
         //{
