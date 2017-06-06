@@ -69,8 +69,8 @@ namespace Backgammon.Object
                 Points[i].Glow(list.Contains(i));
             WhiteBar.Glow(list.Contains(BackgammonGame.WHITE_BAR_ID));
             BlackBar.Glow(list.Contains(BackgammonGame.BLACK_BAR_ID));
-            WhiteBar.Glow(list.Contains(BackgammonGame.WHITE_BAR_ID));
-            WhiteBar.Glow(list.Contains(BackgammonGame.WHITE_BAR_ID));
+            WhiteBearOff.Glow(list.Contains(BackgammonGame.WHITE_BEAR_OFF_ID));
+            BlackBearOff.Glow(list.Contains(BackgammonGame.BLACK_BEAR_OFF_ID));
         }
 
         private bool NotOnBoard(List<int> list)
