@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static ModelDLL.BackgammonGame.GameState;
+
 
 
 
@@ -46,7 +46,7 @@ namespace ModelDLL
             this.observers.Add(view);
         }
 
-        internal void NotifyViews()
+        internal void NotifyAllViews()
         {
             foreach (var observer in observers)
             {
@@ -77,7 +77,6 @@ namespace ModelDLL
         private PlayerInterface whitePlayer;
         private PlayerInterface blackPlayer;
 
-        private GameState state = ChangeTurnToWhite;
 
 
 
@@ -116,7 +115,7 @@ namespace ModelDLL
             whitePlayer = new PlayerInterface(this, WHITE, null);
             blackPlayer = new PlayerInterface(this, BLACK, null);
 
-            state = playerToMove == WHITE ? ChangeTurnToWhite : ChangeTurnToBlack;
+
 
         }
         //Constructors end
@@ -131,11 +130,6 @@ namespace ModelDLL
             pi.SetPlayerIfNull(player);
             player.ConnectPlayerInterface(pi);
             return pi;
-        }
-
-        public void StartGame()
-        {
-            (turnColor == WHITE ? whitePlayer : blackPlayer).MakeMove();
         }
 
         public HashSet<int> GetLegalMovesFor(CheckerColor color, int initialPosition)
@@ -156,9 +150,6 @@ namespace ModelDLL
             {
                 throw new InvalidOperationException(color + " can't move when it is " + color.OppositeColor() + "'s turn (move to final state)");
             }
-
-
-            
 
             currentGameBoardState = finalState.state;
             movesLeft = new List<int>();
@@ -198,52 +189,13 @@ namespace ModelDLL
             }
 
             MovesCalculator.MoveState resultingState = mts.MoveToPosition(targetPosition);
-            var originalGameBoardState = currentGameBoardState;
             currentGameBoardState = resultingState.state;
-           // movesLeft = resultingState.movesLeft;
+            movesLeft = resultingState.movesLeft;
+            Changes.AddRange(resultingState.changes);
+            NotifyAllViews();
 
             List<int> movesMade = resultingState.movesTaken;
-
-
-            // TODO potentially a problem that turns change before the moves taken are returned
-            // potential stack overflow? 
-
-            List<int> positionsLandedOn = resultingState.positionsBeenAt;
-
-
-            int fromPos = from;
-            foreach (int distance in movesMade)
-            {
-                int toPos = GameBoardMover.GetPositionAfterMove(color, fromPos, distance);
-                var move = new Move(color, fromPos, toPos);
-                currentTurn.moves.Add(move);
-                fromPos = toPos;
-                Changes.Add(move);
-
-                if(color == WHITE)
-                {
-                    if(originalGameBoardState.GetCheckersOnPosition(toPos) == -1)
-                    {
-                        Changes.Add(new Move(BLACK, toPos, BLACK.GetBar()));
-                    }
-                }
-                else
-                {
-                    if (originalGameBoardState.GetCheckersOnPosition(toPos) == 1)
-                    {
-                        Changes.Add(new Move(WHITE, toPos, WHITE.GetBar()));
-                    }
-                }
-
-                movesLeft = movesLeft.Without(distance);
-                if(movesLeft.Count() > 0)
-                {
-                    Changes.Add(new DiceState(movesLeft.ToArray()));
-                }
-            }
-
-
-
+          
             NotifyView(color, from, targetPosition);
             if (IsGameOver())
             {
@@ -260,8 +212,6 @@ namespace ModelDLL
                 changeTurns();
             }
 
-            //(turnColor == WHITE ? whitePlayer : blackPlayer).MakeMove();
-
             return movesMade;
 
             
@@ -269,26 +219,10 @@ namespace ModelDLL
 
         private void NotifyView(CheckerColor color, int from, int to) 
         {
-
-
-            //Console.WriteLine("Moving " + color + " from " + from +  " to " + to);
-
-
             Console.WriteLine("Moves made: " + numberOfMovesMade);
             Console.WriteLine("----------------------------------------------\n" + 
                               "Moving " + color + " from " + from + " to " + to + ". Moves left are: " + string.Join(",", movesLeft) + "\n" + currentGameBoardState.Stringify() + 
                               "\n--------------------------------------------------");
-
-
-
-
-
-            //Console.ReadLine();
-
-
-            //Console.WriteLine("----------------------------------------------\n" +  currentGameBoardState.Stringify() + "\n--------------------------------------------------");
-
-            //TODO Implement this
         }
 
 
@@ -357,6 +291,7 @@ namespace ModelDLL
                 movesLeft = new List<int>() { diceValues[0], diceValues[1] };
             }
             Changes.Add(new DiceState(movesLeft.ToArray()));
+            NotifyAllViews();
 
         }
 
@@ -365,84 +300,5 @@ namespace ModelDLL
         {
             return this.turnColor;
         }
-
-        public void RunGame()
-        {
-            /*while(state != GameOver && state != MoveWhite && state !=  MoveBlack)
-            {
-                Execute();
-            }
-            //Execute once more for game over
-            //Execute();*/
-        }
-
-        private void Execute()
-        {
-            switch (this.state)
-            {
-                case ChangeTurnToWhite:
-                    changeTurns(WHITE);
-                    this.state = CheckLegalMovesWhite;
-                    break;
-
-                case CheckLegalMovesWhite:
-                    if (GetMoveableCheckers().Count() == 0) this.state = ChangeTurnToBlack;
-                    else this.state = MoveWhite;
-                    break;
-
-                case MoveWhite:
-                    whitePlayer.MakeMove();
-                    this.state = CheckGameOverWhite;
-                    break;
-
-                case CheckGameOverWhite:
-                    if (IsGameOver()) this.state = GameOver;
-                    else this.state = CheckLegalMovesWhite;
-                    break;
-
-                case ChangeTurnToBlack:
-                    changeTurns(BLACK);
-                    this.state = CheckLegalMovesBlack;
-                    break;
-
-                case CheckLegalMovesBlack:
-                    if (GetMoveableCheckers().Count() == 0) this.state = ChangeTurnToWhite;
-                    else this.state = MoveBlack;
-                    break;
-
-                case MoveBlack:
-                    blackPlayer.MakeMove();
-                    this.state = CheckGameOverBlack;
-                    break;
-
-                case CheckGameOverBlack:
-                    if (IsGameOver()) this.state = GameOver;
-                    else this.state = CheckLegalMovesBlack;
-                    break;
-
-                case GameOver:
-                    Console.WriteLine("Game is now over :) ");
-                    break;
-            }
-        }
-
-
-
-        internal enum GameState
-        {
-            ChangeTurnToWhite,
-            CheckLegalMovesWhite,
-            MoveWhite,
-            CheckGameOverWhite,
-            ChangeTurnToBlack,
-            CheckLegalMovesBlack,
-            MoveBlack,
-            CheckGameOverBlack,
-            GameOver
-        }
     }
 }
-
-
-
-

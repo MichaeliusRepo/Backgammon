@@ -10,10 +10,16 @@ namespace ModelDLL
     {
         private int[] diceValues;
 
-        public DiceState(int[] dicevalues)
+        internal DiceState(int[] dicevalues)
         {
             this.diceValues = dicevalues;
         }
+
+        internal DiceState(List<int> diceValues)
+        {
+            this.diceValues = diceValues.ToArray();
+        }
+        
 
         public int[] GetDiceValues()
         {

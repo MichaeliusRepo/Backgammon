@@ -337,7 +337,7 @@ namespace UnitTest
             Assert.AreEqual("w 6 3", c2.AsMove().DebugString(), "Expected w 6 3, got " + c2.AsMove().DebugString());
             Assert.IsTrue(arrayEqual(new int[] { 1 }, c3.AsDiceState().GetDiceValues()));
 
-            bg.NotifyViews();
+            bg.NotifyAllViews();
 
             changes = bg.GetChanges();
             Assert.AreEqual(0, changes.Count());
@@ -455,7 +455,7 @@ namespace UnitTest
 
         //Below here is obsolete
 
-        [TestMethod]
+      /*  [TestMethod]
         public void TestGetMoveHistoryWorksCorrectlyOneTurnOnly()
         {
             return;
@@ -729,6 +729,6 @@ namespace UnitTest
 
         //Test move history when cant use all moves
         //Test move hisotyr when turn changes, and no legal moves are possible, and turn changes again
-        //Test move history when moves of multiple moves are done
+        //Test move history when moves of multiple moves are done*/
     }
 }

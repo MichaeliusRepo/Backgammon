@@ -21,5 +21,12 @@ namespace ModelDLL
             output.Remove(i);
             return output;
         }
+
+        public static List<Change> With(this List<Change> list, Change move)
+        {
+            List<Change> output = new List<Change>(list);
+            output.Add(move);
+            return output;
+        }
     }
 }

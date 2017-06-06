@@ -24,6 +24,11 @@ namespace ModelDLL
             this.to = to;
         }
 
+        internal static Move CapturingMove(CheckerColor color, int from)
+        {
+            return new Move(color, from, color.GetBar());
+        }
+
         public override string ToString()
         {
             return "Move: " + (color == CheckerColor.White ? "W" : "B") + " from " + from + " to " + to;

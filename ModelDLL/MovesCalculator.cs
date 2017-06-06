@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static ModelDLL.CheckerColor;
 
 namespace ModelDLL
 {
@@ -21,10 +22,8 @@ namespace ModelDLL
 
         internal MovesCalculator(GameBoardState state, CheckerColor color, int fromPosition, List<int> moves)
         {
-            initialMoveState = new MoveState(state, color, fromPosition, moves, new List<int>(), new List<int>());
+            initialMoveState = new MoveState(state, color, fromPosition, moves, new List<Change>());
 
-
-            //THE PARAMETERS IN THE METHODS BELOW  (GenerateMoveStatesForPosition) are experimental!!
 
             //Initialises the set of reachable states given the starting GameBoardState, position and moves
             IEnumerable<MoveState> tmp1 = initialMoveState.GenerateMoveStatesForPosition();
@@ -55,7 +54,6 @@ namespace ModelDLL
 
 
         private Func<MoveState, int> NumberOfEnemyCheckersOnBar = s => s.state.getCheckersOnBar(s.color.OppositeColor());
-    
         internal MoveState MoveToPosition(int position)
         {
             if (!LegalToMoveToPosition(position))
@@ -95,22 +93,20 @@ namespace ModelDLL
 
         internal class MoveState
         {
-            internal List<int> movesTaken;
-            internal List<int> movesLeft;
-            internal CheckerColor color;
             internal GameBoardState state;
+            internal CheckerColor color;
             internal int position;
-            internal List<int> positionsBeenAt;
+            internal List<int> movesLeft;
+            internal List<Change> changes;
 
             internal MoveState(GameBoardState state, CheckerColor color, int position, 
-                              List<int> movesLeft, List<int> movesTaken, List<int> positionsBeenAt)
+                              List<int> movesLeft, List<Change> changes)
             {
                 this.state = state;
                 this.color = color;
                 this.position = position;
                 this.movesLeft = movesLeft;
-                this.movesTaken = movesTaken;
-                this.positionsBeenAt = positionsBeenAt;
+                this.changes = changes;
             }
 
             internal IEnumerable<MoveState> GenerateMoveStatesForPosition()
@@ -120,12 +116,16 @@ namespace ModelDLL
                 //For every move, if it is legal, creates a new MoveState that corresponds to taking the move, and adds it to output
                 foreach (int move in movesLeft)
                 {
+                    
                     var newState = GameBoardMover.Move(state, color, position, move);
                     if(newState != null)
                     {
                         int positionAfterMove = GameBoardMover.GetPositionAfterMove(color, position, move);
+
+                        var newChanges = ComputeChanges(color, position, positionAfterMove, movesLeft);
+
                         var newMoveState = new MoveState(newState, color, positionAfterMove,
-                                                        movesLeft.Without(move), movesTaken.With(move), positionsBeenAt.With(positionAfterMove));
+                                                        movesLeft.Without(move), newChanges);
                         output.Add(newMoveState);
                     }
                 }
@@ -133,6 +133,32 @@ namespace ModelDLL
                 return output;
                 
             }
+
+            private List<Change> ComputeChanges(CheckerColor color, int from, int to, List<int> moves)
+            {
+                //Add the performed move to the changes
+                List<Change> output = changes.With(new Move(color, from, to));
+
+                //If the above move happened to capture a checker, add the capturing move to the changes
+                if (CapturesChecker(color, to))
+                {
+                    var m2 = new Move(color.OppositeColor(), to, color.OppositeColor().GetBar());
+                    output.Add(m2);
+                }
+
+                //If there is at least one move left, add it to the changes
+                var movesLeft = moves.Without(  Math.Abs(to-from) );
+                if (movesLeft.Count() > 0) output.Add(new DiceState(movesLeft));
+
+                return output;
+            }
+
+            private bool CapturesChecker(CheckerColor color, int to)
+            {
+                if (color == White) return state.GetCheckersOnPosition(to) == -1;
+                else return state.GetCheckersOnPosition(to) == 1;
+            }
         }
     }
 }
+
