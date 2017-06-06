@@ -33,7 +33,7 @@ namespace Backgammon.Object
 
         private List<Point> Points { get; set; }
         internal bool InAnimation { get; private set; }
-        private Point WhiteOnBoard, BlackOnBoard, WhiteBoreOff, BlackBoreOff;
+        private Point WhiteBar, BlackBar, WhiteBearOff, BlackBearOff;
 
         // Tests
         internal static readonly int[] TestBoard1 = new int[] { -5, 1, 1, 1,  1,  1,
@@ -67,9 +67,10 @@ namespace Backgammon.Object
         {
             for (int i = 1; i < Points.Count; i++)
                 Points[i].Glow(list.Contains(i));
-            bool canBearOff = NotOnBoard(list);
-            WhiteBoreOff.Glow(canBearOff && BoardScreen.CurrentPlayer == White);
-            BlackBoreOff.Glow(canBearOff && BoardScreen.CurrentPlayer == Black);
+            WhiteBar.Glow(list.Contains(BackgammonGame.WHITE_BAR_ID));
+            BlackBar.Glow(list.Contains(BackgammonGame.BLACK_BAR_ID));
+            WhiteBar.Glow(list.Contains(BackgammonGame.WHITE_BAR_ID));
+            WhiteBar.Glow(list.Contains(BackgammonGame.WHITE_BAR_ID));
         }
 
         private bool NotOnBoard(List<int> list)
@@ -85,29 +86,26 @@ namespace Backgammon.Object
             GlowPoints(new List<int>());
         }
 
-        internal void HighlightChecker(int i)
+        internal void HighlightChecker(CheckerColor color, int i)
         {
-            Checker c = Points[i].GetTopChecker();
-            HighlightImage(c);
+            if (i == color.GetBar())
+                HighlightImage(GetOnBarPoint(color).GetTopChecker());
+            else
+                HighlightImage(Points[i].GetTopChecker());
         }
 
-        internal void HighlightChecker(CheckerColor color)
-        {
-            HighlightImage(GetPointOnBoard(color).GetTopChecker());
-        }
-
-        private Point GetPointOnBoard(CheckerColor color)
+        private Point GetOnBarPoint(CheckerColor color)
         {
             if (color == White)
-                return WhiteOnBoard;
-            return BlackOnBoard;
+                return WhiteBar;
+            return BlackBar;
         }
 
         private Point GetBearOffPoint(CheckerColor color)
         {
             if (color == White)
-                return WhiteBoreOff;
-            return BlackBoreOff;
+                return WhiteBearOff;
+            return BlackBearOff;
         }
 
         private void HighlightImage(Checker c)
@@ -146,17 +144,9 @@ namespace Backgammon.Object
             MoveChecker(Points[from], Points[to]);
         }
 
-        internal void MoveChecker(CheckerColor color, int to)
+        internal void MoveFromBar(CheckerColor color, int to)
         {
-            MoveChecker(GetPointOnBoard(color), Points[to]);
-        }
-
-        internal void MoveChecker(Point from, Point to)
-        {
-            AudioManager.Instance.PlaySound("Checker");
-            InAnimation = true;
-            movingChecker = from.GetTopChecker();
-            from.SendToPoint(to);
+            MoveChecker(GetOnBarPoint(color), Points[to]);
         }
 
         internal void BearOff(CheckerColor color, int from)
@@ -164,9 +154,17 @@ namespace Backgammon.Object
             MoveChecker(Points[from], GetBearOffPoint(color));
         }
 
+        private void MoveChecker(Point from, Point to)
+        {
+            AudioManager.Instance.PlaySound("Checker");
+            InAnimation = true;
+            movingChecker = from.GetTopChecker();
+            from.SendToPoint(to);
+        }
+
         internal void Capture(int at)
         {
-            MoveChecker(Points[at], GetPointOnBoard(Points[at].GetTopChecker().Color));
+            MoveChecker(Points[at], GetOnBarPoint(Points[at].GetTopChecker().Color));
         }
 
         internal int GetAmountOfCheckersAtPoint(int i)
@@ -188,14 +186,14 @@ namespace Backgammon.Object
 
         private void CreatePoints()
         {
-            WhiteOnBoard = new Point(new Vector2(midX, topY), new List<Checker>());
-            BlackOnBoard = new Point(new Vector2(midX, botY), new List<Checker>());
-            WhiteBoreOff = new Point(new Vector2(1060, botY), new List<Checker>(), true);
-            BlackBoreOff = new Point(new Vector2(1060, topY), new List<Checker>(), true);
+            WhiteBar = new Point(new Vector2(midX, topY), new List<Checker>());
+            BlackBar = new Point(new Vector2(midX, botY), new List<Checker>());
+            WhiteBearOff = new Point(new Vector2(1060, botY), new List<Checker>(), true);
+            BlackBearOff = new Point(new Vector2(1060, topY), new List<Checker>(), true);
 
             // Added dummy point to remove zero-indexing
             Points = new List<Point>() { new Point(Vector2.Zero, new List<Checker>()),
-                                                                        WhiteOnBoard, BlackOnBoard, WhiteBoreOff, BlackBoreOff };
+                                                                        WhiteBar, BlackBar, WhiteBearOff, BlackBearOff };
             for (int i = 1; i <= 24; i++)
                 Points.Insert(i, (new Point(FindBoard(i), GetCheckers(i))));
         }
