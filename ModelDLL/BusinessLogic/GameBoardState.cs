@@ -254,7 +254,7 @@ namespace ModelDLL
         {
             //var finalStates = MovesCalculator.GetFinalStates(this, BLACK, moves);
             //var finalStates = new FinalStatesCalculator(new List<GameBoardState>() { this }, BLACK, moves).Calculate();
-            var finalStates = FinalStatesCalculator2.AllReachableStatesTree(this, BLACK, moves).GetFinalStates().Select(node => node.state);
+            var finalStates = FinalStatesCalculator.AllReachableStatesTree(this, BLACK, moves).GetFinalStates().Select(node => node.state);
            
             
             // Console.WriteLine("Number of final states: " + finalStates.Count());

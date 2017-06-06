@@ -6,6 +6,7 @@ using System.Runtime.Serialization.Json;
 using ModelDLL;
 using System.Text;
 using System.Linq;
+using static ModelDLL.CheckerColor;
 
 namespace UnitTest
 {
@@ -21,21 +22,6 @@ namespace UnitTest
                               "<whiteHome>0</whiteHome><whiteBar>0</whiteBar><blackHome>0</blackHome><blackBar>0</blackBar>";
             string xml = state.Xmlify();
             Assert.AreEqual(expected, xml);
-
-            /*var exp = expected.ToCharArray();
-            var act = xml.ToCharArray();
-
-            Console.WriteLine(expected);
-            Console.WriteLine(xml);
-
-            for(int i = 0; i < expected.Length; i++)
-            {
-                if(exp[i] != act[i])
-                {
-                    Console.WriteLine("First error on position " + i + ". Expected " + exp[i] + " but got " + act[i]);
-                    Assert.IsTrue(false);
-                }
-            }*/
         }
 
         [TestMethod]
@@ -51,9 +37,25 @@ namespace UnitTest
         }
 
         [TestMethod]
-        public void GameBoardFromXmlStrings()
+        public void XmlifyMove()
         {
+            Move move1 = new Move(White, 6, 3);
+            Assert.AreEqual("<move>w 6 3</move>", move1.Xmlify());
 
+            Move move2 = new Move(White, 6, White.GetBar());
+            Assert.AreEqual("<move>w 6 25</move>", move2.Xmlify());
+
+            Move move3 = new Move(White, 6, White.BearOffPositionID());
+            Assert.AreEqual("<move>w 6 0</move>", move3.Xmlify());
+
+            Move move4 = new Move(Black, 20, 24);
+            Assert.AreEqual("<move>b 20 24</move>", move4.Xmlify());
+
+            Move move5 = new Move(Black, 24, Black.BearOffPositionID());
+            Assert.AreEqual("<move>b 24 25</move>", move5.Xmlify());
+
+            Move move6 = new Move(Black, 20, Black.GetBar());
+            Assert.AreEqual("<move>b 20 0</move>", move6.Xmlify());
         }
     }
 }

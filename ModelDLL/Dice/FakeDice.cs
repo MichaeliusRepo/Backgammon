@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 
 namespace ModelDLL
 {
+
+    //Used for testing purposes
+   //A dice that can be rigged to return predefined values. 
    public class FakeDice : Dice
     {
-
         private int[] DiceValues = { 0, 0 };
 
         private List<int[]> moves;
@@ -39,7 +41,6 @@ namespace ModelDLL
         public void SetReturnValues(int[] diceValues)
         {
             this.moves = new List<int[]>() { diceValues };
-            //this.DiceValues = diceValues;
         }
     }
 }

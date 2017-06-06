@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using static ModelDLL.CheckerColor;
 
 namespace ModelDLL
 {
@@ -57,6 +58,21 @@ namespace ModelDLL
         public DiceState AsDiceState()
         {
             throw new InvalidOperationException("Tried to cast Move into DiceState");
+        }
+
+        internal string Xmlify()
+        {
+            int to;
+            if (CheckerColorExtensions.IsBar(this.to))
+            {
+                to = color.BarPositionWithRegardsToBoard();
+            }
+            else if (CheckerColorExtensions.IsBearOffPosition(this.to))
+            {
+                to = color.BearOffPositionWithRegardsToBoard();
+            }
+            else to = this.to;
+            return "<move>" + (color == CheckerColor.White ? "w" : "b") + " " + from + " " + to + "</move>";
         }
     }
 

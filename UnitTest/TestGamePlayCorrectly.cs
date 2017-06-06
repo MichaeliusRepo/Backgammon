@@ -313,12 +313,25 @@ namespace UnitTest
             Assert.IsTrue(arrayEqual(ar(1, 5), c9.AsDiceState().GetDiceValues()));
         }
 
+
+        private class DummyView : View
+        {
+            public void NotifyView()
+            {
+                //Do nothing
+            }
+        }
+
         [TestMethod]
         public void TestChangesRegisteredProperlyAfterNotifyViewFlushesChanges()
         {
             List<int[]> moves = new List<int[]>() { ar(1, 3), ar(4, 4) };
             fd = new FakeDice(moves);
             bg = new BackgammonGame(BackgammonGame.DefaultGameBoard, fd);
+
+            
+
+
             bg.Move(White, 6, 3);
 
             var changes = bg.GetChanges();
@@ -333,11 +346,20 @@ namespace UnitTest
             Assert.IsTrue(c3.IsDiceState(), "c3 is not dice state");
 
 
+            
+
             Assert.IsTrue(arrayEqual(ar(1, 3), c1.AsDiceState().GetDiceValues()), "Expected 1,3 but got " + string.Join(",", c1.AsDiceState().GetDiceValues()));
             Assert.AreEqual("w 6 3", c2.AsMove().DebugString(), "Expected w 6 3, got " + c2.AsMove().DebugString());
             Assert.IsTrue(arrayEqual(new int[] { 1 }, c3.AsDiceState().GetDiceValues()));
 
+
+            //At least one view has to be present for backgammon game to flush the recent changes
+            View view = new DummyView();
+            bg.ConnectView(view);
             bg.NotifyAllViews();
+
+            //Disconnecting the view again so that we may read the changes
+            bg.DisconnectView(view);
 
             changes = bg.GetChanges();
             Assert.AreEqual(0, changes.Count());
@@ -452,283 +474,285 @@ namespace UnitTest
         }
 
 
+       
+
 
         //Below here is obsolete
 
-      /*  [TestMethod]
-        public void TestGetMoveHistoryWorksCorrectlyOneTurnOnly()
-        {
-            return;
-            bg.Move(White, 6, 4);
-            bg.Move(White, 6, 5);
+        /*  [TestMethod]
+          public void TestGetMoveHistoryWorksCorrectlyOneTurnOnly()
+          {
+              return;
+              bg.Move(White, 6, 4);
+              bg.Move(White, 6, 5);
 
-            Assert.AreEqual(Black, bg.playerToMove());
+              Assert.AreEqual(Black, bg.playerToMove());
 
-            List<Turn> history = bg.GetTurnHistory();
-            Assert.AreEqual(1, history.Count());
-            Turn t0 = history.ElementAt(0);
+              List<Turn> history = bg.GetTurnHistory();
+              Assert.AreEqual(1, history.Count());
+              Turn t0 = history.ElementAt(0);
 
-            var dice = t0.dice;
-            Assert.IsTrue(Enumerable.SequenceEqual(dice, new int[] { 1, 2 }));
+              var dice = t0.dice;
+              Assert.IsTrue(Enumerable.SequenceEqual(dice, new int[] { 1, 2 }));
 
-            List<Move> moves = t0.moves;
+              List<Move> moves = t0.moves;
 
-            Assert.AreEqual(2, moves.Count());
-            Assert.AreEqual("w 6 4", moves[0].DebugString());
-            Assert.AreEqual("w 6 5", moves[1].DebugString());
+              Assert.AreEqual(2, moves.Count());
+              Assert.AreEqual("w 6 4", moves[0].DebugString());
+              Assert.AreEqual("w 6 5", moves[1].DebugString());
 
-        }
+          }
 
-        [TestMethod]
-        public void TestGetMoveHistoryWorksCorrectlyTwoTurns()
-        {
-            bg.Move(White, 6, 4);
-            bg.Move(White, 6, 5);
-            bg.Move(Black, 1, 4);
-            bg.Move(Black, 1, 5);
+          [TestMethod]
+          public void TestGetMoveHistoryWorksCorrectlyTwoTurns()
+          {
+              bg.Move(White, 6, 4);
+              bg.Move(White, 6, 5);
+              bg.Move(Black, 1, 4);
+              bg.Move(Black, 1, 5);
 
-            Assert.AreEqual(White, bg.playerToMove());
-            List<Turn> history = bg.GetTurnHistory();
-            Assert.AreEqual(2, history.Count());
+              Assert.AreEqual(White, bg.playerToMove());
+              List<Turn> history = bg.GetTurnHistory();
+              Assert.AreEqual(2, history.Count());
 
-            //Testing turn one
-            Turn t0 = history[0];
-            var dice = t0.dice;
-            Assert.IsTrue(Enumerable.SequenceEqual(dice, new int[] { 1, 2 }));
-            List<Move> moves = t0.moves;
-            Assert.AreEqual(2, moves.Count());
-            Assert.AreEqual("w 6 4", moves[0].DebugString());
-            Assert.AreEqual("w 6 5", moves[1].DebugString());
+              //Testing turn one
+              Turn t0 = history[0];
+              var dice = t0.dice;
+              Assert.IsTrue(Enumerable.SequenceEqual(dice, new int[] { 1, 2 }));
+              List<Move> moves = t0.moves;
+              Assert.AreEqual(2, moves.Count());
+              Assert.AreEqual("w 6 4", moves[0].DebugString());
+              Assert.AreEqual("w 6 5", moves[1].DebugString());
 
-            //Testing turn 2
-            Turn t1 = history[1];
-            var dice1 = t1.dice;
-            Console.WriteLine("dice1: " + string.Join(",", dice1));
-            Assert.IsTrue(Enumerable.SequenceEqual(dice1, new int[] { 4, 3 }), "expected dice1 to be 4,3, but was " + string.Join(",", dice1));
-            List<Move> moves1 = t1.moves;
-            Assert.AreEqual(2, moves.Count());
-            Assert.AreEqual("b 1 4", moves1[0].DebugString());
-            Assert.AreEqual("b 1 5", moves1[1].DebugString());
+              //Testing turn 2
+              Turn t1 = history[1];
+              var dice1 = t1.dice;
+              Console.WriteLine("dice1: " + string.Join(",", dice1));
+              Assert.IsTrue(Enumerable.SequenceEqual(dice1, new int[] { 4, 3 }), "expected dice1 to be 4,3, but was " + string.Join(",", dice1));
+              List<Move> moves1 = t1.moves;
+              Assert.AreEqual(2, moves.Count());
+              Assert.AreEqual("b 1 4", moves1[0].DebugString());
+              Assert.AreEqual("b 1 5", moves1[1].DebugString());
 
-        }
+          }
 
-        [TestMethod]
-        public void TestGetMoveHistoryTwoTurnsWhenGetHistoryInBetween()
-        {
-            bg.Move(White, 6, 4);
-            bg.Move(White, 6, 5);
-            var history1 = bg.GetTurnHistory();
-            Assert.AreEqual(1, history1.Count());
+          [TestMethod]
+          public void TestGetMoveHistoryTwoTurnsWhenGetHistoryInBetween()
+          {
+              bg.Move(White, 6, 4);
+              bg.Move(White, 6, 5);
+              var history1 = bg.GetTurnHistory();
+              Assert.AreEqual(1, history1.Count());
 
-            //Testing turn one
-            Turn t0 = history1[0];
-            var dice = t0.dice;
-            Assert.IsTrue(Enumerable.SequenceEqual(dice, new int[] { 1, 2 }));
-            List<Move> moves = t0.moves;
-            Assert.AreEqual(2, moves.Count());
-            Assert.AreEqual("w 6 4", moves[0].DebugString());
-            Assert.AreEqual("w 6 5", moves[1].DebugString());
-
-
-            bg.Move(Black, 1, 4);
-            bg.Move(Black, 1, 5);
-            var history2 = bg.GetTurnHistory();
-            Assert.AreEqual(1, history2.Count());
-            
-            //Testing turn 2
-            Turn t1 = history2[0];
-            var dice1 = t1.dice;
-            Console.WriteLine("dice1: " + string.Join(",", dice1));
-            Assert.IsTrue(Enumerable.SequenceEqual(dice1, new int[] { 4, 3 }), "expected dice1 to be 4,3, but was " + string.Join(",", dice1));
-            List<Move> moves1 = t1.moves;
-            Assert.AreEqual(2, moves.Count());
-            Assert.AreEqual("b 1 4", moves1[0].DebugString());
-            Assert.AreEqual("b 1 5", moves1[1].DebugString());
-        }
-
-        [TestMethod]
-        public void TestGetHistoryThreeTurnsWithTwoEqualDiceThereforeFourMoves()
-        {
-            bg.Move(White, 6, 4);
-            bg.Move(White, 6, 5);
-            bg.Move(Black, 1, 4);
-            bg.Move(Black, 1, 5);
-            bg.Move(White, White.GetBar(), 24);
-            bg.Move(White, White.GetBar(), 24);
-            bg.Move(White, 6, 5);
-            bg.Move(White, 5, 4);
-
-            var history = bg.GetTurnHistory();
-            //Assert.AreEqual(3, history.Count());
-
-            //Testing turn one
-            Turn t0 = history[0];
-            var dice = t0.dice;
-            Assert.IsTrue(Enumerable.SequenceEqual(dice, new int[] { 1, 2 }));
-            List<Move> moves = t0.moves;
-            Assert.AreEqual(2, moves.Count());
-            Assert.AreEqual("w 6 4", moves[0].DebugString());
-            Assert.AreEqual("w 6 5", moves[1].DebugString());
-
-            //Testing turn 2
-            Turn t1 = history[1];
-            var dice1 = t1.dice;
-            Console.WriteLine("dice1: " + string.Join(",", dice1));
-            Assert.IsTrue(Enumerable.SequenceEqual(dice1, new int[] { 4, 3 }), "expected dice1 to be 4,3, but was " + string.Join(",", dice1));
-            List<Move> moves1 = t1.moves;
-            Assert.AreEqual(2, moves.Count());
-            Assert.AreEqual("b 1 4", moves1[0].DebugString());
-            Assert.AreEqual("b 1 5", moves1[1].DebugString());
-
-            //Testing turn 3
-            Turn t2 = history[2];
-            var dice2 = t2.dice;
-            Assert.IsTrue(Enumerable.SequenceEqual(dice2, new int[] { 1, 1, 1,1 }), "expected dice2 to be 1,1, but was " + string.Join(",", dice2));
-            List<Move> moves2 = t2.moves;
-            Assert.AreEqual(4, moves2.Count());
-            Assert.AreEqual("w " + White.GetBar() + " 24", moves2[0].DebugString());
-            Assert.AreEqual("w " + White.GetBar() + " 24", moves2[1].DebugString());
-            Assert.AreEqual("w 6 5", moves2[2].DebugString());
-            Assert.AreEqual("w 5 4", moves2[3].DebugString());
-        }
-
-        [TestMethod]
-        public void TestTurnHistoryWhenCanOnlyUseOneOfTwoMoves()
-        {
-            int[] board = new int[]
-            {
-                -2,-2,-2,-2,-2,-2,
-                14, 1, 0, 0, 0, 0,
-                -3, 0, 0, 0, 0, 0,
-                 0, 0, 0, 0, 0, 0
-            };
-
-            var diceValues = new List<int[]>();
-            diceValues.Add(ar(6, 1));
-            diceValues.Add(ar(4, 3));
-            diceValues.Add(ar(1, 1));
-
-            fd = new FakeDice(diceValues);
-            bg = new BackgammonGame(board, fd);
-
-            bg.Move(White, 8, 7);
-            bg.Move(Black, 6, 9);
-            bg.Move(Black, 6, 10);
-
-            var history = bg.GetTurnHistory();
-            Assert.AreEqual(2, history.Count());
-
-            var t1 = history[0];
-            Assert.IsTrue(Enumerable.SequenceEqual(t1.dice, new int[] { 6, 1 }));
-            Assert.AreEqual(1, t1.moves.Count());
-            Assert.AreEqual("w 8 7", t1.moves[0].DebugString());
-
-            var t2 = history[1];
-            Assert.IsTrue(Enumerable.SequenceEqual(t2.dice, new int[] { 4, 3 }));
-            Assert.AreEqual(2, t2.moves.Count());
-            Assert.AreEqual("b 6 9", t2.moves[0].DebugString());
-            Assert.AreEqual("b 6 10", t2.moves[1].DebugString());
-        }
+              //Testing turn one
+              Turn t0 = history1[0];
+              var dice = t0.dice;
+              Assert.IsTrue(Enumerable.SequenceEqual(dice, new int[] { 1, 2 }));
+              List<Move> moves = t0.moves;
+              Assert.AreEqual(2, moves.Count());
+              Assert.AreEqual("w 6 4", moves[0].DebugString());
+              Assert.AreEqual("w 6 5", moves[1].DebugString());
 
 
-        [TestMethod]
-        public void TestTurnHistoryWhenNoMovesAreLegal()
-        {
-            int[] board = new int[]
-            {
-                0,0,0,0,0,0,
-                0,0,0,0,0,0,
-                0,0,0,0,0,-15,
-                2,2,2,2,2,5
-            };
+              bg.Move(Black, 1, 4);
+              bg.Move(Black, 1, 5);
+              var history2 = bg.GetTurnHistory();
+              Assert.AreEqual(1, history2.Count());
 
-            List<int[]> diceValues = new List<int[]>() { ar(3, 4), ar(5, 1) };
-            fd = new FakeDice(diceValues);
-            bg = new BackgammonGame(board, fd);
+              //Testing turn 2
+              Turn t1 = history2[0];
+              var dice1 = t1.dice;
+              Console.WriteLine("dice1: " + string.Join(",", dice1));
+              Assert.IsTrue(Enumerable.SequenceEqual(dice1, new int[] { 4, 3 }), "expected dice1 to be 4,3, but was " + string.Join(",", dice1));
+              List<Move> moves1 = t1.moves;
+              Assert.AreEqual(2, moves.Count());
+              Assert.AreEqual("b 1 4", moves1[0].DebugString());
+              Assert.AreEqual("b 1 5", moves1[1].DebugString());
+          }
 
-            bg.Move(White, 24, 21);
-            bg.Move(White, 24, 20);
+          [TestMethod]
+          public void TestGetHistoryThreeTurnsWithTwoEqualDiceThereforeFourMoves()
+          {
+              bg.Move(White, 6, 4);
+              bg.Move(White, 6, 5);
+              bg.Move(Black, 1, 4);
+              bg.Move(Black, 1, 5);
+              bg.Move(White, White.GetBar(), 24);
+              bg.Move(White, White.GetBar(), 24);
+              bg.Move(White, 6, 5);
+              bg.Move(White, 5, 4);
 
-            var history = bg.GetTurnHistory();
-            Assert.AreEqual(2, history.Count());
+              var history = bg.GetTurnHistory();
+              //Assert.AreEqual(3, history.Count());
 
-            var t1 = history[0];
-            Assert.IsTrue(Enumerable.SequenceEqual(t1.dice, new int[] { 3, 4 }));
-            Assert.AreEqual("w 24 21", t1.moves[0].DebugString());
-            Assert.AreEqual("w 24 20", t1.moves[1].DebugString());
+              //Testing turn one
+              Turn t0 = history[0];
+              var dice = t0.dice;
+              Assert.IsTrue(Enumerable.SequenceEqual(dice, new int[] { 1, 2 }));
+              List<Move> moves = t0.moves;
+              Assert.AreEqual(2, moves.Count());
+              Assert.AreEqual("w 6 4", moves[0].DebugString());
+              Assert.AreEqual("w 6 5", moves[1].DebugString());
 
+              //Testing turn 2
+              Turn t1 = history[1];
+              var dice1 = t1.dice;
+              Console.WriteLine("dice1: " + string.Join(",", dice1));
+              Assert.IsTrue(Enumerable.SequenceEqual(dice1, new int[] { 4, 3 }), "expected dice1 to be 4,3, but was " + string.Join(",", dice1));
+              List<Move> moves1 = t1.moves;
+              Assert.AreEqual(2, moves.Count());
+              Assert.AreEqual("b 1 4", moves1[0].DebugString());
+              Assert.AreEqual("b 1 5", moves1[1].DebugString());
 
-            //Checks that black players turn ended and was registered even though he 
-            //did not make a move
-            var t2 = history[1];
-            Assert.IsTrue(Enumerable.SequenceEqual(t2.dice, new int[] { 5, 1 }));
-            Assert.AreEqual(0, t2.moves.Count());
+              //Testing turn 3
+              Turn t2 = history[2];
+              var dice2 = t2.dice;
+              Assert.IsTrue(Enumerable.SequenceEqual(dice2, new int[] { 1, 1, 1,1 }), "expected dice2 to be 1,1, but was " + string.Join(",", dice2));
+              List<Move> moves2 = t2.moves;
+              Assert.AreEqual(4, moves2.Count());
+              Assert.AreEqual("w " + White.GetBar() + " 24", moves2[0].DebugString());
+              Assert.AreEqual("w " + White.GetBar() + " 24", moves2[1].DebugString());
+              Assert.AreEqual("w 6 5", moves2[2].DebugString());
+              Assert.AreEqual("w 5 4", moves2[3].DebugString());
+          }
 
-        }
+          [TestMethod]
+          public void TestTurnHistoryWhenCanOnlyUseOneOfTwoMoves()
+          {
+              int[] board = new int[]
+              {
+                  -2,-2,-2,-2,-2,-2,
+                  14, 1, 0, 0, 0, 0,
+                  -3, 0, 0, 0, 0, 0,
+                   0, 0, 0, 0, 0, 0
+              };
 
-        [TestMethod]
-        public void TestTurnHistoryWhenCompositeMovesArePerfomed()
-        {
-            List<int[]> diceValues = new List<int[]>() { ar(5, 1), ar(4, 1) };
-            fd = new FakeDice(diceValues);
-            bg = new BackgammonGame(BackgammonGame.DefaultGameBoard, fd);
+              var diceValues = new List<int[]>();
+              diceValues.Add(ar(6, 1));
+              diceValues.Add(ar(4, 3));
+              diceValues.Add(ar(1, 1));
 
-            bg.Move(White, 24, 18);
-            bg.Move(Black, 12, 17);
+              fd = new FakeDice(diceValues);
+              bg = new BackgammonGame(board, fd);
 
-            var history = bg.GetTurnHistory();
-            Assert.AreEqual(2, history.Count());
+              bg.Move(White, 8, 7);
+              bg.Move(Black, 6, 9);
+              bg.Move(Black, 6, 10);
 
-            var t1 = history[0];
-            Assert.IsTrue(Enumerable.SequenceEqual(t1.dice, new int[] { 5, 1 }));
-            var moves1 = t1.moves;
-            Assert.AreEqual(2, moves1.Count());
-            Assert.AreEqual("w 24 23", moves1[0].DebugString());
-            Assert.AreEqual("w 23 18", moves1[1].DebugString());
+              var history = bg.GetTurnHistory();
+              Assert.AreEqual(2, history.Count());
 
-            var t2 = history[1];
-            Assert.IsTrue(Enumerable.SequenceEqual(t2.dice, new int[] { 4, 1 }));
-            var moves2 = t2.moves;
-            Assert.AreEqual(2, moves2.Count());
-            Assert.AreEqual("b 12 16", moves2[0].DebugString());
-            Assert.AreEqual("b 16 17", moves2[1].DebugString());
-        }
+              var t1 = history[0];
+              Assert.IsTrue(Enumerable.SequenceEqual(t1.dice, new int[] { 6, 1 }));
+              Assert.AreEqual(1, t1.moves.Count());
+              Assert.AreEqual("w 8 7", t1.moves[0].DebugString());
 
-        [TestMethod]
-        public void TestTurnHistoryWhenBlackStarts()
-        {
-            List<int[]> diceValues = new List<int[]>() { ar(5, 1), ar(4, 1) };
-            fd = new FakeDice(diceValues);
-            bg = new BackgammonGame(BackgammonGame.DefaultGameBoard, fd, 0, 0, 0, 0, Black);
-
-            bg.Move(Black, 1, 2);
-            bg.Move(Black, 12, 17);
-
-            bg.Move(White, 6, 2);
-            bg.Move(White, 6, 5);
-
-            var history = bg.GetTurnHistory();
-            Assert.AreEqual(2, history.Count());
-
-            var t1 = history[0];
-            Assert.IsTrue(Enumerable.SequenceEqual(t1.dice, new int[] { 5, 1 }));
-            var moves1 = t1.moves;
-            Assert.AreEqual(2, moves1.Count());
-            Assert.AreEqual("b 1 2", moves1[0].DebugString());
-            Assert.AreEqual("b 12 17", moves1[1].DebugString());
-
-            var t2 = history[1];
-            Assert.IsTrue(Enumerable.SequenceEqual(t2.dice, new int[] { 4, 1 }));
-            var moves2 = t2.moves;
-            Assert.AreEqual(2, moves2.Count());
-            Assert.AreEqual("w 6 2", moves2[0].DebugString());
-            Assert.AreEqual("w 6 5", moves2[1].DebugString());
+              var t2 = history[1];
+              Assert.IsTrue(Enumerable.SequenceEqual(t2.dice, new int[] { 4, 3 }));
+              Assert.AreEqual(2, t2.moves.Count());
+              Assert.AreEqual("b 6 9", t2.moves[0].DebugString());
+              Assert.AreEqual("b 6 10", t2.moves[1].DebugString());
+          }
 
 
-        }
+          [TestMethod]
+          public void TestTurnHistoryWhenNoMovesAreLegal()
+          {
+              int[] board = new int[]
+              {
+                  0,0,0,0,0,0,
+                  0,0,0,0,0,0,
+                  0,0,0,0,0,-15,
+                  2,2,2,2,2,5
+              };
 
-        //Test move history when cant use all moves
-        //Test move hisotyr when turn changes, and no legal moves are possible, and turn changes again
-        //Test move history when moves of multiple moves are done*/
+              List<int[]> diceValues = new List<int[]>() { ar(3, 4), ar(5, 1) };
+              fd = new FakeDice(diceValues);
+              bg = new BackgammonGame(board, fd);
+
+              bg.Move(White, 24, 21);
+              bg.Move(White, 24, 20);
+
+              var history = bg.GetTurnHistory();
+              Assert.AreEqual(2, history.Count());
+
+              var t1 = history[0];
+              Assert.IsTrue(Enumerable.SequenceEqual(t1.dice, new int[] { 3, 4 }));
+              Assert.AreEqual("w 24 21", t1.moves[0].DebugString());
+              Assert.AreEqual("w 24 20", t1.moves[1].DebugString());
+
+
+              //Checks that black players turn ended and was registered even though he 
+              //did not make a move
+              var t2 = history[1];
+              Assert.IsTrue(Enumerable.SequenceEqual(t2.dice, new int[] { 5, 1 }));
+              Assert.AreEqual(0, t2.moves.Count());
+
+          }
+
+          [TestMethod]
+          public void TestTurnHistoryWhenCompositeMovesArePerfomed()
+          {
+              List<int[]> diceValues = new List<int[]>() { ar(5, 1), ar(4, 1) };
+              fd = new FakeDice(diceValues);
+              bg = new BackgammonGame(BackgammonGame.DefaultGameBoard, fd);
+
+              bg.Move(White, 24, 18);
+              bg.Move(Black, 12, 17);
+
+              var history = bg.GetTurnHistory();
+              Assert.AreEqual(2, history.Count());
+
+              var t1 = history[0];
+              Assert.IsTrue(Enumerable.SequenceEqual(t1.dice, new int[] { 5, 1 }));
+              var moves1 = t1.moves;
+              Assert.AreEqual(2, moves1.Count());
+              Assert.AreEqual("w 24 23", moves1[0].DebugString());
+              Assert.AreEqual("w 23 18", moves1[1].DebugString());
+
+              var t2 = history[1];
+              Assert.IsTrue(Enumerable.SequenceEqual(t2.dice, new int[] { 4, 1 }));
+              var moves2 = t2.moves;
+              Assert.AreEqual(2, moves2.Count());
+              Assert.AreEqual("b 12 16", moves2[0].DebugString());
+              Assert.AreEqual("b 16 17", moves2[1].DebugString());
+          }
+
+          [TestMethod]
+          public void TestTurnHistoryWhenBlackStarts()
+          {
+              List<int[]> diceValues = new List<int[]>() { ar(5, 1), ar(4, 1) };
+              fd = new FakeDice(diceValues);
+              bg = new BackgammonGame(BackgammonGame.DefaultGameBoard, fd, 0, 0, 0, 0, Black);
+
+              bg.Move(Black, 1, 2);
+              bg.Move(Black, 12, 17);
+
+              bg.Move(White, 6, 2);
+              bg.Move(White, 6, 5);
+
+              var history = bg.GetTurnHistory();
+              Assert.AreEqual(2, history.Count());
+
+              var t1 = history[0];
+              Assert.IsTrue(Enumerable.SequenceEqual(t1.dice, new int[] { 5, 1 }));
+              var moves1 = t1.moves;
+              Assert.AreEqual(2, moves1.Count());
+              Assert.AreEqual("b 1 2", moves1[0].DebugString());
+              Assert.AreEqual("b 12 17", moves1[1].DebugString());
+
+              var t2 = history[1];
+              Assert.IsTrue(Enumerable.SequenceEqual(t2.dice, new int[] { 4, 1 }));
+              var moves2 = t2.moves;
+              Assert.AreEqual(2, moves2.Count());
+              Assert.AreEqual("w 6 2", moves2[0].DebugString());
+              Assert.AreEqual("w 6 5", moves2[1].DebugString());
+
+
+          }
+
+          //Test move history when cant use all moves
+          //Test move hisotyr when turn changes, and no legal moves are possible, and turn changes again
+          //Test move history when moves of multiple moves are done*/
     }
 }

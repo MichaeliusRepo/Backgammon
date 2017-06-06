@@ -8,6 +8,9 @@ namespace ModelDLL
 {
     static class ExtensionMethods
     {
+
+        //Adds an extension method to lists of integers, where it returns a copy of the list
+        //when supplied a integer
         public static List<int> With(this List<int> list, int i)
         {
             List<int> output = new List<int>(list);
@@ -15,6 +18,9 @@ namespace ModelDLL
             return output;
         }
 
+
+        //Returns a copy of a list of integers, where the integer 'i' is removed
+        //from the copy, if such an integer exists in the copy
         public static List<int> Without(this List<int> list, int i)
         {
             List<int> output = new List<int>(list);
@@ -22,6 +28,8 @@ namespace ModelDLL
             return output;
         }
 
+        //Given a list of type Change, and a new Change, returns a copy of the original
+        //list with the new change added
         public static List<Change> With(this List<Change> list, Change move)
         {
             List<Change> output = new List<Change>(list);

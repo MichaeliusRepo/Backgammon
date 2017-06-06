@@ -46,13 +46,21 @@ namespace ModelDLL
             this.observers.Add(view);
         }
 
+        public void DisconnectView(View view)
+        {
+            observers.Remove(view);
+        }
+
         internal void NotifyAllViews()
         {
             foreach (var observer in observers)
             {
                 observer.NotifyView();
             }
-            Changes = new List<Change>();
+            if(observers.Count() > 0)
+            {
+                Changes = new List<Change>();
+            }
         }
 
         public List<Turn> GetTurnHistory()
@@ -141,7 +149,7 @@ namespace ModelDLL
 
         internal IEnumerable<Node> GetFinalStates()
         {
-            return FinalStatesCalculator2.AllReachableStatesTree(currentGameBoardState, playerToMove(), movesLeft).GetFinalStates();
+            return FinalStatesCalculator.AllReachableStatesTree(currentGameBoardState, playerToMove(), movesLeft).GetFinalStates();
         } 
 
         internal void MoveToFinalState(CheckerColor color, Node finalState)

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ModelDLL
 {
-    class FinalStatesCalculator2
+    class FinalStatesCalculator
     {
         internal static Node AllReachableStatesTree(GameBoardState initialState, CheckerColor color, List<int> moves)
         {

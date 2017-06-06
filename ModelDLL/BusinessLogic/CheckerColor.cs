@@ -73,6 +73,16 @@ namespace ModelDLL
         {
             return (color == CheckerColor.White ? CheckerColor.Black : CheckerColor.White);
         }
+
+        public static bool IsBar(int i)
+        {
+            return i == WHITE_BAR_ID || i == BLACK_BAR_ID;
+        }
+
+        internal static bool IsBearOffPosition(int i)
+        {
+            return i == BEAR_OFF_BLACK_ID || i == BEAR_OFF_WHITE_ID;
+        }
     }
 
     public enum CheckerColor { White, Black };
