@@ -51,12 +51,11 @@ namespace ModelDLL
             int turn = 0;
             while (!game1.GameIsOver())
             {
-                while(game1.NumberOfTurnsMade == turn)
+                while(game1.playerToMove() == CheckerColor.White)
                 {
                     game1WhitePlayer.MakeMove();
                 }
                 game1BlackPlayer.MakeMove();
-                turn++;
 
                 if(game1.GetGameBoardState().Stringify() != game2.GetGameBoardState().Stringify())
                 {
@@ -77,15 +76,14 @@ namespace ModelDLL
                     Console.WriteLine("NUMBER OF TURNS MADE ARE NOT EQUAL");
                 }
 
-                //turn = game2.NumberOfTurnsMade;
-                while(game2.NumberOfTurnsMade == turn)
+                while(game2.playerToMove() == CheckerColor.Black)
                 {
                     game2BlackPlayer.MakeMove();
                 }
                 game2WhitePlayer.MakeMove();
-                turn++;
+                //turn++;
 
-                Console.ReadLine();
+                //Console.ReadLine();
             }
 
             Console.Write("Game is over. Enter for next round>");

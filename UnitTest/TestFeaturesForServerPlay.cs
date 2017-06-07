@@ -115,6 +115,7 @@ namespace UnitTest
 
         }
 
+        [TestMethod]
         public void TestGetBackgammonPreviousTurnWithDoubleRoll()
         {
             fd = new FakeDice(ar(2, 2));
@@ -140,6 +141,7 @@ namespace UnitTest
 
         }
 
+        [TestMethod]
         public void TestGetPreviousTurnWhenOnlySomeMovesCouldBeUsed()
         {
             //White will roll 1 and 3, so he will only be able to move the checker on position 24 to position 21. 
@@ -149,9 +151,10 @@ namespace UnitTest
                 14,0,0,0,0,0,
                 0,0,0,0,0,0,
                 0,0,0,-3,-2,-2,
-                -2,-2,0-2,-2,1
+                -2,-2,0,-2,-2,1
             };
 
+            fd.SetReturnValues(ar(1, 3));
             bg = new BackgammonGame(board, fd);
             bg.Move(White, 24, 21);
 
@@ -165,9 +168,11 @@ namespace UnitTest
             Assert.AreEqual("w 24 21", moves[0].DebugString());
         }
 
+        [TestMethod]
         public void TestGetPreviousTurnWhenNoLegalMoves()
         {
-            //When it becomes black's turn, there will be no legal moves, and the turn should skip
+            //When it becomes black's turn, there will be no legal moves, but the turn should change to white
+            //before bg.EndTurn(Black) is called
             int[] board = new int[]
             {
                 -15,2,2,2,2,2,
@@ -176,11 +181,20 @@ namespace UnitTest
                 0,0,0,0,0,0
             };
 
+            List<int[]> moves = new List<int[]>() { ar(1, 3), ar(5, 3) };
+            fd = new FakeDice(moves);
+
             bg = new BackgammonGame(board, fd);
             bg.Move(White, 8, 5);
             bg.Move(White, 8, 7);
 
             var turn = bg.GetPreviousTurn();
+            Assert.AreEqual(White, turn.color);
+            Assert.IsTrue(arrayEquals(ar(1, 3), turn.dice.ToArray()));
+            Assert.AreEqual(2, turn.moves.Count());
+
+            bg.EndTurn(Black);
+            turn = bg.GetPreviousTurn();
             Assert.AreEqual(Black, turn.color);
             Assert.IsTrue(arrayEquals(ar(5, 3), turn.dice.ToArray()));
             Assert.AreEqual(0, turn.moves.Count());

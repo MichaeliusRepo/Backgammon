@@ -189,6 +189,19 @@ namespace ModelDLL
 
         }
 
+        public void EndTurn(CheckerColor color)
+        {
+            if(color != turnColor)
+            {
+                throw new InvalidOperationException("Can't end " + color + "'s turn when it is " + color.OppositeColor() + "'s turn");
+            }
+            if(GetMoveableCheckers().Count() > 0)
+            {
+                throw new InvalidOperationException("Can't end turn when there are legal moves available");
+            }
+            changeTurns();
+        }
+
         public List<int> Move(CheckerColor color, int from, int targetPosition)
         {
 
@@ -220,8 +233,6 @@ namespace ModelDLL
                 }
             }
 
-            
-          
             NotifyView(color, from, targetPosition);
             if (IsGameOver())
             {
@@ -260,13 +271,13 @@ namespace ModelDLL
         private void changeTurns()
         {
             //recalculateMoves();
-               turnColor = turnColor.OppositeColor();
+            turnColor = turnColor.OppositeColor();
             changeTurns(turnColor);
 
-            if (GetMoveableCheckers().Count() == 0)
-            {
-                changeTurns();
-            }
+            //if (GetMoveableCheckers().Count() == 0)
+            //{
+             //   changeTurns();
+            //}
            
             
         }

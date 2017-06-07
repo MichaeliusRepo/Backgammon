@@ -40,16 +40,22 @@ namespace ModelDLL
 
         internal void SendData(string data)
         {
-            if (data == "") return;
+
+            if (data.Length <  3)
+            {
+                model.EndTurn(this.color);
+                return;
+            }
+
             List<Move> moves = new List<Move>();
             var split = data.Split(';');
-            foreach( var s in split)
+            foreach (var s in split)
             {
                 var components = s.Split(' ');
                 //if (components.Count() < 3) break;
                 int from = int.Parse(components[1]);
                 int to = int.Parse(components[2]);
-                if(components[0] == "w")
+                if (components[0] == "w")
                 {
                     moves.Add(new ModelDLL.Move(CheckerColor.White, from, to));
                 }

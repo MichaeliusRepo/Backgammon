@@ -41,6 +41,11 @@ namespace ModelDLL
         public void MakeMove()
         {
             var moveableCheckers = pi.GetMoveableCheckers();
+            if(moveableCheckers.Count() == 0)
+            {
+                pi.EndTurn();
+                return;
+            }
             int checkerToMove = moveableCheckers.ElementAt(0);
             var reachablePositions = pi.GetLegalMovesForChecker(checkerToMove);
             int positionToMoveTo = reachablePositions.ElementAt(0);

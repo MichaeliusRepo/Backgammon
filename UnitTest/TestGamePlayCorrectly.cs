@@ -473,6 +473,23 @@ namespace UnitTest
             Assert.IsTrue(arrayEqual(new int[] { 1 }, c4.AsDiceState().GetDiceValues()));
         }
 
+        [TestMethod]
+        public void TestChangesRegisteredProperlyWhenTurnChangesAndThereAreNoLegalMoves()
+        {
+            int[] board = new int[]
+              {
+                  0,0,0,0,0,0,
+                  0,0,0,0,0,0,
+                  0,0,0,0,0,-15,
+                  2,2,2,2,2,5
+              };
+            fd.SetReturnValues(ar(1, 3));
+            bg = new BackgammonGame(board, fd);
+
+            bg.Move(White, 24, 23);
+            bg.Move(White, 24, 21);
+        }
+
 
        
 

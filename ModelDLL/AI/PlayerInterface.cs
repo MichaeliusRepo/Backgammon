@@ -48,6 +48,11 @@ namespace ModelDLL
             return new HashSet<int>(bg.GetMoveableCheckers());
         }
 
+        internal void EndTurn()
+        {
+            bg.EndTurn(this.color);
+        }
+
         public List<int> GetMovesLeft()
         {
             if (!IsMyTurn())
