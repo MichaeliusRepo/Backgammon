@@ -32,6 +32,8 @@ namespace Backgammon.Screen
         private PlayerInterface WhiteInterface, BlackInterface;
         private bool WhiteAI => OptionScreen.WhiteAI.SwitchedOn;
         private bool BlackAI => OptionScreen.BlackAI.SwitchedOn;
+        private bool WhiteOnline;
+        private bool BlackOnline; // = true;
         internal CheckerColor CurrentPlayer => ViewInterface.GetNextPlayerToMove();
         private GameState State;
         private List<int> MovableCheckers, PossibleDestinations;
@@ -44,7 +46,7 @@ namespace Backgammon.Screen
 
         #endregion
 
-        #region The Vision of The Scandinavian Wonderboys
+        #region Auxilary Methods
 
         public void NotifyView()
         {
@@ -55,9 +57,9 @@ namespace Backgammon.Screen
 
         private void Instantiate()
         {
-            int[] InitialBoard = Board.TestBoard3; // BackgammonGame.DefaultGameBoard;
+            int[] InitialBoard = BackgammonGame.DefaultGameBoard; // Board.TestBoard3;
             Board = new Board(InitialBoard);
-            Model = new BackgammonGame(InitialBoard, new FakeDice(new int[] { 2, 3 }));
+            Model = new BackgammonGame(InitialBoard, new RealDice());
             ViewInterface = new ViewInterface(Model);
             WhiteInterface = new PlayerInterface(Model, White, null);
             BlackInterface = new PlayerInterface(Model, Black, null);
@@ -76,6 +78,12 @@ namespace Backgammon.Screen
         {
             DiceRolls = c.GetDiceValues();
             GenerateDiceImages();
+        }
+
+        private void NotifyNoPossibleMovesAvailable()
+        { // TODO
+            Model.EndTurn(CurrentPlayer);
+            Console.WriteLine("No possible moves were available.");
         }
 
         private void AnimateCheckers(Move m)
@@ -112,14 +120,20 @@ namespace Backgammon.Screen
 
         private void BeginTurn()
         {
-            //CheckInconsistency(); // Gives and cures cancer at the same time. Have a try!
+            //CheckInconsistency(); // Gives and cures cancer at the same time. Have a taste!
             Board.RemoveCheckerHighlight();
             Board.StopGlowPoints();
-            if (AIEnabled(CurrentPlayer)) AITurn();
+            if (ViewInterface.GetMoveableCheckers().Count == 0)
+                NotifyNoPossibleMovesAvailable();
+
+            if (NetworkEnabled(CurrentPlayer)) NetworkMove();
+            else if (AIEnabled(CurrentPlayer)) AITurn();
             else PlayerTurn();
         }
 
         private bool AIEnabled(CheckerColor c) { return (c == White) ? WhiteAI : BlackAI; }
+
+        private bool NetworkEnabled(CheckerColor c) { return (c == White) ? WhiteOnline : BlackOnline; }
 
         private void CheckInconsistency()
         {
@@ -241,6 +255,19 @@ namespace Backgammon.Screen
             Animating
         }
 
+        #region Onrain Pray
+
+        public void NetworkMove()
+        {
+            // 1) Send latest move as data
+            // 2) Retrieve move in return
+        }
+
+        #endregion
+
     }
+
+
+
 }
 
