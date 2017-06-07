@@ -49,7 +49,7 @@ namespace ModelDLL
 
 
             int turn = 0;
-            while (!game1.GameIsOver())
+            while (!game2.GameIsOver())
             {
                 while(game1.playerToMove() == CheckerColor.White)
                 {

@@ -124,7 +124,10 @@ namespace Backgammon.Screen
             Board.RemoveCheckerHighlight();
             Board.StopGlowPoints();
             if (ViewInterface.GetMoveableCheckers().Count == 0)
+            {
                 NotifyNoPossibleMovesAvailable();
+                return;
+            }
 
             if (NetworkEnabled(CurrentPlayer)) NetworkMove();
             else if (AIEnabled(CurrentPlayer)) AITurn();

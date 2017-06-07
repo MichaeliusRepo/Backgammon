@@ -199,7 +199,10 @@ namespace ModelDLL
             {
                 throw new InvalidOperationException("Can't end turn when there are legal moves available");
             }
+            Console.WriteLine("End turn was called, changing turns now");
+            Console.WriteLine("Dice before end turn:" + string.Join(",", movesLeft));
             changeTurns();
+            Console.WriteLine("Dice after end turn:" + string.Join(",", movesLeft));
         }
 
         public List<int> Move(CheckerColor color, int from, int targetPosition)
@@ -233,7 +236,7 @@ namespace ModelDLL
                 }
             }
 
-            NotifyView(color, from, targetPosition);
+            //NotifyView(color, from, targetPosition);
             if (IsGameOver())
             {
                 Console.WriteLine("Game is over!! Terminating");
@@ -286,10 +289,11 @@ namespace ModelDLL
         {
             recalculateMoves();
             turnColor = color;
-
             this.PreviousTurn = this.CurrentTurn;
             this.CurrentTurn = new Turn(color, new List<Move>(), new List<int>(movesLeft));
             NumberOfTurnsMade++;
+            //This is done in recalculateMoves(), so no need to do that here
+            //NotifyAllViews();
         }
 
         private bool IsGameOver()
