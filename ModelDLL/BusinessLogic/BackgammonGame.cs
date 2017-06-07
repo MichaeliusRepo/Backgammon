@@ -29,12 +29,33 @@ namespace ModelDLL
         public static readonly int BLACK_BEAR_OFF_ID = BLACK.BearOffPositionID();
         public const int MAX_MOVE_DISTANCE_ACCEPTED = 6;
 
+        private int numberOfMovesMade = 0;
+
+        internal int NumberOfTurnsMade { get; private set; }
+
+
+
+        internal CheckerColor turnColor;
+        internal Dice dice;
+        internal List<int> movesLeft;
+
+       // private Turn currentTurn = new Turn();
+       // private List<Turn> turnHistory = new List<Turn>();
+
+        private GameBoardState currentGameBoardState;
+
+        private PlayerInterface whitePlayer;
+        private PlayerInterface blackPlayer;
+
+        private Turn CurrentTurn = null;
+        private Turn PreviousTurn = null;
+
+
+        //NOTIFYING THE VIEW
+
         private List<View> observers = new List<View>();
 
         private List<Change> Changes = new List<Change>();
-
-
-        
 
         public List<Change> GetChanges()
         {
@@ -57,35 +78,13 @@ namespace ModelDLL
             {
                 observer.NotifyView();
             }
-            if(observers.Count() > 0)
+            if (observers.Count() > 0)
             {
                 Changes = new List<Change>();
             }
         }
 
-        public List<Turn> GetTurnHistory()
-        { // My name is Michaelius the Courageous, and I demand you make this method public.
-            var tmp = turnHistory;
-            turnHistory = new List<Turn>();
-            return tmp;
-        }
-
-        private int numberOfMovesMade = 0;
-
-
-        internal CheckerColor turnColor;
-        internal Dice dice;
-        internal List<int> movesLeft;
-
-        private Turn currentTurn = new Turn();
-        private List<Turn> turnHistory = new List<Turn>();
-
-        private GameBoardState currentGameBoardState;
-
-        private PlayerInterface whitePlayer;
-        private PlayerInterface blackPlayer;
-
-
+        //END OF NOTIFYING THE VIEW
 
 
         //Constructors
@@ -101,6 +100,11 @@ namespace ModelDLL
             initialize(gameBoard, dice, whiteCheckersOnBar, whiteCheckersBoreOff, blackCheckersOnBar, blackCheckersBoreOff, CheckerColor.White);
         }
 
+        internal Turn GetPreviousTurn()
+        {
+            return PreviousTurn;
+        }
+
         public BackgammonGame(int[] gameBoard, Dice dice)
         {
             initialize(gameBoard, dice, 0, 0, 0, 0, CheckerColor.White);
@@ -112,11 +116,12 @@ namespace ModelDLL
             this.turnColor = playerToMove;
             this.dice = dice;
             recalculateMoves();
+            this.CurrentTurn = new Turn(turnColor, new List<Move>(), new List<int>(movesLeft));
 
             //No need for this, as it is done in recalculate moves
             //this.Changes.Add(new DiceState(movesLeft.ToArray()));
 
-            this.currentTurn.dice = new List<int>(movesLeft);
+            //this.currentTurn.dice = new List<int>(movesLeft);
 
             this.currentGameBoardState = new GameBoardState(gameBoard, whiteCheckersOnBar, whiteCheckersBoreOff, blackCheckersOnBar, blackCheckersBoreOff);
             
@@ -138,6 +143,11 @@ namespace ModelDLL
             pi.SetPlayerIfNull(player);
             player.ConnectPlayerInterface(pi);
             return pi;
+        }
+
+        internal void SetMovesLeft(List<int> movesLeft)
+        {
+            this.movesLeft = movesLeft;
         }
 
         public HashSet<int> GetLegalMovesFor(CheckerColor color, int initialPosition)
@@ -202,6 +212,14 @@ namespace ModelDLL
             Changes.AddRange(resultingState.changes);
             NotifyAllViews();
 
+            foreach(Change change in resultingState.changes)
+            {
+                if (change is Move)
+                {
+                    CurrentTurn.moves.Add(change as Move);
+                }
+            }
+
             
           
             NotifyView(color, from, targetPosition);
@@ -227,17 +245,22 @@ namespace ModelDLL
 
         private void NotifyView(CheckerColor color, int from, int to) 
         {
-            Console.WriteLine("Moves made: " + numberOfMovesMade);
+          /*  Console.WriteLine("Moves made: " + numberOfMovesMade);
             Console.WriteLine("----------------------------------------------\n" + 
                               "Moving " + color + " from " + from + " to " + to + ". Moves left are: " + string.Join(",", movesLeft) + "\n" + currentGameBoardState.Stringify() + 
-                              "\n--------------------------------------------------");
+                              "\n--------------------------------------------------");*/
         }
 
+        internal bool GameIsOver()
+        {
+            return this.currentGameBoardState.GetCheckersOnPosition(WHITE.GetBar()) == 15 ||
+                   this.currentGameBoardState.GetCheckersOnPosition(BLACK.GetBar()) == 15;
+        }
 
         private void changeTurns()
         {
             //recalculateMoves();
-            turnColor = turnColor.OppositeColor();
+               turnColor = turnColor.OppositeColor();
             changeTurns(turnColor);
 
             if (GetMoveableCheckers().Count() == 0)
@@ -250,12 +273,12 @@ namespace ModelDLL
 
         private void changeTurns(CheckerColor color)
         {
-            this.turnHistory.Add(currentTurn);
             recalculateMoves();
             turnColor = color;
 
-            currentTurn = new Turn();
-            currentTurn.dice = this.movesLeft;
+            this.PreviousTurn = this.CurrentTurn;
+            this.CurrentTurn = new Turn(color, new List<Move>(), new List<int>(movesLeft));
+            NumberOfTurnsMade++;
         }
 
         private bool IsGameOver()

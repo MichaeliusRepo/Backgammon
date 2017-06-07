@@ -57,7 +57,7 @@
     <Content Include="Reference.txt" />
     <Compile Include="TestingAI.cs" />
     <Compile Include="TestCheckerMovesRules.cs" />
-    <Compile Include="UnitTest1.cs" />
+    <Compile Include="TestFeaturesForServerPlay.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestMetaRules.cs" />
     <Compile Include="TestGamePlayCorrectly.cs" />

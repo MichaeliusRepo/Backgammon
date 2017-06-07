@@ -40,10 +40,11 @@ namespace ModelDLL
 
         public void MakeMove()
         {
-            int checkerToMove = pi.GetMoveableCheckers().ElementAt(0);
-            int positionToMoveTo = pi.GetLegalMovesForChecker(checkerToMove).ElementAt(0);
+            var moveableCheckers = pi.GetMoveableCheckers();
+            int checkerToMove = moveableCheckers.ElementAt(0);
+            var reachablePositions = pi.GetLegalMovesForChecker(checkerToMove);
+            int positionToMoveTo = reachablePositions.ElementAt(0);
             pi.move(checkerToMove, positionToMoveTo);
-
         }
     }
 }

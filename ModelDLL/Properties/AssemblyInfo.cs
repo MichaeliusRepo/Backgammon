@@ -37,3 +37,5 @@ using System.Runtime.InteropServices;
 
 
 [assembly: InternalsVisibleTo("UnitTest")]
+[assembly: InternalsVisibleTo("ConsoleApplication3")]
+

@@ -80,11 +80,13 @@ namespace ModelDLL
     {
         public List<Move> moves = new List<Move>();
         public List<int> dice = new List<int>();
+        public CheckerColor color;
 
         public Turn(){ }
 
-        public Turn(List<Move> moves, List<int> dice)
+        public Turn(CheckerColor color, List<Move> moves, List<int> dice)
         {
+            this.color = color;
             this.moves = moves;
             this.dice = dice;
         }
