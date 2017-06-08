@@ -171,104 +171,7 @@ namespace ModelDLL
             return new GameBoardState(copy);
         }
 
-        private double ProbabilityOfWhiteCapturing()
-        {
-            return InvertColor().ProbabilityOfWhiteGettingCaptured();
-        }
-
-        public double ProbabilityOfWhiteGettingCaptured()
-        {
-          
-
-            if (getCheckersOnBar(BLACK) > 0)
-             {
-                  return ProbabilityOfWhiteGettingCapturedIfBlackHasCheckersOnBar();
-             }
-
-            return ProbabilityOfWhiteGettingCaptured(AllRolledTwice, AllRolledOnce);
-        }
-
         private Predicate<int> IsInMainBoard = delegate (int i) { return i >= 1 && i <= 24; };
-
-        private double ProbabilityOfWhiteGettingCaptured(List<List<int>> movesThatAppearTwiceLeft, List<List<int>> movesThatAppearOnceLeft)
-        {
-            //A subset of the game board excluding the bars and target positions
-            IEnumerable<KeyValuePair<int, int>> mainBoard = gameBoard.Where(kv => IsInMainBoard(kv.Key));
-
-
-            //The positions of the capturable white checkers/the white checkers that are standing alone
-            IEnumerable<int> capturable = mainBoard.Where(kv => kv.Value == 1).Select(kv => kv.Key);
-
-            //If no checkers are captruable, then the probability is zero
-            if (capturable.Count() == 0) return 0;
-
-
-            //The positions of the black checkers on the board
-            IEnumerable<int> blackCheckers = mainBoard.Where(kv => kv.Value < 0).Select(kv => kv.Key);
-
-
-            double a = movesThatAppearTwiceLeft.Where(moves => BlackCapturesGivenMoves(capturable, blackCheckers, moves)).Count() * 2.0 / 36;
-            double b = movesThatAppearOnceLeft.Where(moves => BlackCapturesGivenMoves(capturable, blackCheckers, moves)).Count() / 36.0;
-
-            return a + b;
-        }
-
-        private double ProbabilityOfWhiteGettingCapturedIfBlackHasCheckersOnBar()
-        {
-            var allRolledWtwice = AllRolledTwice.Where(movesTMP => BlackCapturesGivenMoves(movesTMP));
-            double a = allRolledWtwice.Count() * 2.0 / 36;
-
-            var allRolledOnce = AllRolledOnce.Where(movesTMP => BlackCapturesGivenMoves(movesTMP));
-            double b = allRolledOnce.Count() / 36.0;
-
-
-            return a + b;
-        }
-       
-        //Given a collection of positions describing where there are white checkers that are capturable,
-        //the positions of the black checkers and a list of moves, determines whether or not at least one 
-        //white checker can be captured by a black checker
-        private bool BlackCapturesGivenMoves(IEnumerable<int> capturable, IEnumerable<int> blackCheckers, List<int> moves)
-        {
-            //Gets all the positions that are reachable for the black checkers
-            var blackReachable = blackCheckers
-
-                                //Creates a collection of collections of ints. 
-                                //Each of the ints represent a position that a black checker can get to
-                                .Select(p => new MovesCalculator(this, BLACK, p, moves).GetReachablePositions()) 
-
-                                //Combines the multiple collections in the previous line into one collection
-                                .Aggregate((a, b) => a.Concat(b));
-
-
-            //Finding the positions that appear in both the capturable white checkers
-            //and the reachable positions for black
-            var checkersBlackCanCapture = blackReachable.Intersect(capturable);
-
-            //Returns true if there is at least one such position
-            return checkersBlackCanCapture.Count() > 0;
-
-        }
-
-        private bool BlackCapturesGivenMoves(List<int> moves)
-        {
-            //var finalStates = MovesCalculator.GetFinalStates(this, BLACK, moves);
-            //var finalStates = new FinalStatesCalculator(new List<GameBoardState>() { this }, BLACK, moves).Calculate();
-            var finalStates = FinalStatesCalculator.AllReachableStatesTree(this, BLACK, moves).GetFinalStates().Select(node => node.state);
-           
-            
-            // Console.WriteLine("Number of final states: " + finalStates.Count());
-            //Console.WriteLine(string.Join(",", finalStates.Select(s => s.Stringify() + "\n\n\n")));
-            return BlackCaptured(finalStates);
-        }
-
-        private bool BlackCaptured(IEnumerable<GameBoardState> states)
-        {
-            return states.Where(s => s.getCheckersOnBar(WHITE) > this.getCheckersOnBar(WHITE)).Count() > 0;
-        }
-
-
-
         public int[] getMainBoard()
         {
             return gameBoard
@@ -328,18 +231,43 @@ namespace ModelDLL
                                       getCheckersOnTarget(WHITE));
         }
 
-        internal string Xmlify()
-        {
-            var board = getMainBoard().Select(i => i + " ").Aggregate((a, b) => a + b);
-            
-            //Remove the trailing space
-            board = board.Substring(0, board.Length - 1);
-            board = "<board>" + board + "</board>";
-            var rest = String.Format("<whiteHome>{0}</whiteHome><whiteBar>{1}</whiteBar><blackHome>{2}</blackHome><blackBar>{3}</blackBar>",
-                                      GetCheckersOnPosition(WHITE.GetBar()), GetCheckersOnPosition(WHITE.BearOffPositionID()),
-                                      GetCheckersOnPosition(BLACK.GetBar())*-1, GetCheckersOnPosition(BLACK.BearOffPositionID()) * -1);
 
-            return board + rest;
+        public override bool Equals(Object obj)
+        {
+            // Check for null values and compare run-time types.
+            if (obj == null || GetType() != obj.GetType())
+                return false;
+
+
+            GameBoardState other = obj as GameBoardState;
+
+            //Check that both dictionaries have the same keys
+            bool sameKeys = gameBoard.Keys.Except(other.gameBoard.Keys).Count() == 0 &&
+                            other.gameBoard.Keys.Except(gameBoard.Keys).Count() == 0;
+
+            if (!sameKeys) return false;
+
+
+            //Check that the values are equal as well
+            foreach (var key in gameBoard.Keys)
+            {
+                if(gameBoard[key] != other.gameBoard[key])
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public override int GetHashCode()
+        {
+            int hc = gameBoard.Keys.Count();
+            foreach(var key in gameBoard.Keys)
+            {
+                hc = unchecked(hc * 31 + gameBoard[key]);
+            }
+            return hc;
         }
     }
 }

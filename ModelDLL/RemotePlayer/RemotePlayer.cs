@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace ModelDLL
 {
@@ -28,42 +29,33 @@ namespace ModelDLL
         public void MakeMove()
         {
             var turn = model.GetPreviousTurn();
-            var moves = turn.moves.Select(move => move.Xmlify());
-            var data = string.Join("", moves);
+
+            var state = model.GetGameBoardState();
+            var data = UpdateCreatorParser.CreateXmlForGameBoardState(state, "");
+
+            var moves = turn.moves;
+            data += UpdateCreatorParser.GenerateXmlForListOfMoves(moves);
+
+
+            data = "<update>" + data + "</update>";
             client.SendDataToServer(data);
         }
 
         internal void SendData(string data)
         {
-
-            if (data.Length == 0)
+            List<Move> moves = UpdateCreatorParser.ParseListOfMoves(data);
+            if(moves.None())
             {
-                model.EndTurn(this.color);
-                return;
+                model.EndTurn(color);
+                
             }
-
-            List<Move> moves = new List<Move>();
-            var split = data.Split(';');
-            foreach (var s in split)
+            else
             {
-                var components = s.Split(' ');
-                //if (components.Count() < 3) break;
-                int from = int.Parse(components[1]);
-                int to = int.Parse(components[2]);
-                if (components[0] == "w")
+                foreach (var move in moves)
                 {
-                    moves.Add(new ModelDLL.Move(CheckerColor.White, from, to));
+                    if (move.color == this.color)
+                        model.Move(move.color, move.from, move.to);
                 }
-                else
-                {
-                    moves.Add(new ModelDLL.Move(CheckerColor.Black, from, to));
-                }
-            }
-
-            foreach( var move in moves)
-            {
-                if(move.color == this.color)
-                    model.Move(move.color, move.from, move.to);
             }
         }
     }

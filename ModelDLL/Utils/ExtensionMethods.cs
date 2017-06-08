@@ -36,5 +36,12 @@ namespace ModelDLL
             output.Add(move);
             return output;
         }
+
+
+        //Given a collection that implements IEnumerable, returns true if it contains no objects
+        public static bool None<T>(this IEnumerable<T> enumerator)
+        {
+            return !enumerator.Any();
+        }
     }
 }

@@ -118,11 +118,6 @@ namespace ModelDLL
             recalculateMoves();
             this.CurrentTurn = new Turn(turnColor, new List<Move>(), new List<int>(movesLeft));
 
-            //No need for this, as it is done in recalculate moves
-            //this.Changes.Add(new DiceState(movesLeft.ToArray()));
-
-            //this.currentTurn.dice = new List<int>(movesLeft);
-
             this.currentGameBoardState = new GameBoardState(gameBoard, whiteCheckersOnBar, whiteCheckersBoreOff, blackCheckersOnBar, blackCheckersBoreOff);
             
             whitePlayer = new PlayerInterface(this, WHITE, null);
@@ -154,39 +149,6 @@ namespace ModelDLL
         {
             MovesCalculator root = new MovesCalculator(currentGameBoardState, color, initialPosition, GetMovesLeft());
             return new HashSet<int>(root.GetReachablePositions());
-
-        }
-
-        internal IEnumerable<Node> GetFinalStates()
-        {
-            return FinalStatesCalculator.AllReachableStatesTree(currentGameBoardState, playerToMove(), movesLeft).GetFinalStates();
-        } 
-
-        internal void MoveToFinalState(CheckerColor color, Node finalState)
-        {
-            if (color != playerToMove())
-            {
-                throw new InvalidOperationException(color + " can't move when it is " + color.OppositeColor() + "'s turn (move to final state)");
-            }
-
-            currentGameBoardState = finalState.state;
-            movesLeft = new List<int>();
-
-            List<FinalStateMove> movesMade = finalState.MovesMade();
-            foreach(FinalStateMove move in movesMade)
-            {
-                //TODO REMOVE THIS
-                numberOfMovesMade++;
-                NotifyView(color, move.from, GameBoardMover.GetPositionAfterMove(color, move.from, move.distance));
-            }
-            if (IsGameOver())
-            {
-                Console.WriteLine("Game is over!! Terminating");
-                Console.ReadLine();
-                return;
-            }
-            changeTurns();
-            (turnColor == WHITE ? whitePlayer : blackPlayer).MakeMove();
 
         }
 

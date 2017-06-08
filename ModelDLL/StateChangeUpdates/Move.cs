@@ -18,6 +18,8 @@ namespace ModelDLL
         [DataMember]
         public readonly int to;
 
+        internal static Move NoMove = new Move(White, 0, 0);
+
         internal Move(CheckerColor color, int from, int to)
         {
             this.color = color;
@@ -40,39 +42,21 @@ namespace ModelDLL
             return (color == CheckerColor.White ? "w" : "b") + " " + from + " " + to;
         }
 
-        public bool IsMove()
+        public override bool Equals(Object obj)
         {
-            return true;
+            // Check for null values and compare run-time types.
+            if (obj == null || GetType() != obj.GetType())
+                return false;
+
+            Move move = (Move)obj;
+            return (color == move.color) &&
+                   (from == move.from) &&
+                   (to == move.to);
         }
 
-        public bool IsDiceState()
+        public override int GetHashCode()
         {
-            return false;
-        }
-
-        public Move AsMove()
-        {
-            return this;
-        }
-
-        public DiceState AsDiceState()
-        {
-            throw new InvalidOperationException("Tried to cast Move into DiceState");
-        }
-
-        internal string Xmlify()
-        {
-            int to;
-            if (CheckerColorExtensions.IsBar(this.to))
-            {
-                to = color.BarPositionWithRegardsToBoard();
-            }
-            else if (CheckerColorExtensions.IsBearOffPosition(this.to))
-            {
-                to = color.BearOffPositionWithRegardsToBoard();
-            }
-            else to = this.to;
-            return "<move>" + (color == CheckerColor.White ? "w" : "b") + " " + from + " " + to + "</move>";
+            return from ^ to  * (color == White? 1 : 17);
         }
     }
 

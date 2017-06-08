@@ -19,31 +19,10 @@ namespace ModelDLL
         {
             this.diceValues = diceValues.ToArray();
         }
-        
 
         public int[] GetDiceValues()
         {
             return new List<int>(diceValues).ToArray();
-        }
-
-        public DiceState AsDiceState()
-        {
-            return this;
-        }
-
-        public Move AsMove()
-        {
-            throw new InvalidOperationException("Tried to cast Move into DiceState");
-        }
-
-        public bool IsDiceState()
-        {
-            return true;
-        }
-
-        public bool IsMove()
-        {
-            return false;
         }
     }
 }

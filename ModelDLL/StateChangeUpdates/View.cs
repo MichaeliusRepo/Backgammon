@@ -11,14 +11,5 @@ namespace ModelDLL
         void NotifyView();
     }
 
-    public interface Change
-    {
-        bool IsMove();
-        bool IsDiceState();
-
-        //These throws exception if the object is not of the correct type. 
-        //Use above methods to check before converting
-        Move AsMove();
-        DiceState AsDiceState();
-    }
+    public interface Change{}
 }

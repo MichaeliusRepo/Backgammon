@@ -48,17 +48,21 @@ namespace ModelDLL
             game2.ConnectView(view2);
 
 
-            int turn = 0;
-            while (!game2.GameIsOver())
+        
+            while (!(game1.GameIsOver() || game2.GameIsOver()))
             {
+                if(game1.NumberOfTurnsMade == 56)
+                {
+                    Console.WriteLine("stop");
+                }
                 while(game1.playerToMove() == CheckerColor.White)
                 {
                     game1WhitePlayer.MakeMove();
                 }
                 game1BlackPlayer.MakeMove();
 
-                
 
+                Console.WriteLine("turn for game 1: " + game1.NumberOfTurnsMade);
                 if(game1.GetGameBoardState().Stringify() != game2.GetGameBoardState().Stringify())
                 {
                     Console.WriteLine("GAME STATE IS NOT EQUAL IN THE TWO GAMES!!!");
@@ -72,22 +76,14 @@ namespace ModelDLL
                     Console.WriteLine(a + " for game1 and " + b + " for game2");
                 }
 
-
-                if(game1.NumberOfTurnsMade != game2.NumberOfTurnsMade)
-                {
-                    Console.WriteLine("NUMBER OF TURNS MADE ARE NOT EQUAL");
-                }
-
-                //if (game1.GameIsOver()) break;
+                if (game1.GameIsOver()) break;
 
                 while (game2.playerToMove() == CheckerColor.Black)
                 {
                     game2BlackPlayer.MakeMove();
                 }
                 game2WhitePlayer.MakeMove();
-                //turn++;
-
-                //Console.ReadLine();
+               
             }
 
             Console.Write("Game is over. Enter for next round>");

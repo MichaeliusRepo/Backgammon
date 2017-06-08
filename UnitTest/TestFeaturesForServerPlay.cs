@@ -41,9 +41,11 @@ namespace UnitTest
         {
             GameBoardState state = new GameBoardState(BackgammonGame.DefaultGameBoard, 0, 0, 0, 0);
 
-            string expected = "<board>-2 0 0 0 0 5 0 3 0 0 0 -5 5 0 0 0 -3 0 -5 0 0 0 0 2</board>"+
-                              "<whiteHome>0</whiteHome><whiteBar>0</whiteBar><blackHome>0</blackHome><blackBar>0</blackBar>";
-            string xml = state.Xmlify();
+            string expected = "<gameboard><board>-2 0 0 0 0 5 0 3 0 0 0 -5 5 0 0 0 -3 0 -5 0 0 0 0 2</board>"+
+                              "<whiteGoal>0</whiteGoal><whiteBar>0</whiteBar><blackGoal>0</blackGoal><blackBar>0</blackBar></gameboard>";
+            string xml = UpdateCreatorParser.CreateXmlForGameBoardState(state, "gameboard");
+            GameBoardState parsedState = UpdateCreatorParser.ParseGameBoardState(xml);
+
             Assert.AreEqual(expected, xml);
         }
 
@@ -53,32 +55,81 @@ namespace UnitTest
             int[] mainBoard = new int[] {-2,0,0,0,0,3,0,3,0,0,0,-5,5,0,0,0,-1,0,-5,0,0,0,0,2};
             GameBoardState state = new GameBoardState(mainBoard, 1, 1, 1, 1);
 
-            string expected = "<board>-2 0 0 0 0 3 0 3 0 0 0 -5 5 0 0 0 -1 0 -5 0 0 0 0 2</board>" +
-                              "<whiteHome>1</whiteHome><whiteBar>1</whiteBar><blackHome>-1</blackHome><blackBar>-1</blackBar>";
-            string xml = state.Xmlify();
+            string expected = "<gameboard><board>-2 0 0 0 0 3 0 3 0 0 0 -5 5 0 0 0 -1 0 -5 0 0 0 0 2</board>" +
+                              "<whiteGoal>1</whiteGoal><whiteBar>1</whiteBar><blackGoal>-1</blackGoal><blackBar>-1</blackBar></gameboard>";
+            string xml = UpdateCreatorParser.CreateXmlForGameBoardState(state, "gameboard");
+            GameBoardState parsedState = UpdateCreatorParser.ParseGameBoardState(xml);
+
             Assert.AreEqual(expected, xml);
+            Assert.AreEqual(state, parsedState);
         }
 
         [TestMethod]
-        public void XmlifyMove()
+        public void XmlifyMoveAndParseBackFromString()
         {
             Move move1 = new Move(White, 6, 3);
-            Assert.AreEqual("<move>w 6 3</move>", move1.Xmlify());
+            string move1Xml = UpdateCreatorParser.CreateXmlForMove(move1);
+            Move parsedMove1 = UpdateCreatorParser.ParseMove(move1Xml);
 
+            Assert.AreEqual("<move>w 6 3</move>", move1Xml);
+            Assert.AreEqual(move1, parsedMove1);
+           
             Move move2 = new Move(White, 6, White.GetBar());
-            Assert.AreEqual("<move>w 6 25</move>", move2.Xmlify());
+            string move2Xml = UpdateCreatorParser.CreateXmlForMove(move2);
+            Move parsedMove2 = UpdateCreatorParser.ParseMove(move2Xml);
+
+            Assert.AreEqual("<move>w 6 25</move>", move2Xml);
+            Assert.AreEqual(move2, parsedMove2, "this one failing");
 
             Move move3 = new Move(White, 6, White.BearOffPositionID());
-            Assert.AreEqual("<move>w 6 0</move>", move3.Xmlify());
+            string move3Xml = UpdateCreatorParser.CreateXmlForMove(move3);
+            Move parsedMove3 = UpdateCreatorParser.ParseMove(move3Xml);
+
+            Assert.AreEqual("<move>w 6 28</move>", move3Xml);
+            Assert.AreEqual(move3, parsedMove3);
+            
 
             Move move4 = new Move(Black, 20, 24);
-            Assert.AreEqual("<move>b 20 24</move>", move4.Xmlify());
+            string move4Xml = UpdateCreatorParser.CreateXmlForMove(move4);
+            Move parsedMove4 = UpdateCreatorParser.ParseMove(move4Xml);
+
+            Assert.AreEqual("<move>b 20 24</move>", move4Xml);
+            Assert.AreEqual(move4, parsedMove4);
 
             Move move5 = new Move(Black, 24, Black.BearOffPositionID());
-            Assert.AreEqual("<move>b 24 25</move>", move5.Xmlify());
+            string move5Xml = UpdateCreatorParser.CreateXmlForMove(move5);
+            Move parsedMove5 = UpdateCreatorParser.ParseMove(move5Xml);
+
+            Assert.AreEqual("<move>b 24 27</move>", move5Xml);
+            Assert.AreEqual(move5, parsedMove5);
+            
 
             Move move6 = new Move(Black, 20, Black.GetBar());
-            Assert.AreEqual("<move>b 20 0</move>", move6.Xmlify());
+            string move6Xml = UpdateCreatorParser.CreateXmlForMove(move6);
+            Move parsedMove6 = UpdateCreatorParser.ParseMove(move6Xml);
+
+            Assert.AreEqual("<move>b 20 26</move>", move6Xml);
+            Assert.AreEqual(move6, parsedMove6);
+        }
+
+        [TestMethod]
+        public void TestCanGenerateAndParseListOfMoves()
+        {
+            Move move1 = new Move(White, 5, 2);
+            Move move2 = new Move(Black, 20, Black.GetBar());
+            Move move3 = new Move(White, 1, White.BearOffPositionID());
+
+            List<Move> moves = new List<Move>() { move1, move2, move3 };
+
+            string xml = UpdateCreatorParser.GenerateXmlForListOfMoves(moves);
+            string expected = "<moves><move>w 5 2</move><move>b 20 26</move><move>w 1 28</move></moves>";
+            Assert.AreEqual(expected, xml);
+
+            List<Move> parsedMoves = UpdateCreatorParser.ParseListOfMoves(xml);
+
+            Assert.IsTrue(parsedMoves.Contains(move1));
+            Assert.IsTrue(parsedMoves.Contains(move2));
+            Assert.IsTrue(parsedMoves.Contains(move3));
         }
 
         [TestMethod]

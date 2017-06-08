@@ -43,11 +43,11 @@
   <ItemGroup>
     <Compile Include="BusinessLogic\BackgammonGame.cs" />
     <Compile Include="BusinessLogic\CheckerColor.cs" />
+    <Compile Include="RemotePlayer\UpdateCreatorParser.cs" />
     <Compile Include="RemotePlayer\RemotePlayer.cs" />
+    <Compile Include="StateChangeUpdates\ExtentionMethodsForChanges.cs" />
     <Compile Include="StateChangeUpdates\DiceState.cs" />
     <Compile Include="StateChangeUpdates\Move.cs" />
-    <Compile Include="AI\FinalStatesCalculator.cs" />
-    <Compile Include="AI\GreedyAI.cs" />
     <Compile Include="BusinessLogic\MovesCalculator.cs" />
     <Compile Include="Utils\ExtensionMethods.cs" />
     <Compile Include="AI\NaiveAI.cs" />

@@ -87,34 +87,10 @@ namespace ModelDLL
             }
         }
 
-        internal IEnumerable<Node> GetFinalStates()
-        {
-            if (!IsMyTurn())
-            {
-                throw new InvalidOperationException("Player " + color + " tried to get all final states when not his turn");
-            }
-            else return bg.GetFinalStates();
-        }
-
-        internal void MoveTo(Node finalState)
-        {
-            if (!IsMyTurn())
-            {
-                throw new InvalidOperationException("Player " + color + " tried to move to  final state when not his turn");
-            }
-            else bg.MoveToFinalState(color, finalState);
-        }
-
-
         internal void MakeMove()
 
         {
             if (player != null) player.MakeMove();
         }
-
-        /*public List<Turn> GetAndFlushTurnHistory()
-        {
-            return bg.GetTurnHistory();
-        }*/
     }
 }

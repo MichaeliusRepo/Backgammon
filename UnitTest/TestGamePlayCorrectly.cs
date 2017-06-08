@@ -6,8 +6,16 @@ using ModelDLL;
 using static ModelDLL.CheckerColor;
 using System.Collections.Generic;
 
+
 namespace UnitTest
 {
+
+
+
+    //Note about a lot of these tests
+    // You will see methods like .IsMove(), .IsDiceState(), .AsMove() and .AsDiceState()
+    // being used many times in this code file. See the file  ExtentionMethodsForChange.cs in 
+    // ModelDLL for an explanation as to why they appear
 
     [TestClass]
     public class TestGamePlayCorrectly
