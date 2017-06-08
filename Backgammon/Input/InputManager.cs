@@ -26,6 +26,8 @@ namespace Backgammon.Input
             }
         }
 
+        private InputManager() { } // Make constructor private.
+
         public void Update()
         {
             prevKeyState = currentKeyState;
