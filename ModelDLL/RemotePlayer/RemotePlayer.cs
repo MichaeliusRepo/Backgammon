@@ -28,20 +28,15 @@ namespace ModelDLL
         public void MakeMove()
         {
             var turn = model.GetPreviousTurn();
-            var moves = turn.moves.Select(move => move.DebugString());
-            var data = string.Join(";", moves);
-            //if (data.Length < 3)
-           // {
-            //    Console.WriteLine("Something happened");
-             //   var turn2 = turn;
-           // }
+            var moves = turn.moves.Select(move => move.Xmlify());
+            var data = string.Join("", moves);
             client.SendDataToServer(data);
         }
 
         internal void SendData(string data)
         {
 
-            if (data.Length <  3)
+            if (data.Length == 0)
             {
                 model.EndTurn(this.color);
                 return;
@@ -138,10 +133,14 @@ namespace ModelDLL
 
         public void NotifyView()
         {
-            Console.WriteLine("----------------------------------------------------");
-            Console.WriteLine("This is coming from ConsoleView: "+ identifier);
-            Console.WriteLine(model.GetGameBoardState().Stringify());
-            Console.WriteLine("----------------------------------------------------");
+            var changes = model.GetChanges();
+            if(changes.Where(c => c is Move).Count() > 0)
+            { 
+                Console.WriteLine("----------------------------------------------------");
+                Console.WriteLine("This is coming from ConsoleView: "+ identifier);
+                Console.WriteLine(model.GetGameBoardState().Stringify());
+                Console.WriteLine("----------------------------------------------------");
+            }
         }
     }
 }

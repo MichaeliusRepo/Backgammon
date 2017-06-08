@@ -182,6 +182,7 @@ namespace ModelDLL
             if (IsGameOver())
             {
                 Console.WriteLine("Game is over!! Terminating");
+                Console.ReadLine();
                 return;
             }
             changeTurns();
@@ -207,6 +208,12 @@ namespace ModelDLL
 
         public List<int> Move(CheckerColor color, int from, int targetPosition)
         {
+
+            if (GameIsOver())
+            {
+                Console.WriteLine("Game is over, so doing nothing");
+                return null;
+            }
 
             if (color != playerToMove())
             {
@@ -267,8 +274,7 @@ namespace ModelDLL
 
         internal bool GameIsOver()
         {
-            return this.currentGameBoardState.GetCheckersOnPosition(WHITE.GetBar()) == 15 ||
-                   this.currentGameBoardState.GetCheckersOnPosition(BLACK.GetBar()) == 15;
+            return currentGameBoardState.getCheckersOnTarget(WHITE) == 15 || currentGameBoardState.getCheckersOnTarget(BLACK) == 15;
         }
 
         private void changeTurns()
