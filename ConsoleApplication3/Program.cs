@@ -57,6 +57,8 @@ namespace ModelDLL
                 }
                 game1BlackPlayer.MakeMove();
 
+                
+
                 if(game1.GetGameBoardState().Stringify() != game2.GetGameBoardState().Stringify())
                 {
                     Console.WriteLine("GAME STATE IS NOT EQUAL IN THE TWO GAMES!!!");
@@ -76,7 +78,9 @@ namespace ModelDLL
                     Console.WriteLine("NUMBER OF TURNS MADE ARE NOT EQUAL");
                 }
 
-                while(game2.playerToMove() == CheckerColor.Black)
+                //if (game1.GameIsOver()) break;
+
+                while (game2.playerToMove() == CheckerColor.Black)
                 {
                     game2BlackPlayer.MakeMove();
                 }
