@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static ModelDLL.CheckerColor;
 
 namespace ModelDLL
 {
@@ -29,39 +30,12 @@ namespace ModelDLL
         public const int NUMBER_OF_CHECKERS_PER_PLAYER = 15;
         public static readonly GameBoardState DefaultGameBoardState = new GameBoardState(BackgammonGame.DefaultGameBoard, 0, 0, 0, 0);
 
-        private readonly CheckerColor WHITE = CheckerColor.White;
-        private readonly CheckerColor BLACK = CheckerColor.Black;
+        private readonly CheckerColor White = CheckerColor.White;
+        private readonly CheckerColor Black = CheckerColor.Black;
+
+
 
         private Dictionary<int, int> gameBoard = new Dictionary<int, int>();
-
-        private static readonly int MaximumNumberOfMoves = 4;
-
-        private static readonly List<List<int>> AllRolledTwice = new List<List<int>>() {
-                new List<int>() { 1,2 }, //3
-                new List<int>() { 1,3 }, //4
-                new List<int>() { 1,4 }, //5
-                new List<int>() { 1,5 }, //6
-                new List<int>() { 1,6 }, //7
-                new List<int>() { 2,3 }, //5
-                new List<int>() { 2,4 }, //6
-                new List<int>() { 2,5 }, //7
-                new List<int>() { 2,6 }, //8
-                new List<int>() { 3,4 }, //7
-                new List<int>() { 3,5 }, //8
-                new List<int>() { 3,6 }, //9
-                new List<int>() { 4,5 }, //9
-                new List<int>() { 4,6 }, //10
-                new List<int>() { 5,6 } //11
-        };
-
-        private static readonly List<List<int>> AllRolledOnce = new List<List<int>>() {
-            new List<int>() {1,1,1,1}, //4
-            new List<int>() {2,2,2,2}, //8
-            new List<int>() {3,3,3,3}, //12
-            new List<int>() {4,4,4,4}, //16
-            new List<int>() {5,5,5,5}, //20
-            new List<int>() {6,6,6,6} //24
-        };
 
         public GameBoardState(int[] mainBoard, int whiteCheckersOnBar, int whiteCheckersOnTarget, int blackCheckersOnBar, int blackCheckersOnTarget)
         {
@@ -89,27 +63,27 @@ namespace ModelDLL
             {
                 gameBoard.Add(i + 1, mainBoard[i]);
             }
-            gameBoard.Add(WHITE.GetBar(), whiteCheckersOnBar);
-            gameBoard.Add(BLACK.GetBar(), blackCheckersOnBar);
-            gameBoard.Add(WHITE.BearOffPositionID(), whiteCheckersOnTarget);
-            gameBoard.Add(BLACK.BearOffPositionID(), blackCheckersOnTarget);
+            gameBoard.Add(White.GetBar(), whiteCheckersOnBar);
+            gameBoard.Add(Black.GetBar(), blackCheckersOnBar);
+            gameBoard.Add(White.BearOffPositionID(), whiteCheckersOnTarget);
+            gameBoard.Add(Black.BearOffPositionID(), blackCheckersOnTarget);
         }
 
         public int pip(CheckerColor color)
         {
-            if(color == BLACK)
+            if(color == Black)
             {
-                return this.InvertColor().pip(WHITE);
+                return this.InvertColor().pip(White);
             }
 
-            return gameBoard.Where(kv => kv.Key >= 1 && kv.Key <= 24).Where(kv => kv.Value > 0).Select(kv => kv.Key * kv.Value).Sum() + getCheckersOnBar(WHITE)*25;
+            return gameBoard.Where(kv => kv.Key >= 1 && kv.Key <= 24).Where(kv => kv.Value > 0).Select(kv => kv.Key * kv.Value).Sum() + getCheckersOnBar(White)*25;
         }
 
-        internal int capturableCheckers(CheckerColor color)
+        public int capturableCheckers(CheckerColor color)
         {
-            if(color == BLACK)
+            if(color == Black)
             {
-                return InvertColor().capturableCheckers(WHITE);
+                return InvertColor().capturableCheckers(White);
             }
 
             return gameBoard.Where(kv => kv.Key >= 1 && kv.Key <= 24).Where(kv => kv.Value == 1).Count();
@@ -150,7 +124,7 @@ namespace ModelDLL
 
 
         //TODO COMMENT THE BELOW
-        //ASSUMPTION IS THAT WE ARE ONLY MOVING WHITE CHECKERS!!!!
+        //ASSUMPTION IS THAT WE ARE ONLY MOVING White CHECKERS!!!!
         internal GameBoardState MoveChecker(int from, int to)
         {
 
@@ -162,7 +136,7 @@ namespace ModelDLL
             if (copy[to] == -1)
             {
                 copy[to] = 1;
-                copy[BLACK.GetBar()]++;
+                copy[Black.GetBar()]++;
             }
             else
             {
@@ -212,8 +186,8 @@ namespace ModelDLL
                 if (i < 10) s += " ";
             }
             s += "\n";
-            return s + string.Join(", ", mainBoard) + " bar w/b: " + GetCheckersOnPosition(WHITE.GetBar()) + "/" + GetCheckersOnPosition(BLACK.GetBar())
-                                          + " bore off w/b: " + GetCheckersOnPosition(WHITE.BearOffPositionID()) + "/" + GetCheckersOnPosition(BLACK.BearOffPositionID());
+            return s + string.Join(", ", mainBoard) + " bar w/b: " + GetCheckersOnPosition(White.GetBar()) + "/" + GetCheckersOnPosition(Black.GetBar())
+                                          + " bore off w/b: " + GetCheckersOnPosition(White.BearOffPositionID()) + "/" + GetCheckersOnPosition(Black.BearOffPositionID());
         }
 
         internal GameBoardState InvertColor()
@@ -225,10 +199,10 @@ namespace ModelDLL
                 newBoard[i] = mainBoard[mainBoard.Length - 1 - i] * -1;
             }
             return new GameBoardState(newBoard,
-                                      getCheckersOnBar   (BLACK),
-                                      getCheckersOnTarget(BLACK),
-                                      getCheckersOnBar   (WHITE),
-                                      getCheckersOnTarget(WHITE));
+                                      getCheckersOnBar   (Black),
+                                      getCheckersOnTarget(Black),
+                                      getCheckersOnBar   (White),
+                                      getCheckersOnTarget(White));
         }
 
 

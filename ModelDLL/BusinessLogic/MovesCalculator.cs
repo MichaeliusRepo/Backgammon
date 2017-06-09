@@ -7,7 +7,7 @@ using static ModelDLL.CheckerColor;
 
 namespace ModelDLL
 {
-    class MovesCalculator
+    public class MovesCalculator
     {
 
         /* Given an initial state, a checker color, an initial position and the moves left to take, 
@@ -90,6 +90,28 @@ namespace ModelDLL
             return output;
         }
 
+        public static IEnumerable<ReachableState> GetReachableStatesThisTurn(GameBoardState state, CheckerColor color, List<int> movesLeft)
+        {
+            IEnumerable<int> moveableCheckers = GetMoveableCheckers(state, color, movesLeft);
+            List<MoveState> moveStates = new List<MoveState>();
+            foreach(int pos in moveableCheckers)
+            {
+                var tmp = new MovesCalculator(state, color, pos, movesLeft).reachableStates;
+                foreach(var moveState in tmp)
+                {
+                    if (moveState.IsFinal)
+                    {
+                        moveStates.Add(moveState);
+                    }
+                }
+            }
+            if(moveStates.Count() == 0)
+            {
+                return new List<ReachableState>();
+            }
+
+            return moveStates.Select(moveState => new ReachableState(moveState.state, moveState.MovesMade()));
+        }
 
         internal class MoveState
         {
@@ -98,6 +120,7 @@ namespace ModelDLL
             internal int position;
             internal List<int> movesLeft;
             internal List<Change> changes;
+            internal bool IsFinal = true;
 
             internal MoveState(GameBoardState state, CheckerColor color, int position, 
                               List<int> movesLeft, List<Change> changes)
@@ -120,6 +143,8 @@ namespace ModelDLL
                     var newState = GameBoardMover.Move(state, color, position, move);
                     if(newState != null)
                     {
+                        IsFinal = false;
+
                         int positionAfterMove = GameBoardMover.GetPositionAfterMove(color, position, move);
 
                         var newChanges = ComputeChanges(color, position, positionAfterMove, movesLeft);
@@ -132,6 +157,14 @@ namespace ModelDLL
 
                 return output;
                 
+            }
+
+            internal List<Move> MovesMade()
+            {
+                return changes.Where(change => change is Move)
+                              .Select(change => (Move)change)
+                              .Where(move => move.color == this.color)
+                              .ToList();
             }
 
             private List<Change> ComputeChanges(CheckerColor color, int from, int to, List<int> moves)
@@ -157,6 +190,18 @@ namespace ModelDLL
             {
                 if (color == White) return state.GetCheckersOnPosition(to) == -1;
                 else return state.GetCheckersOnPosition(to) == 1;
+            }
+        }
+
+        public class ReachableState
+        {
+            public readonly GameBoardState state;
+            public readonly List<Move> movesMade;
+
+            internal ReachableState(GameBoardState state, List<Move> movesMade)
+            {
+                this.state = state;
+                this.movesMade = movesMade;
             }
         }
     }

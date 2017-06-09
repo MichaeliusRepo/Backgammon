@@ -19,13 +19,9 @@ namespace ModelDLL
             this.client = client;
             this.color = color;
         }
-       
 
-        //public void ConnectPlayerInterface(PlayerInterface playerInterface)
-        //{
-        //    throw new NotImplementedException();
-        //}
-
+        //Generates XML for the changes that happened during the previous turn,
+        //and transmits it to the client, which will pass it to the server
         public void MakeMove()
         {
             var turn = model.GetPreviousTurn();
@@ -41,7 +37,11 @@ namespace ModelDLL
             client.SendDataToServer(data);
         }
 
-        internal void SendData(string data)
+        
+        //Receives XML for the changes that happened on the other side of the connection,
+        //parses it into moves, and performs those move on the BackgammonGame instance it is 
+        //connected to. 
+        internal void ReceiveData(string data)
         {
             List<Move> moves = UpdateCreatorParser.ParseListOfMoves(data);
             if(moves.None())
@@ -56,82 +56,6 @@ namespace ModelDLL
                     if (move.color == this.color)
                         model.Move(move.color, move.from, move.to);
                 }
-            }
-        }
-    }
-
-    internal interface Client
-    {
-        void SendDataToServer(string data);
-        void SendDataToPlayer(string data);
-    }
-
-    class FakeClient : Client
-    {
-        internal RemotePlayer player;
-        internal FakeServer server;
-
-        internal FakeClient(RemotePlayer player, FakeServer server)
-        {
-            this.player = player;
-            this.server = server;
-        }
-
-        public void SendDataToPlayer(string data)
-        {
-            player.SendData(data);
-        }
-
-        public void SendDataToServer(string data)
-        {
-            server.Send(this, data);
-        }
-    }
-
-    class FakeServer
-    {
-        internal Client client1;
-        internal Client client2;
-
-        internal FakeServer(Client client1, Client client2)
-        {
-            this.client1 = client1;
-            this.client2 = client2;
-        }
-
-        internal void Send(Client fromClient, string data)
-        {
-            if(fromClient == client1)
-            {
-                client2.SendDataToPlayer(data);
-            }
-            else
-            {
-                client1.SendDataToPlayer(data);
-            }
-        }
-    }
-
-    class ConsoleView : View
-    {
-        private string identifier;
-        private BackgammonGame model;
-
-        internal ConsoleView(BackgammonGame model, string identifier)
-        {
-            this.model = model;
-            this.identifier = identifier;
-        }
-
-        public void NotifyView()
-        {
-            var changes = model.GetChanges();
-            if(changes.Where(c => c is Move).Count() > 0)
-            { 
-                Console.WriteLine("----------------------------------------------------");
-                Console.WriteLine("This is coming from ConsoleView: "+ identifier);
-                Console.WriteLine(model.GetGameBoardState().Stringify());
-                Console.WriteLine("----------------------------------------------------");
             }
         }
     }

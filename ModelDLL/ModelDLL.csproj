@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="BusinessLogic\BackgammonGame.cs" />
     <Compile Include="BusinessLogic\CheckerColor.cs" />
+    <Compile Include="RemotePlayer\DummyServerImplementation.cs" />
     <Compile Include="RemotePlayer\UpdateCreatorParser.cs" />
     <Compile Include="RemotePlayer\RemotePlayer.cs" />
     <Compile Include="StateChangeUpdates\ExtentionMethodsForChanges.cs" />
@@ -59,7 +60,6 @@
     <Compile Include="Dice\FakeDice.cs" />
     <Compile Include="Dice\Dice.cs" />
     <Compile Include="AI\Player.cs" />
-    <Compile Include="AI\PlayerInterface.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
