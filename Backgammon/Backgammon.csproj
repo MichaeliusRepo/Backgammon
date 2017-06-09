@@ -57,6 +57,7 @@
     <StartupObject>Backgammon.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="AI-Networking\AIInstance.cs" />
     <Compile Include="AI-Networking\NetworkingInstance.cs" />
     <Compile Include="Audio\AudioManager.cs" />
     <Compile Include="Backgammon.cs" />

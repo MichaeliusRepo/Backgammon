@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Backgammon.Audio;
 using Backgammon.Input;
 using Backgammon.Object;
+using Backgammon.AI_Networking;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -29,11 +30,8 @@ namespace Backgammon.Screen
         private Board Board;
         private BackgammonGame Model;
         private ViewInterface ViewInterface;
-        private PlayerInterface WhiteInterface, BlackInterface;
-        private bool WhiteAI => OptionScreen.WhiteAI.SwitchedOn;
-        private bool BlackAI => OptionScreen.BlackAI.SwitchedOn;
-        private bool WhiteOnline;
-        private bool BlackOnline; // = true;
+        private PlayerType WhitePlayer => OptionScreen.WhiteAI.SwitchedOn ? PlayerType.Computer : PlayerType.Human;
+        private PlayerType BlackPlayer => OptionScreen.BlackAI.SwitchedOn ? PlayerType.Computer : PlayerType.Human;
         internal CheckerColor CurrentPlayer => ViewInterface.GetNextPlayerToMove();
         private GameState State;
         private List<int> MovableCheckers, PossibleDestinations;
@@ -61,8 +59,6 @@ namespace Backgammon.Screen
             Board = new Board(InitialBoard);
             Model = new BackgammonGame(InitialBoard, new RealDice());
             ViewInterface = new ViewInterface(Model);
-            WhiteInterface = new PlayerInterface(Model, White, null);
-            BlackInterface = new PlayerInterface(Model, Black, null);
             Model.ConnectView(this);
         }
 
@@ -120,6 +116,8 @@ namespace Backgammon.Screen
 
         private void BeginTurn()
         {
+            if (Board.GameOver())
+                return;
             //CheckInconsistency(); // Gives and cures cancer at the same time. Have a taste!
             Board.RemoveCheckerHighlight();
             Board.StopGlowPoints();
@@ -129,14 +127,15 @@ namespace Backgammon.Screen
                 return;
             }
 
-            if (NetworkEnabled(CurrentPlayer)) NetworkMove();
-            else if (AIEnabled(CurrentPlayer)) AITurn();
-            else PlayerTurn();
+            if (IsPlayerType(CurrentPlayer, PlayerType.Online))
+                NetworkMove();
+            else if (IsPlayerType(CurrentPlayer, PlayerType.Computer))
+                AITurn();
+            else
+                PlayerTurn();
         }
 
-        private bool AIEnabled(CheckerColor c) { return (c == White) ? WhiteAI : BlackAI; }
-
-        private bool NetworkEnabled(CheckerColor c) { return (c == White) ? WhiteOnline : BlackOnline; }
+        private bool IsPlayerType(CheckerColor c, PlayerType p) { return (c == White) ? (WhitePlayer == p) : (BlackPlayer == p); }
 
         private void CheckInconsistency()
         {
@@ -149,18 +148,16 @@ namespace Backgammon.Screen
                         ", model's got " + motherboard[i]);
         }
 
-        private void AITurn()
-        { // This AI is a bastard child of the NaiveAI; I must throw her into the river and convince the village elder that a child was never concieved in the first place!
-            SelectedPoint = ViewInterface.GetMoveableCheckers().First();
-            MoveChecker(ViewInterface.GetLegalMovesForCheckerAtPosition(SelectedPoint).Last());
-        }
+        private void AITurn() { AIInstance.Instance.Move(Model, CurrentPlayer); }
 
         private void PlayerTurn()
         {
             MovableCheckers = ViewInterface.GetMoveableCheckers();
             Board.GlowPoints(MovableCheckers);
-            if (MovableCheckers.Contains(CurrentPlayer.GetBar())) PickChecker(CurrentPlayer.GetBar());
-            else State = GameState.PickChecker;
+            if (MovableCheckers.Contains(CurrentPlayer.GetBar()))
+                PickChecker(CurrentPlayer.GetBar());
+            else
+                State = GameState.PickChecker;
         }
 
         private void PickChecker(int clickedPoint)
@@ -176,8 +173,7 @@ namespace Backgammon.Screen
 
         private void MoveChecker(int clickedPoint)
         {
-            if (CurrentPlayer == White) WhiteInterface.move(SelectedPoint, clickedPoint);
-            else BlackInterface.move(SelectedPoint, clickedPoint);
+            Model.Move(CurrentPlayer, SelectedPoint, clickedPoint);
             Board.StopGlowPoints();
             Board.RemoveCheckerHighlight();
         }
@@ -256,6 +252,13 @@ namespace Backgammon.Screen
             PickChecker,
             PickDestination,
             Animating
+        }
+
+        private enum PlayerType
+        {
+            Human,
+            Computer,
+            Online
         }
 
         #region Onrain Pray

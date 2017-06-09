@@ -23,7 +23,7 @@ namespace Backgammon.Screen
         internal static Button AudioMuted, ShowPips, WhiteAI, BlackAI;
         private List<Button> Buttons;
 
-        internal Image Image = new Image() { Path = "Images/SplashScreenBlurry", Position = new Vector2(540, 360) };
+        internal Image Image = new Image() { Path = "Images/OptionScreen", Position = new Vector2(540, 360) };
 
         private void MakeButtons()
         {

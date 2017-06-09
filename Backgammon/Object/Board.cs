@@ -189,6 +189,12 @@ namespace Backgammon.Object
             return Points[i].GetTopChecker().Color;
         }
 
+        internal bool GameOver() { return WhiteWon() || BlackWon(); }
+
+        internal bool WhiteWon() { return WhiteBearOff.GetAmount() == 15; }
+
+        internal bool BlackWon() { return BlackBearOff.GetAmount() == 15; }
+
         private void CreatePoints()
         {
             WhiteBar = new Point(new Vector2(midX, topY), new List<Checker>());
