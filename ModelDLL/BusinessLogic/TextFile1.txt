@@ -1,0 +1,26 @@
+﻿
+
+Explanation for how to get reachable states this turn:
+
+
+The method you want is the method called 
+
+ GetReachableStatesThisTurn(GameBoardState state, CheckerColor color, List<int> movesLeft)
+
+ It is static, so call it using MovesCalculator.GetReachableStatesThisTurn
+
+ The return value is a a collection of type ReachableState. 
+
+ In order to cast the collection to a list:
+
+ var collection =  GetReachableStatesThisTurn(someState, someColor, someMovesLeft);
+ var list = collection.ToList();
+
+ Each of the ReachableStates have two public fields:
+
+ - state, which is the game board state you'll use to quantify how good it is
+ - movesMade, which are the moves that you used to get there
+    move to the position using repeated call to the model.Move()
+    The first move made is a index 0, the last one is on the highest index. 
+
+	Enjoy. Tell me if it is messed up
