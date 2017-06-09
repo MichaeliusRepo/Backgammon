@@ -16,14 +16,18 @@ namespace MachLearn
 
         internal CheckerColor Run()
         {
-            game = new BackgammonGame(BackgammonGame.DefaultGameBoard, new RealDice());
             while (!TemporalDifference.GameOver(st))
             {
                 var outcome = PickBestOutcome();
-                for (int i = 0; i < outcome.movesMade.Count; i++)
-                    game.Move(CurrentPlayer, outcome.movesMade[i].from, outcome.movesMade[i].to);
-                TemporalDifference.UpdateWeights(st, outcome.state);
-                st = outcome.state;
+                if (outcome == null)
+                    game.EndTurn(game.playerToMove());
+                else
+                {
+                    for (int i = 0; i < outcome.movesMade.Count; i++)
+                        game.Move(CurrentPlayer, outcome.movesMade[i].from, outcome.movesMade[i].to);
+                    TemporalDifference.UpdateWeights(st, outcome.state);
+                    st = outcome.state;
+                }
             }
             return (game.GetGameBoardState().getCheckersOnTarget(White) == 15) ? White : Black;
         }
@@ -36,14 +40,20 @@ namespace MachLearn
 
         public void MakeMove()
         { // Use this for AI in View.
+            st = game.GetGameBoardState();
             var outcome = PickBestOutcome();
-            for (int i = 0; i < outcome.movesMade.Count; i++)
-                game.Move(CurrentPlayer, outcome.movesMade[i].from, outcome.movesMade[i].to);
+            if (outcome == null)
+                game.EndTurn(game.playerToMove());
+            else
+                for (int i = 0; i < outcome.movesMade.Count; i++)
+                    game.Move(CurrentPlayer, outcome.movesMade[i].from, outcome.movesMade[i].to);
         }
 
         private MovesCalculator.ReachableState PickBestOutcome()
         {
             var collection = MovesCalculator.GetReachableStatesThisTurn(st, CurrentPlayer, game.GetMovesLeft()).ToArray();
+            if (collection.Length == 0)
+                return null;
             return (CurrentPlayer == CheckerColor.White) ? PickHighest(collection) : PickLowest(collection);
         } // The color check should only be done once.
 

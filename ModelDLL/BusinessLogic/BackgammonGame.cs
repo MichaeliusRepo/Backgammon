@@ -179,7 +179,7 @@ namespace ModelDLL
 
             if (IsGameOver())
             {
-                Console.WriteLine("Game is over!! Terminating");
+                //Console.WriteLine("Game is over!! Terminating"); // Michaelius: The view notifies gameover. ML doesn't like printing.
                 return new List<int>();
             }
 

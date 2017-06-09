@@ -10,9 +10,9 @@ namespace MachLearn
 {
     static class TemporalDifference
     {
-        internal static double[] w = new double[8] { 0, 0, 0, 0, 0, 0, 0, 0 };
-        internal static double[] EligibilityTraces = new double[8] { 0,0,0,0,0,0,0,0};
-        internal static double lambda = 0.7, alpha = 0.1;
+        internal static double[] w = new double[8] { 0.1, -0.1, 0, 0, 0.1, -0.1, 0.001, -0.001 };
+        internal static double[] EligibilityTraces = new double[8] { 0, 0, 0, 0, 0, 0, 0, 0 };
+        internal static double lambda = 0.7, alpha = 0.02; // default values were lambda = 0.7, alpha = 0.1 or 0.02.
         internal static int[] dVdw = new int[8];
 
         private static void UpdateF(GameBoardState st)
@@ -41,12 +41,14 @@ namespace MachLearn
 
         public static double ValueFunction(GameBoardState st)
         { // This is the squashing function, the Sigmoid Function o(a) = 1 / (1 + e^-a)
-            return 1 / (1 + Math.Pow(Math.E, -EvaluationFunction(st)));
+            // sigma(4) = 0.98, so KEEP VALUES LOW
+            return (double)(1.0 / (1.0 + (double)Math.Pow(Math.E, -EvaluationFunction(st))));
+            //return EvaluationFunction(st);
         }
 
         private static double DifferenceFunction(GameBoardState st, GameBoardState st1)
         {
-            var v = ValueFunction(st);
+            double v = ValueFunction(st);
             if (!GameOver(st))
                 return ValueFunction(st1) - v;
             double z = (st.getCheckersOnTarget(White) == 15) ? 1 : 0;
