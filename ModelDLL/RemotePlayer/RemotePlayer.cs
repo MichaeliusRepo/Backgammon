@@ -21,10 +21,10 @@ namespace ModelDLL
         }
        
 
-        public void ConnectPlayerInterface(PlayerInterface playerInterface)
-        {
-            throw new NotImplementedException();
-        }
+        //public void ConnectPlayerInterface(PlayerInterface playerInterface)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
         public void MakeMove()
         {

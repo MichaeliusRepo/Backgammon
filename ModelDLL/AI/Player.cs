@@ -9,6 +9,5 @@ namespace ModelDLL
     public interface Player
     {
         void MakeMove();
-        void ConnectPlayerInterface(PlayerInterface playerInterface);
     }
 }

@@ -43,11 +43,6 @@ namespace ModelDLL
 
         private GameBoardState currentGameBoardState;
 
-
-        //TODO remove these
-        private PlayerInterface whitePlayer;
-        private PlayerInterface blackPlayer;
-
         private Turn CurrentTurn = null;
         private Turn PreviousTurn = null;
 
@@ -117,34 +112,13 @@ namespace ModelDLL
             this.CurrentTurn = new Turn(turnColor, new List<Move>(), new List<int>(movesLeft));
 
             this.currentGameBoardState = new GameBoardState(gameBoard, whiteCheckersOnBar, whiteCheckersBoreOff, blackCheckersOnBar, blackCheckersBoreOff);
-
-            //TODO remove this    
-            whitePlayer = new PlayerInterface(this, WHITE, null);
-            blackPlayer = new PlayerInterface(this, BLACK, null);
-
-
-
         }
-        //Constructors end
 
         internal Turn GetPreviousTurn()
         {
             return PreviousTurn;
         }
 
-
-        //TODO remove this
-        public PlayerInterface ConnectPlayer(CheckerColor color, Player player)
-        {
-            var pi = color == WHITE ? whitePlayer : blackPlayer;
-            if (pi.HasPlayer())
-            {
-                return null;
-            }
-            pi.SetPlayerIfNull(player);
-            player.ConnectPlayerInterface(pi);
-            return pi;
-        }
 
         public HashSet<int> GetLegalMovesFor(CheckerColor color, int initialPosition)
         {
@@ -163,10 +137,7 @@ namespace ModelDLL
             {
                 throw new InvalidOperationException("Can't end turn when there are legal moves available");
             }
-            //Console.WriteLine("End turn was called, changing turns now");
-            //Console.WriteLine("Dice before end turn:" + string.Join(",", movesLeft));
-            //changeTurns();
-            //Console.WriteLine("Dice after end turn:" + string.Join(",", movesLeft));
+            changeTurns();
         }
 
         public List<int> Move(CheckerColor color, int from, int targetPosition)
@@ -206,7 +177,6 @@ namespace ModelDLL
                 }
             }
 
-            //NotifyView(color, from, targetPosition);
             if (IsGameOver())
             {
                 Console.WriteLine("Game is over!! Terminating");
@@ -227,14 +197,6 @@ namespace ModelDLL
             
         }
 
-        //TODO remove this
-        private void NotifyView(CheckerColor color, int from, int to) 
-        {
-          /*  Console.WriteLine("Moves made: " + numberOfMovesMade);
-            Console.WriteLine("----------------------------------------------\n" + 
-                              "Moving " + color + " from " + from + " to " + to + ". Moves left are: " + string.Join(",", movesLeft) + "\n" + currentGameBoardState.Stringify() + 
-                              "\n--------------------------------------------------");*/
-        }
 
         internal bool GameIsOver()
         {
@@ -243,16 +205,8 @@ namespace ModelDLL
 
         private void changeTurns()
         {
-            //recalculateMoves();
             turnColor = turnColor.OppositeColor();
-            changeTurns(turnColor);
-
-            //if (GetMoveableCheckers().Count() == 0)
-            //{
-             //   changeTurns();
-            //}
-           
-            
+            changeTurns(turnColor);           
         }
 
         private void changeTurns(CheckerColor color)
@@ -262,8 +216,6 @@ namespace ModelDLL
             this.PreviousTurn = this.CurrentTurn;
             this.CurrentTurn = new Turn(color, new List<Move>(), new List<int>(movesLeft));
             NumberOfTurnsMade++;
-            //This is done in recalculateMoves(), so no need to do that here
-            //NotifyAllViews();
         }
 
         //TODO remove this
@@ -294,11 +246,15 @@ namespace ModelDLL
         public List<int> GetMoveableCheckers()
         {
             CheckerColor color = playerToMove();
-            return MovesCalculator.GetMoveableCheckers(currentGameBoardState, color, movesLeft).ToList();
+            return GetMoveableCheckers(color);
         }
 
         public List<int> GetMoveableCheckers(CheckerColor color)
         {
+            if(color != turnColor)
+            {
+                throw new InvalidOperationException("Cant get moveable checkers for player " + color + " when it is " + color.OppositeColor() + "'s turn");
+            }
             return MovesCalculator.GetMoveableCheckers(currentGameBoardState, color, movesLeft).ToList();
         }
 

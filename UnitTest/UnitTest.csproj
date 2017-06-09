@@ -58,7 +58,6 @@
     <Compile Include="TestCheckerMovesRules.cs" />
     <Compile Include="TestFeaturesForServerPlay.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestMetaRules.cs" />
     <Compile Include="TestGamePlayCorrectly.cs" />
   </ItemGroup>
   <ItemGroup>
