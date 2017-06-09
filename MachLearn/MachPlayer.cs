@@ -12,7 +12,6 @@ namespace MachLearn
     {
         private BackgammonGame game;
         private GameBoardState st;
-        private CheckerColor CurrentPlayer => game.playerToMove();
 
         internal CheckerColor Run()
         {
@@ -24,11 +23,12 @@ namespace MachLearn
                 else
                 {
                     for (int i = 0; i < outcome.movesMade.Count; i++)
-                        game.Move(CurrentPlayer, outcome.movesMade[i].from, outcome.movesMade[i].to);
+                        game.Move(game.playerToMove(), outcome.movesMade[i].from, outcome.movesMade[i].to);
                     TemporalDifference.UpdateWeights(st, outcome.state);
                     st = outcome.state;
                 }
             }
+            TemporalDifference.UpdateWeights(st, st); // st1 doesn't matter when game is won.
             return (game.GetGameBoardState().getCheckersOnTarget(White) == 15) ? White : Black;
         }
 
@@ -46,15 +46,16 @@ namespace MachLearn
                 game.EndTurn(game.playerToMove());
             else
                 for (int i = 0; i < outcome.movesMade.Count; i++)
-                    game.Move(CurrentPlayer, outcome.movesMade[i].from, outcome.movesMade[i].to);
+                    game.Move(game.playerToMove(), outcome.movesMade[i].from, outcome.movesMade[i].to);
         }
 
         private MovesCalculator.ReachableState PickBestOutcome()
         {
-            var collection = MovesCalculator.GetReachableStatesThisTurn(st, CurrentPlayer, game.GetMovesLeft()).ToArray();
+            var collection = MovesCalculator.GetReachableStatesThisTurn(st, game.playerToMove(), game.GetMovesLeft()).ToArray();
             if (collection.Length == 0)
                 return null;
-            return (CurrentPlayer == CheckerColor.White) ? PickHighest(collection) : PickLowest(collection);
+            return PickHighest(collection);
+            //return (game.playerToMove() == White) ? PickHighest(collection) : PickLowest(collection);
         } // The color check should only be done once.
 
         private MovesCalculator.ReachableState PickHighest(MovesCalculator.ReachableState[] array)

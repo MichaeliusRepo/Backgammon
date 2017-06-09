@@ -12,9 +12,12 @@ namespace MachLearn
     class Program
     {
         private string LocalDirectory => AppDomain.CurrentDomain.BaseDirectory;
+        private static int Modulo;
 
         static void Main(string[] args)
         {
+            Console.WriteLine("Print data every ...th game: (100 for quick test, type 1000 for overnight data mining))");
+            Modulo = int.Parse(Console.ReadLine());
             MineData();
             //PitMachVsNaive1000();
         }
@@ -25,7 +28,7 @@ namespace MachLearn
             while (true)
                 try
                 {
-                    if (gameCount % 100 == 0)
+                    if (gameCount % Modulo == 0)
                         PrintData(gameCount, WhiteWins, BlackWins);
                     if (new MachPlayer(new BackgammonGame(BackgammonGame.DefaultGameBoard, new RealDice())).Run() == White)
                         WhiteWins++;
@@ -67,14 +70,6 @@ namespace MachLearn
                     black.MakeMove();
             return (game.GetGameBoardState().getCheckersOnTarget(White) == 15) ? White : Black;
         }
-
-        //static void PrintData(int gameCount)
-        //{
-        //    Console.WriteLine(gameCount);
-        //    string[] contents = new string[3] { String.Join("     \n", TemporalDifference.w),
-        //        String.Join("     \n", TemporalDifference.EligibilityTraces), ""};
-        //    File.WriteAllLines(GetFilePath(gameCount), contents);
-        //}
 
         static void PrintData(int gameCount, int BlackWins, int WhiteWins)
         {

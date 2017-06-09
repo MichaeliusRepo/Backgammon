@@ -55,7 +55,7 @@ namespace MachLearn
             return z - v;
         }
 
-        private static void DefineEligbilityTraces()
+        private static void DefineEligibilityTraces()
         {
             for (int i = 0; i < EligibilityTraces.Length; i++)
                 EligibilityTraces[i] = lambda * EligibilityTraces[i] + dVdw[i];
@@ -70,7 +70,7 @@ namespace MachLearn
         public static void UpdateWeights(GameBoardState st, GameBoardState st1)
         {
             UpdateF(st);
-            DefineEligbilityTraces();
+            DefineEligibilityTraces();
             ParameterUpdate(st, st1);
         }
 
