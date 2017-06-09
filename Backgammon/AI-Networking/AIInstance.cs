@@ -27,7 +27,6 @@ namespace Backgammon.AI_Networking
 
         private AIInstance() { } // Make constructor private for singleton.
 
-
         internal void Move(BackgammonGame model, CheckerColor c)
         {
             Move(model, c, (c == CheckerColor.White) ? WhiteAI : BlackAI);
@@ -38,11 +37,6 @@ namespace Backgammon.AI_Networking
             if (ai == null)
                 ai = new NaiveAI(model, c);
             ai.MakeMove();
-        }
-
-        private void NintyPercentJunk()
-        {
-
         }
 
     }

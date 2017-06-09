@@ -174,10 +174,21 @@ namespace Backgammon.Object
 
         internal int GetAmountOfCheckersAtPoint(int i)
         {
-            int value = Points[i].GetAmount();
-            if (value != 0 && Points[i].GetTopChecker().Color == Black)
-                return -value;
-            return value;
+            if (i == CheckerColor.Black.GetBar())
+                return BlackBar.GetAmount();
+            else if (i == White.GetBar())
+                return WhiteBar.GetAmount();
+            else if (i == White.BearOffPositionID())
+                return WhiteBearOff.GetAmount();
+            else if (i == Black.BearOffPositionID())
+                return BlackBearOff.GetAmount();
+            else
+            {
+                int value = Points[i].GetAmount();
+                if (value != 0 && Points[i].GetTopChecker().Color == Black)
+                    return -value;
+                return value;
+            }
         }
 
         internal CheckerColor GetColorAtPoint(int i)
@@ -189,11 +200,7 @@ namespace Backgammon.Object
             return Points[i].GetTopChecker().Color;
         }
 
-        internal bool GameOver() { return WhiteWon() || BlackWon(); }
-
-        internal bool WhiteWon() { return WhiteBearOff.GetAmount() == 15; }
-
-        internal bool BlackWon() { return BlackBearOff.GetAmount() == 15; }
+        internal bool GameOver() { return WhiteBearOff.GetAmount() == 15 || BlackBearOff.GetAmount() == 15; }
 
         private void CreatePoints()
         {

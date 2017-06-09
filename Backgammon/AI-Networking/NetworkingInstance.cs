@@ -16,9 +16,9 @@ namespace Backgammon.AI_Networking
         private const int chunkSize = 4096 * 1024;
         private static DropboxClient dbx;
         private static string FileName, Content;
-        private static string localPath => AppDomain.CurrentDomain.BaseDirectory + FileName;
-        private static string remoteUploadPath => @"/uploads/" + FileName;
-        private static string remoteStringPath => @"/string/string.txt"; //+ FileName;
+        private static string LocalPath => AppDomain.CurrentDomain.BaseDirectory + FileName;
+        private static string RemoteUploadPath => @"/uploads/" + FileName;
+        private static string RemoteStringPath => @"/string/string.txt"; //+ FileName;
         private static List<string> folderContents;
 
         private static NetworkingInstance instance;
@@ -55,16 +55,16 @@ namespace Backgammon.AI_Networking
 
         public List<string> ListFiles()
         {
-            task = Task.Run(listFiles);
+            task = Task.Run(TaskListFiles);
             task.Wait();
             return folderContents;
         }
 
-        private static async Task listFiles()
+        private static async Task TaskListFiles()
         {
             folderContents.Clear();
             FileName = string.Empty;
-            var list = await dbx.Files.ListFolderAsync(remoteUploadPath);
+            var list = await dbx.Files.ListFolderAsync(RemoteUploadPath);
             foreach (var item in list.Entries.Where(i => i.IsFile))
                 folderContents.Add(item.Name);
         }
@@ -72,53 +72,53 @@ namespace Backgammon.AI_Networking
         public void Upload(string fileName)
         {
             FileName = fileName;
-            task = Task.Run(upload);
+            task = Task.Run(TaskUpload);
             task.Wait();
         }
 
-        private static async Task upload()
+        private static async Task TaskUpload()
         {
-            using (var fileStream = File.Open(localPath, FileMode.Open))
+            using (var fileStream = File.Open(LocalPath, FileMode.Open))
                 if (fileStream.Length <= chunkSize)
-                    await dbx.Files.UploadAsync(remoteUploadPath, body: fileStream);
+                    await dbx.Files.UploadAsync(RemoteUploadPath, body: fileStream);
         }
 
         public void Download(string fileName)
         {
             FileName = fileName;
-            task = Task.Run(download);
+            task = Task.Run(TaskDownload);
             task.Wait();
         }
 
-        private static async Task download()
+        private static async Task TaskDownload()
         {
-            using (var response = await dbx.Files.DownloadAsync(remoteUploadPath))
-                File.WriteAllText(localPath, await response.GetContentAsStringAsync());
+            using (var response = await dbx.Files.DownloadAsync(RemoteUploadPath))
+                File.WriteAllText(LocalPath, await response.GetContentAsStringAsync());
         }
 
         public void UploadString(string content)
         {
             Content = content;
-            task = Task.Run(uploadString);
+            task = Task.Run(TaskUploadString);
             task.Wait();
         }
 
-        private static async Task uploadString()
+        private static async Task TaskUploadString()
         {
             using (var mem = new MemoryStream(Encoding.UTF8.GetBytes(Content)))
-                await dbx.Files.UploadAsync(remoteStringPath, WriteMode.Overwrite.Instance, body: mem);
+                await dbx.Files.UploadAsync(RemoteStringPath, WriteMode.Overwrite.Instance, body: mem);
         }
 
         public string DownloadString()
         {
-            task = Task.Run(downloadString);
+            task = Task.Run(TaskDownloadString);
             task.Wait();
             return Content;
         }
 
-        private static async Task downloadString()
+        private static async Task TaskDownloadString()
         {
-            using (var response = await dbx.Files.DownloadAsync(remoteStringPath))
+            using (var response = await dbx.Files.DownloadAsync(RemoteStringPath))
                 Content = await response.GetContentAsStringAsync();
         }
 
