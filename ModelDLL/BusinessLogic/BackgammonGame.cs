@@ -286,9 +286,16 @@ namespace ModelDLL
 
         //Returns a set of integers, representing the positions from which a checker can be moved
         //based on the state of the game and the remina
+
+            //TODO REMOVE THIS
         public List<int> GetMoveableCheckers()
         {
             CheckerColor color = playerToMove();
+            return MovesCalculator.GetMoveableCheckers(currentGameBoardState, color, movesLeft).ToList();
+        }
+
+        public List<int> GetMoveableCheckers(CheckerColor color)
+        {
             return MovesCalculator.GetMoveableCheckers(currentGameBoardState, color, movesLeft).ToList();
         }
 

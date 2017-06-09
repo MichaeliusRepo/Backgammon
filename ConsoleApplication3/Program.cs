@@ -24,8 +24,8 @@ namespace ModelDLL
             //Setting up game one
             BackgammonGame game1 = new BackgammonGame(BackgammonGame.DefaultGameBoard, dice);
 
-            NaiveAI game1WhitePlayer = new NaiveAI(null);
-            game1.ConnectPlayer(CheckerColor.White, game1WhitePlayer);
+            NaiveAI game1WhitePlayer = new NaiveAI(game1, CheckerColor.White);
+            //game1.ConnectPlayer(CheckerColor.White, game1WhitePlayer);
 
             RemotePlayer game1BlackPlayer = new RemotePlayer(game1, client1, CheckerColor.Black);
             client1.player = game1BlackPlayer;
@@ -41,8 +41,8 @@ namespace ModelDLL
             RemotePlayer game2WhitePlayer = new RemotePlayer(game2, client2, CheckerColor.White);
             client2.player = game2WhitePlayer;
 
-            NaiveAI game2BlackPlayer = new NaiveAI(null);
-            game2.ConnectPlayer(CheckerColor.Black, game2BlackPlayer);
+            NaiveAI game2BlackPlayer = new NaiveAI(game2, CheckerColor.Black);
+            //game2.ConnectPlayer(CheckerColor.Black, game2BlackPlayer);
 
             View view2 = new ConsoleView(game2, "Game 2 View");
             game2.ConnectView(view2);

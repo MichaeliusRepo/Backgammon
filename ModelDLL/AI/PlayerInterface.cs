@@ -16,6 +16,11 @@ namespace ModelDLL
             this.player = player;
         }
 
+        internal BackgammonGame GetModel()
+        {
+            return bg;
+        }
+
         internal bool HasPlayer()
         {
             return player != null;
