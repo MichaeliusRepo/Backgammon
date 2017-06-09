@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Backgammon", "Backgammon\Backgammon.csproj", "{9455B144-A4B6-4780-A91C-8B5FBBE2D4BD}"
 EndProject
@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication3", "Cons
 	ProjectSection(ProjectDependencies) = postProject
 		{7B678EAB-8EC8-46AE-A397-2DA56CD78742} = {7B678EAB-8EC8-46AE-A397-2DA56CD78742}
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MachLearn", "MachLearn\MachLearn.csproj", "{0A343CA2-975B-4135-BC34-61F2F73CAD07}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,6 +55,14 @@ Global
 		{C4FB0DAE-B977-4FB1-9B11-5A783CA0BD30}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C4FB0DAE-B977-4FB1-9B11-5A783CA0BD30}.Release|x86.ActiveCfg = Release|Any CPU
 		{C4FB0DAE-B977-4FB1-9B11-5A783CA0BD30}.Release|x86.Build.0 = Release|Any CPU
+		{0A343CA2-975B-4135-BC34-61F2F73CAD07}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A343CA2-975B-4135-BC34-61F2F73CAD07}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A343CA2-975B-4135-BC34-61F2F73CAD07}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0A343CA2-975B-4135-BC34-61F2F73CAD07}.Debug|x86.Build.0 = Debug|Any CPU
+		{0A343CA2-975B-4135-BC34-61F2F73CAD07}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A343CA2-975B-4135-BC34-61F2F73CAD07}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A343CA2-975B-4135-BC34-61F2F73CAD07}.Release|x86.ActiveCfg = Release|Any CPU
+		{0A343CA2-975B-4135-BC34-61F2F73CAD07}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
