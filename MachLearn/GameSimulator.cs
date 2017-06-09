@@ -4,54 +4,66 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ModelDLL;
+using static ModelDLL.CheckerColor;
 
 namespace MachLearn
 {
-    class GameSimulator
+    public class MachPlayer : Player
     {
-        static int gameCount = 0;
-        private BackgammonGame game = new BackgammonGame(BackgammonGame.DefaultGameBoard, new RealDice());
+        private BackgammonGame game;
         private GameBoardState st;
-        private CheckerColor c => game.playerToMove();
+        private CheckerColor CurrentPlayer => game.playerToMove();
 
-        public void Run()
+        internal CheckerColor Run()
         {
+            game = new BackgammonGame(BackgammonGame.DefaultGameBoard, new RealDice());
             while (!TemporalDifference.GameOver(st))
             {
                 var outcome = PickBestOutcome();
-                for (int i = 0; i < outcome.from.Count; i++)
-                    game.Move(c, outcome.from[i], outcome.to[i]);
+                for (int i = 0; i < outcome.movesMade.Count; i++)
+                    game.Move(CurrentPlayer, outcome.movesMade[i].from, outcome.movesMade[i].to);
                 TemporalDifference.UpdateWeights(st, outcome.state);
                 st = outcome.state;
             }
+            return (game.GetGameBoardState().getCheckersOnTarget(White) == 15) ? White : Black;
         }
 
-        private Outcome PickBestOutcome()
+        public MachPlayer(BackgammonGame g)
         {
-            var outcomes = new List<Outcome>();
-
-            var MovableCheckers = game.GetMoveableCheckers();
-
-            foreach (int from in MovableCheckers)
-                foreach (int to in game.GetLegalMovesFor(c, from))
-                {
-
-                }
-
-
-
-
-            return null;
+            game = g;
+            st = g.GetGameBoardState();
         }
 
-        private class Outcome
+        public void MakeMove()
+        { // Use this for AI in View.
+            var outcome = PickBestOutcome();
+            for (int i = 0; i < outcome.movesMade.Count; i++)
+                game.Move(CurrentPlayer, outcome.movesMade[i].from, outcome.movesMade[i].to);
+        }
+
+        private MovesCalculator.ReachableState PickBestOutcome()
         {
-            internal GameBoardState state;
-            internal List<int> from = new List<int>();
-            internal List<int> to = new List<int>();
-            double value;
+            var collection = MovesCalculator.GetReachableStatesThisTurn(st, CurrentPlayer, game.GetMovesLeft()).ToArray();
+            return (CurrentPlayer == CheckerColor.White) ? PickHighest(collection) : PickLowest(collection);
+        } // The color check should only be done once.
+
+        private MovesCalculator.ReachableState PickHighest(MovesCalculator.ReachableState[] array)
+        {
+            var best = array[0];
+            foreach (var rs in array)
+                if (TemporalDifference.ValueFunction(rs.state) > TemporalDifference.ValueFunction(best.state))
+                    best = rs;
+            return best;
         }
 
+        private MovesCalculator.ReachableState PickLowest(MovesCalculator.ReachableState[] array)
+        {
+            var best = array[0];
+            foreach (var rs in array)
+                if (TemporalDifference.ValueFunction(rs.state) < TemporalDifference.ValueFunction(best.state))
+                    best = rs;
+            return best;
+        }
 
     }
 }

@@ -10,8 +10,8 @@ namespace MachLearn
 {
     static class TemporalDifference
     {
-        internal static double[] w;
-        internal static double[] EligibilityTraces;
+        internal static double[] w = new double[8] { 0, 0, 0, 0, 0, 0, 0, 0 };
+        internal static double[] EligibilityTraces = new double[8] { 0,0,0,0,0,0,0,0};
         internal static double lambda = 0.7, alpha = 0.1;
         internal static int[] dVdw = new int[8];
 

@@ -97,6 +97,10 @@
     <MonoGameContentReference Include="Content\Content.mgcb" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\MachLearn\MachLearn.csproj">
+      <Project>{0a343ca2-975b-4135-bc34-61f2f73cad07}</Project>
+      <Name>MachLearn</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ModelDLL\ModelDLL.csproj">
       <Project>{7b678eab-8ec8-46ae-a397-2da56cd78742}</Project>
       <Name>ModelDLL</Name>
