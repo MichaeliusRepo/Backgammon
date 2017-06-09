@@ -29,8 +29,10 @@ namespace ModelDLL
         public static readonly int BLACK_BEAR_OFF_ID = BLACK.BearOffPositionID();
         public const int MAX_MOVE_DISTANCE_ACCEPTED = 6;
 
-        private int numberOfMovesMade = 0;
 
+
+        //Remove these
+        private int numberOfMovesMade = 0;
         internal int NumberOfTurnsMade { get; private set; }
 
 
@@ -39,11 +41,10 @@ namespace ModelDLL
         internal Dice dice;
         internal List<int> movesLeft;
 
-       // private Turn currentTurn = new Turn();
-       // private List<Turn> turnHistory = new List<Turn>();
-
         private GameBoardState currentGameBoardState;
 
+
+        //TODO remove these
         private PlayerInterface whitePlayer;
         private PlayerInterface blackPlayer;
 
@@ -100,10 +101,7 @@ namespace ModelDLL
             initialize(gameBoard, dice, whiteCheckersOnBar, whiteCheckersBoreOff, blackCheckersOnBar, blackCheckersBoreOff, CheckerColor.White);
         }
 
-        internal Turn GetPreviousTurn()
-        {
-            return PreviousTurn;
-        }
+       
 
         public BackgammonGame(int[] gameBoard, Dice dice)
         {
@@ -119,7 +117,8 @@ namespace ModelDLL
             this.CurrentTurn = new Turn(turnColor, new List<Move>(), new List<int>(movesLeft));
 
             this.currentGameBoardState = new GameBoardState(gameBoard, whiteCheckersOnBar, whiteCheckersBoreOff, blackCheckersOnBar, blackCheckersBoreOff);
-            
+
+            //TODO remove this    
             whitePlayer = new PlayerInterface(this, WHITE, null);
             blackPlayer = new PlayerInterface(this, BLACK, null);
 
@@ -128,6 +127,13 @@ namespace ModelDLL
         }
         //Constructors end
 
+        internal Turn GetPreviousTurn()
+        {
+            return PreviousTurn;
+        }
+
+
+        //TODO remove this
         public PlayerInterface ConnectPlayer(CheckerColor color, Player player)
         {
             var pi = color == WHITE ? whitePlayer : blackPlayer;
@@ -138,11 +144,6 @@ namespace ModelDLL
             pi.SetPlayerIfNull(player);
             player.ConnectPlayerInterface(pi);
             return pi;
-        }
-
-        internal void SetMovesLeft(List<int> movesLeft)
-        {
-            this.movesLeft = movesLeft;
         }
 
         public HashSet<int> GetLegalMovesFor(CheckerColor color, int initialPosition)
@@ -162,10 +163,10 @@ namespace ModelDLL
             {
                 throw new InvalidOperationException("Can't end turn when there are legal moves available");
             }
-            Console.WriteLine("End turn was called, changing turns now");
-            Console.WriteLine("Dice before end turn:" + string.Join(",", movesLeft));
-            changeTurns();
-            Console.WriteLine("Dice after end turn:" + string.Join(",", movesLeft));
+            //Console.WriteLine("End turn was called, changing turns now");
+            //Console.WriteLine("Dice before end turn:" + string.Join(",", movesLeft));
+            //changeTurns();
+            //Console.WriteLine("Dice after end turn:" + string.Join(",", movesLeft));
         }
 
         public List<int> Move(CheckerColor color, int from, int targetPosition)
@@ -226,6 +227,7 @@ namespace ModelDLL
             
         }
 
+        //TODO remove this
         private void NotifyView(CheckerColor color, int from, int to) 
         {
           /*  Console.WriteLine("Moves made: " + numberOfMovesMade);
@@ -264,6 +266,7 @@ namespace ModelDLL
             //NotifyAllViews();
         }
 
+        //TODO remove this
         private bool IsGameOver()
         {
             return currentGameBoardState.getCheckersOnTarget(WHITE) == 15 || currentGameBoardState.getCheckersOnTarget(BLACK) == 15;

@@ -37,30 +37,30 @@ namespace ModelDLL
         private static readonly int MaximumNumberOfMoves = 4;
 
         private static readonly List<List<int>> AllRolledTwice = new List<List<int>>() {
-                new List<int>() { 1,2 },
-                new List<int>() { 1,3 },
-                new List<int>() { 1,4 },
-                new List<int>() { 1,5 },
-                new List<int>() { 1,6 },
-                new List<int>() { 2,3 },
-                new List<int>() { 2,4 },
-                new List<int>() { 2,5 },
-                new List<int>() { 2,6 },
-                new List<int>() { 3,4 },
-                new List<int>() { 3,5 },
-                new List<int>() { 3,6 },
-                new List<int>() { 4,5 },
-                new List<int>() { 4,6 },
-                new List<int>() { 5,6 }
+                new List<int>() { 1,2 }, //3
+                new List<int>() { 1,3 }, //4
+                new List<int>() { 1,4 }, //5
+                new List<int>() { 1,5 }, //6
+                new List<int>() { 1,6 }, //7
+                new List<int>() { 2,3 }, //5
+                new List<int>() { 2,4 }, //6
+                new List<int>() { 2,5 }, //7
+                new List<int>() { 2,6 }, //8
+                new List<int>() { 3,4 }, //7
+                new List<int>() { 3,5 }, //8
+                new List<int>() { 3,6 }, //9
+                new List<int>() { 4,5 }, //9
+                new List<int>() { 4,6 }, //10
+                new List<int>() { 5,6 } //11
         };
 
         private static readonly List<List<int>> AllRolledOnce = new List<List<int>>() {
-            new List<int>() {1,1,1,1},
-            new List<int>() {2,2,2,2},
-            new List<int>() {3,3,3,3},
-            new List<int>() {4,4,4,4},
-            new List<int>() {5,5,5,5},
-            new List<int>() {6,6,6,6}
+            new List<int>() {1,1,1,1}, //4
+            new List<int>() {2,2,2,2}, //8
+            new List<int>() {3,3,3,3}, //12
+            new List<int>() {4,4,4,4}, //16
+            new List<int>() {5,5,5,5}, //20
+            new List<int>() {6,6,6,6} //24
         };
 
         public GameBoardState(int[] mainBoard, int whiteCheckersOnBar, int whiteCheckersOnTarget, int blackCheckersOnBar, int blackCheckersOnTarget)
@@ -95,7 +95,7 @@ namespace ModelDLL
             gameBoard.Add(BLACK.BearOffPositionID(), blackCheckersOnTarget);
         }
 
-        internal int pip(CheckerColor color)
+        public int pip(CheckerColor color)
         {
             if(color == BLACK)
             {
