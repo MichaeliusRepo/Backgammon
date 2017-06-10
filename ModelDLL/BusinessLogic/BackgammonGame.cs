@@ -96,8 +96,6 @@ namespace ModelDLL
             initialize(gameBoard, dice, whiteCheckersOnBar, whiteCheckersBoreOff, blackCheckersOnBar, blackCheckersBoreOff, CheckerColor.White);
         }
 
-       
-
         public BackgammonGame(int[] gameBoard, Dice dice)
         {
             initialize(gameBoard, dice, 0, 0, 0, 0, CheckerColor.White);
@@ -140,13 +138,19 @@ namespace ModelDLL
             changeTurns();
         }
 
-        public List<int> Move(CheckerColor color, int from, int targetPosition)
+        internal void UpdateMovesLeft(List<int> movesLeft)
+        {
+            this.movesLeft = movesLeft;
+            Changes.Add(new DiceState(movesLeft));
+        }
+
+        public void Move(CheckerColor color, int from, int targetPosition)
         {
 
             if (GameIsOver())
             {
                 Console.WriteLine("Game is over, so doing nothing");
-                return null;
+                return;
             }
 
             if (color != playerToMove())
@@ -177,10 +181,10 @@ namespace ModelDLL
                 }
             }
 
-            if (IsGameOver())
+            if (GameIsOver())
             {
                 //Console.WriteLine("Game is over!! Terminating"); // Michaelius: The view notifies gameover. ML doesn't like printing.
-                return new List<int>();
+                return;
             }
 
             if (movesLeft.Count() == 0)
@@ -190,13 +194,8 @@ namespace ModelDLL
             else if (GetMoveableCheckers().Count() == 0)
             {
                 changeTurns();
-            }
-
-            return new List<int>();
-
-            
+            }            
         }
-
 
         internal bool GameIsOver()
         {
@@ -218,13 +217,6 @@ namespace ModelDLL
             NumberOfTurnsMade++;
         }
 
-        //TODO remove this
-        private bool IsGameOver()
-        {
-            return currentGameBoardState.getCheckersOnTarget(WHITE) == 15 || currentGameBoardState.getCheckersOnTarget(BLACK) == 15;
-        }
-
-
         //Returns the list of moves that remains to be used
         public List<int> GetMovesLeft()
         {
@@ -240,9 +232,6 @@ namespace ModelDLL
 
 
         //Returns a set of integers, representing the positions from which a checker can be moved
-        //based on the state of the game and the remina
-
-            //TODO REMOVE THIS
         public List<int> GetMoveableCheckers()
         {
             CheckerColor color = playerToMove();

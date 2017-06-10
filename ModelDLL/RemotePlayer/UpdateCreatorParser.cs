@@ -59,6 +59,10 @@ namespace ModelDLL
             }
         }
 
+        internal static string GenerateXmlForDice(List<int> dice)
+        {
+            return "<dice>" + dice.Aggregate("", (a, b) => a + " " + b).Trim() + "</dice>";
+        }
 
         internal static GameBoardState ParseGameBoardState(string xml)
         {
@@ -196,6 +200,28 @@ namespace ModelDLL
             to = AdaptPositionFromOutputFormat(to);
 
             return new Move(color, from, to);
+        }
+
+        internal static List<int> ParseDiceFromXml(string data)
+        {
+            XDocument xdoc = XDocument.Parse(data);
+            var diceTag = xdoc.Descendants("dice");
+            if (diceTag.Count() == 0)
+            {
+                throw new ArgumentException("There is no tag <dice></dice> in the input xml");
+            }
+            List<int> newMovesLeft;
+            try
+            {
+                var dice = diceTag.ElementAt(0).Value.Split(' ').Select(str => int.Parse(str)).ToArray();
+                newMovesLeft = new List<int>(dice);
+            }
+            catch
+            {
+                throw new ArgumentException("The contents of the <dice> tag was not all integers");
+            }
+
+            return newMovesLeft;
         }
 
         //the specification for how to number positions is not necesarilly identical to the numbering used 

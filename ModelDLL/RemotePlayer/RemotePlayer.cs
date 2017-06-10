@@ -32,6 +32,7 @@ namespace ModelDLL
             var moves = turn.moves;
             data += UpdateCreatorParser.GenerateXmlForListOfMoves(moves);
 
+            data += UpdateCreatorParser.GenerateXmlForDice(turn.dice);
 
             data = "<update>" + data + "</update>";
             client.SendDataToServer(data);
@@ -43,11 +44,15 @@ namespace ModelDLL
         //connected to. 
         internal void ReceiveData(string data)
         {
+            List<int> newMovesLeft = UpdateCreatorParser.ParseDiceFromXml(data);
+
+            model.UpdateMovesLeft(newMovesLeft);
+
             List<Move> moves = UpdateCreatorParser.ParseListOfMoves(data);
-            if(moves.None())
+            if (moves.None())
             {
                 model.EndTurn(color);
-                
+
             }
             else
             {
@@ -58,5 +63,7 @@ namespace ModelDLL
                 }
             }
         }
+
+        
     }
 }

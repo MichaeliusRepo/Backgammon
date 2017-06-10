@@ -561,7 +561,7 @@ namespace UnitTest
             fd.SetReturnValues(new int[] {3,1});
             bg = new BackgammonGame(initialGameBoard, fd);
 
-            List<int> positionsVisited = bg.Move(WHITE, 6, 2);
+            bg.Move(WHITE, 6, 2);
 
 
             int[] expectedGameBoard = new int[] { -2, 1, 0, 0,  0,  4,

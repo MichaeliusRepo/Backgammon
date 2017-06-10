@@ -11,7 +11,9 @@ namespace ModelDLL
     {
         static void Main(string[] args)
         {
-            Dice dice = new FakeDice(new int[] { 1, 3 });
+            Dice dice1 = new RealDice();
+            Dice dice2 = new RealDice();
+
 
             FakeServer server = new FakeServer(null, null);
 
@@ -22,7 +24,7 @@ namespace ModelDLL
             server.client2 = client2;
 
             //Setting up game one
-            BackgammonGame game1 = new BackgammonGame(BackgammonGame.DefaultGameBoard, dice);
+            BackgammonGame game1 = new BackgammonGame(BackgammonGame.DefaultGameBoard, dice1);
 
             NaiveAI game1WhitePlayer = new NaiveAI(game1, CheckerColor.White);
             //game1.ConnectPlayer(CheckerColor.White, game1WhitePlayer);
@@ -36,7 +38,7 @@ namespace ModelDLL
 
 
             //Setting up game two
-            BackgammonGame game2 = new BackgammonGame(BackgammonGame.DefaultGameBoard, dice);
+            BackgammonGame game2 = new BackgammonGame(BackgammonGame.DefaultGameBoard, dice2);
 
             RemotePlayer game2WhitePlayer = new RemotePlayer(game2, client2, CheckerColor.White);
             client2.player = game2WhitePlayer;
@@ -48,7 +50,7 @@ namespace ModelDLL
             game2.ConnectView(view2);
 
 
-        
+            //dice1.QueueRandomRoll();
             while (!(game1.GameIsOver() || game2.GameIsOver()))
             {
                 if(game1.NumberOfTurnsMade == 56)
