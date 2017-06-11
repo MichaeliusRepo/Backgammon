@@ -75,14 +75,6 @@ namespace Backgammon
             if (InputManager.Instance.KeyPressed(Keys.Escape))
                 Exit();
 
-
-
-            //if (InputManager.Instance.KeyPressed(Keys.S))
-            //    AudioManager.Instance.PlaySound("Checker");
-
-            //if (InputManager.Instance.KeyPressed(Keys.C))
-            //    AudioManager.Instance.PlaySound("MenuClick");
-
             // TODO: Add your update logic here
             ScreenManager.Instance.Update(gameTime);
             base.Update(gameTime);

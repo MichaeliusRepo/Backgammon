@@ -11,10 +11,6 @@ namespace Backgammon
         [STAThread]
         static void Main()
         {
-
-            //TODO remove this when done
-            Debug.AutoFlush = true;
-
             using (var game = new Backgammon())
                 game.Run();
         }

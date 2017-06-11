@@ -14,7 +14,7 @@ namespace Backgammon.Screen
     {
         private Image Off;
         private Image On;
-        private Vector2 Position;
+        internal Vector2 Position;
         internal bool Triggered { get; private set; }
         internal bool SwitchedOn => On.IsActive;
 

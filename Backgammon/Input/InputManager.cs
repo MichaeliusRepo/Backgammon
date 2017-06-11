@@ -13,6 +13,7 @@ namespace Backgammon.Input
     {
         KeyboardState currentKeyState, prevKeyState;
         MouseState currentMouseState, prevMouseState;
+        GamePadState currentGamePadState, prevGamePadState;
 
         private static InputManager instance;
 
@@ -32,10 +33,12 @@ namespace Backgammon.Input
         {
             prevKeyState = currentKeyState;
             prevMouseState = currentMouseState;
+            prevGamePadState = currentGamePadState;
             if (!ScreenManager.Instance.IsTransitioning)
             {
                 currentKeyState = Keyboard.GetState();
                 currentMouseState = Mouse.GetState();
+                currentGamePadState = GamePad.GetState(PlayerIndex.One);
             }
         }
 
@@ -57,6 +60,14 @@ namespace Backgammon.Input
         internal bool MouseLeftPressed()
         {
             return (currentMouseState.LeftButton == ButtonState.Released && prevMouseState.LeftButton == ButtonState.Pressed);
+        }
+
+        internal bool GamePadButtonPressed(params Buttons[] buttons)
+        {
+            foreach (Buttons button in buttons)
+                if (currentGamePadState.IsButtonDown(button) && prevGamePadState.IsButtonUp(button))
+                    return true;
+            return false;
         }
 
         internal bool KeyPressed(params Keys[] keys)

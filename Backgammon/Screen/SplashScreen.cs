@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
 using Backgammon.Input;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -32,9 +31,8 @@ namespace Backgammon.Screen
             base.Update(gameTime);
             Image.Update(gameTime);
 
-            if (InputManager.Instance.KeyPressed(Keys.Enter) || InputManager.Instance.MouseLeftPressed())
+            if (InputManager.Instance.KeyPressed(Keys.Enter) || InputManager.Instance.MouseLeftPressed() || InputManager.Instance.GamePadButtonPressed(Buttons.Start))
                 ScreenManager.Instance.ChangeScreens("OptionScreen");
-            //ScreenManager.Instance.ChangeScreens("BoardScreen");
         }
 
         public override void Draw(SpriteBatch spriteBatch)

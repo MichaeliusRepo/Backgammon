@@ -44,6 +44,7 @@
     <Compile Include="BusinessLogic\BackgammonGame.cs" />
     <Compile Include="BusinessLogic\CheckerColor.cs" />
     <Compile Include="RemotePlayer\DummyServerImplementation.cs" />
+    <Compile Include="RemotePlayer\RealClient.cs" />
     <Compile Include="RemotePlayer\UpdateCreatorParser.cs" />
     <Compile Include="RemotePlayer\RemotePlayer.cs" />
     <Compile Include="StateChangeUpdates\ExtentionMethodsForChanges.cs" />

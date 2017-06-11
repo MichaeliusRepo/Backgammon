@@ -24,11 +24,12 @@ namespace MachLearn
                 {
                     for (int i = 0; i < outcome.movesMade.Count; i++)
                         game.Move(game.playerToMove(), outcome.movesMade[i].from, outcome.movesMade[i].to);
-                    TemporalDifference.UpdateWeights(st, outcome.state);
+                    TemporalDifference.UpdateWeights(st, outcome.state, game.playerToMove());
                     st = outcome.state;
                 }
             }
-            TemporalDifference.UpdateWeights(st, st); // st1 doesn't matter when game is won.
+            TemporalDifference.UpdateWeights(st, st, White);
+            TemporalDifference.UpdateWeights(st, st, Black); // st1 doesn't matter when game is won.
             return (game.GetGameBoardState().getCheckersOnTarget(White) == 15) ? White : Black;
         }
 
@@ -45,8 +46,11 @@ namespace MachLearn
             if (outcome == null)
                 game.EndTurn(game.playerToMove());
             else
+            {
                 for (int i = 0; i < outcome.movesMade.Count; i++)
                     game.Move(game.playerToMove(), outcome.movesMade[i].from, outcome.movesMade[i].to);
+                TemporalDifference.UpdateWeights(st, outcome.state, game.playerToMove());
+            }
         }
 
         private MovesCalculator.ReachableState PickBestOutcome()
@@ -54,8 +58,8 @@ namespace MachLearn
             var collection = MovesCalculator.GetReachableStatesThisTurn(st, game.playerToMove(), game.GetMovesLeft()).ToArray();
             if (collection.Length == 0)
                 return null;
-            return PickHighest(collection);
-            //return (game.playerToMove() == White) ? PickHighest(collection) : PickLowest(collection);
+            return (game.playerToMove() == White) ? PickHighest(collection) : PickLowest(collection);
+            //return (game.playerToMove() == White) ? PickLowest(collection) : PickHighest(collection);
         } // The color check should only be done once.
 
         private MovesCalculator.ReachableState PickHighest(MovesCalculator.ReachableState[] array)

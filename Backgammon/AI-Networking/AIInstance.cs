@@ -14,7 +14,7 @@ namespace Backgammon.AI_Networking
         private Player WhiteAI;
         private Player BlackAI;
 #pragma warning restore 0649
-        private bool naive = false;
+        private bool naive = true;
 
         private static AIInstance instance;
         internal static AIInstance Instance

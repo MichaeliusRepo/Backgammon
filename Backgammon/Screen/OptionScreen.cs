@@ -14,16 +14,13 @@ namespace Backgammon.Screen
 {
     internal class OptionScreen : GameScreen
     {
-        // Audio, Pips, Player/AI for each color.
-        //internal static bool AudioMuted => AudioManager.Instance.AudioMuted();
-        //internal static bool ShowPips { get; private set; }
-        //internal static bool WhiteAI = false; // { get; private set; }
-        //internal static bool BlackAI = true; // { get; private set; }
-
         internal static Button AudioMuted, ShowPips, WhiteAI, BlackAI;
-        private List<Button> Buttons;
+        private List<Button> ButtonList;
+        private int Hover = 0;
+        private float HighlightOffset = 33;
 
         internal Image Image = new Image() { Path = "Images/OptionScreen", Position = new Vector2(540, 360) };
+        internal Image Highlight = new Image { Path = "Images/OptionSelect", IsActive = false, Effects = "FadeEffect" };
 
         private void MakeButtons()
         {
@@ -31,15 +28,29 @@ namespace Backgammon.Screen
             ShowPips = new Button(new Vector2(200, 400), true);
             WhiteAI = new Button(new Vector2(600, 200));
             BlackAI = new Button(new Vector2(600, 400), true);
-            Buttons = new List<Button>() { AudioMuted, ShowPips, WhiteAI, BlackAI };
+            ButtonList = new List<Button>() { AudioMuted, ShowPips, WhiteAI, BlackAI };
+        }
+
+        private void MoveHighlight(Buttons button)
+        {
+            if (!Highlight.IsActive)
+                Highlight.IsActive = true;
+            else if (button == Buttons.DPadLeft)
+                Hover = (Hover + 2) % 4;
+            else if (Hover < 3)
+                Hover = (Hover + 1) % 2;
+            else
+                Hover = ((Hover + 1) % 2) + 2;
+            Highlight.Position = ButtonList[Hover].Position + new Vector2(0, (Hover % 2 == 0) ? -HighlightOffset : HighlightOffset);
         }
 
         public override void LoadContent()
         {
             base.LoadContent();
             Image.LoadContent();
+            Highlight.LoadContent();
             MakeButtons();
-            foreach (Button b in Buttons)
+            foreach (Button b in ButtonList)
                 b.LoadContent();
         }
 
@@ -47,25 +58,34 @@ namespace Backgammon.Screen
         {
             base.UnloadContent();
             Image.UnloadContent();
-            foreach (Button b in Buttons)
+            Highlight.UnloadContent();
+            foreach (Button b in ButtonList)
                 b.UnloadContent();
         }
 
         public override void Update(GameTime gameTime)
         {
-            if (AudioMuted.Triggered) AudioManager.Instance.ToggleAudio();
-            if (InputManager.Instance.KeyPressed(Keys.Enter)) ScreenManager.Instance.ChangeScreens("BoardScreen");
+            if (AudioMuted.Triggered)
+                AudioManager.Instance.ToggleAudio();
+            if (InputManager.Instance.KeyPressed(Keys.Enter) || InputManager.Instance.GamePadButtonPressed(Buttons.Start))
+                ScreenManager.Instance.ChangeScreens("BoardScreen");
+            if (InputManager.Instance.GamePadButtonPressed(Buttons.DPadUp, Buttons.DPadDown))
+                MoveHighlight(Buttons.DPadUp);
+            else if (InputManager.Instance.GamePadButtonPressed(Buttons.DPadLeft, Buttons.DPadRight))
+                MoveHighlight(Buttons.DPadLeft);
 
             base.Update(gameTime);
             Image.Update(gameTime);
-            foreach (Button b in Buttons)
+            Highlight.Update(gameTime);
+            foreach (Button b in ButtonList)
                 b.Update(gameTime);
         }
 
         public override void Draw(SpriteBatch spriteBatch)
         {
             Image.Draw(spriteBatch);
-            foreach (Button b in Buttons)
+            Highlight.Draw(spriteBatch);
+            foreach (Button b in ButtonList)
                 b.Draw(spriteBatch);
         }
     }

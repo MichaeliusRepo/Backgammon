@@ -186,9 +186,9 @@ namespace Backgammon.Screen
         {
             base.LoadContent();
             Image.LoadContent();
-            foreach (Image DiceImage in DiceImages)
-                DiceImage.LoadContent();
             Instantiate();
+            DiceRolls = Model.GetMovesLeft().ToArray();
+            GenerateDiceImages();
             BeginTurn();
         }
 
@@ -203,6 +203,9 @@ namespace Backgammon.Screen
         public override void Update(GameTime gameTime)
         {
             if (InputManager.Instance.KeyPressed(Keys.M)) AudioManager.Instance.ToggleAudio();
+            if (Board.GameOver() && (InputManager.Instance.KeyPressed(Keys.Enter) || InputManager.Instance.MouseLeftPressed()))
+                ScreenManager.Instance.ChangeScreens("SplashScreen");
+
             int clickedPoint = Board.GetClickedPoint();
 
             switch (State)
@@ -230,6 +233,7 @@ namespace Backgammon.Screen
                         MoveChecker(clickedPoint);
                     break;
             }
+
             base.Update(gameTime);
             Image.Update(gameTime);
             Board.Update(gameTime);

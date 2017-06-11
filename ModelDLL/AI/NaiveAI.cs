@@ -33,9 +33,9 @@ namespace ModelDLL
                 return;
             }
 
-            int checkerToMove = moveableCheckers.First();
+            int checkerToMove = (model.playerToMove() == CheckerColor.Black) ? moveableCheckers.First() : moveableCheckers.Last();
             var reachablePositions = model.GetLegalMovesFor(color, checkerToMove);
-            int positionToMoveTo = reachablePositions.First();
+            int positionToMoveTo = reachablePositions.Last();
             model.Move(color, checkerToMove, positionToMoveTo);
         }
     }
