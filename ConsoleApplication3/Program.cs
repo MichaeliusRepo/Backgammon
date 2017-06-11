@@ -11,7 +11,70 @@ namespace ModelDLL
     {
         static void Main(string[] args)
         {
-            Dice dice1 = new RealDice();
+
+            Console.WriteLine("What color do you want to play?");
+            //var humanPlayer = Console.ReadLine();
+
+            CheckerColor humanColor = CheckerColor.White;
+            bool done = false;
+            while (!done)
+            {
+                var humanPlayer = Console.ReadLine();
+                if (humanPlayer == "white")
+                {
+                    humanColor = CheckerColor.White;
+                    done = true;
+                    Console.WriteLine("White chosen");
+                }
+                    
+                else if (humanPlayer == "black")
+                {
+                    humanColor = CheckerColor.Black;
+                    done = true;
+                    Console.WriteLine("Black chosen");
+                }
+                else
+                {
+                    Console.WriteLine("Plase try again");
+                }
+            }
+
+
+            Dice dice = new RealDice();
+            BackgammonGame game = new BackgammonGame(BackgammonGame.DefaultGameBoard, dice);
+
+
+            
+            RealClient client = new RealClient(null);
+            RemotePlayer remotePlayer = new RemotePlayer(game, client, humanColor.OppositeColor());
+            client.player = remotePlayer;
+
+            NaiveAI ai = new NaiveAI(game, CheckerColor.White);
+
+
+            Player whitePlayer = humanColor == CheckerColor.White ? (Player)ai : (Player)remotePlayer;
+            Player blackPlayer = humanColor == CheckerColor.Black ? (Player)ai : (Player)remotePlayer;
+
+            if(humanColor.OppositeColor() == CheckerColor.Black)
+            {
+                client.SendDataToPlayer("");
+            }
+
+            Console.WriteLine("Game is ready to start. Press enter when both players are connected");
+            Console.ReadLine();
+
+            while (!game.GameIsOver())
+            {
+                (game.playerToMove() == CheckerColor.White ? whitePlayer : blackPlayer).MakeMove();
+            }
+
+            Console.WriteLine("Game is over");
+
+
+
+
+
+            /*Dice dice1 = new RealDice();
             Dice dice2 = new RealDice();
 
 
@@ -89,7 +152,7 @@ namespace ModelDLL
             }
 
             Console.Write("Game is over. Enter for next round>");
-            Console.ReadLine();
+            Console.ReadLine();*/
 
 
 

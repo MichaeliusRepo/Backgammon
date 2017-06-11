@@ -6,12 +6,12 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ModelDLL.RemotePlayer
+namespace ModelDLL
 {
     internal class RealClient : Client
     {
         private TcpClient tcpClient = new TcpClient();
-        private RemotePlayer player;
+        public RemotePlayer player;
 
         public RealClient(RemotePlayer player)
         {
