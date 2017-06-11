@@ -32,6 +32,7 @@ namespace Backgammon.Object
         private Checker movingChecker;
 
         private List<Point> Points { get; set; }
+        internal List<Point> GamePadPointOrdering { get; private set; }
         internal bool InAnimation { get; private set; }
         private Point WhiteBar, BlackBar, WhiteBearOff, BlackBearOff;
 
@@ -214,6 +215,9 @@ namespace Backgammon.Object
                                                                         WhiteBar, BlackBar, WhiteBearOff, BlackBearOff };
             for (int i = 1; i <= 24; i++)
                 Points.Insert(i, (new Point(FindBoard(i), GetCheckers(i))));
+
+            // This is to help support the GamePad navigate around.
+            GamePadPointOrdering = CreateGamePadList();
         }
 
         private Vector2 FindBoard(int i)
@@ -240,6 +244,28 @@ namespace Backgammon.Object
             for (int k = 0; k < amountOfCheckers; k++)
                 checkers.Add(new Checker(checkerColor));
             return checkers;
+        }
+
+        private List<Point> CreateGamePadList()
+        {
+            var list = new List<Point>();
+            for (int i = 13; i <= 24; i++)
+            {
+                list.Add(Points[i]);
+                if (i == 18)
+                    list.Add(WhiteBar);
+                if (i == 24)
+                    list.Add(BlackBearOff);
+            }
+            for (int i = 12; i <= 1; i--)
+            {
+                list.Add(Points[i]);
+                if (i == 7)
+                    list.Add(BlackBar);
+                if (i == 1)
+                    list.Add(WhiteBearOff);
+            }
+            return new List<Point>() { };
         }
 
         internal void Update(GameTime gameTime)

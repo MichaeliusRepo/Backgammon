@@ -38,6 +38,13 @@ namespace Backgammon.Screen
             On = new Image() { Path = "Images/On", Position = Position, IsActive = false };
         }
 
+        internal void Trigger()
+        {
+            Triggered = true;
+            On.IsActive = !On.IsActive;
+            AudioManager.Instance.PlaySound("MenuClick");
+        }
+
         public void LoadContent()
         {
             Off.LoadContent();
@@ -54,10 +61,7 @@ namespace Backgammon.Screen
         {
             Triggered = InputManager.Instance.WasClicked(Off.GetBounds());
             if (Triggered)
-            {
-                On.IsActive = !On.IsActive;
-                AudioManager.Instance.PlaySound("MenuClick");
-            }
+                Trigger();
         }
 
         public void Draw(SpriteBatch spriteBatch)

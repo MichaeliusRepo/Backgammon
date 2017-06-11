@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace ModelDLL
 {
-    internal interface Client
+    public interface Client
     {
         void SendDataToServer(string data);
         void SendDataToPlayer(string data);

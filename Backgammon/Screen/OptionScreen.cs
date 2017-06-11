@@ -37,10 +37,10 @@ namespace Backgammon.Screen
                 Highlight.IsActive = true;
             else if (button == Buttons.DPadLeft)
                 Hover = (Hover + 2) % 4;
-            else if (Hover < 3)
-                Hover = (Hover + 1) % 2;
+            else if (Hover < 2)
+                Hover = (Hover == 0) ? 1 : 0;
             else
-                Hover = ((Hover + 1) % 2) + 2;
+                Hover = (Hover == 2) ? 3 : 2;
             Highlight.Position = ButtonList[Hover].Position + new Vector2(0, (Hover % 2 == 0) ? -HighlightOffset : HighlightOffset);
         }
 
@@ -73,6 +73,8 @@ namespace Backgammon.Screen
                 MoveHighlight(Buttons.DPadUp);
             else if (InputManager.Instance.GamePadButtonPressed(Buttons.DPadLeft, Buttons.DPadRight))
                 MoveHighlight(Buttons.DPadLeft);
+            if (InputManager.Instance.GamePadButtonPressed(Buttons.A, Buttons.B, Buttons.X, Buttons.Y))
+                ButtonList[Hover].Trigger();
 
             base.Update(gameTime);
             Image.Update(gameTime);

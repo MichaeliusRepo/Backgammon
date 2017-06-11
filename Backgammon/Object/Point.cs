@@ -13,9 +13,9 @@ namespace Backgammon.Object
 {
     public class Point
     {
-        protected int Number { get; private set; }
-        protected Vector2 Position { get; private set; }
-        protected List<Checker> Checkers { get; private set; }
+        private int Number { get; set; }
+        internal Vector2 Position { get; private set; }
+        private List<Checker> Checkers { get; set; }
         private Image Image = new Image() { Path = "Images/Glow", Effects = "FadeEffect", IsActive = false, Scale = new Vector2(1.4f, 1.4f) };
         internal Vector2 ReceivingPosition { get; private set; }
 

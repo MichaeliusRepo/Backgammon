@@ -7,7 +7,7 @@ using System.Xml.Linq;
 
 namespace ModelDLL
 {
-    class RemotePlayer : Player
+    public class RemotePlayer : Player
     {
         private CheckerColor color;
         private Client client;
@@ -16,7 +16,7 @@ namespace ModelDLL
         public RemotePlayer(BackgammonGame model, Client client, CheckerColor color)
         {
             this.model = model;
-            this.client = client;
+            this.client = new RealClient(this);
             this.color = color;
         }
 
@@ -25,9 +25,11 @@ namespace ModelDLL
         public void MakeMove()
         {
             var turn = model.GetPreviousTurn();
-
-
-
+            if (turn == null)
+            {
+                client.SendDataToPlayer(string.Empty);
+                return;
+            }
             var state = model.GetGameBoardState();
             var data = UpdateCreatorParser.CreateXmlForGameBoardState(state, "");
 
@@ -40,7 +42,7 @@ namespace ModelDLL
             client.SendDataToServer(data);
         }
 
-        
+
         //Receives XML for the changes that happened on the other side of the connection,
         //parses it into moves, and performs those move on the BackgammonGame instance it is 
         //connected to. 
@@ -66,6 +68,6 @@ namespace ModelDLL
             }
         }
 
-        
+
     }
 }

@@ -25,13 +25,14 @@ namespace Backgammon.Screen
         #region Fields
 
         private Image Image = new Image { Path = "Images/Board", Position = new Vector2(540, 360) };
+        private Image GamePadArrow = new Image { Path = "Images/GamePadArrow", IsActive = false };
         private List<Image> DiceImages = new List<Image>();
 
         private Board Board;
         private BackgammonGame Model;
         private ViewInterface ViewInterface;
-        private PlayerType WhitePlayer => OptionScreen.WhiteAI.SwitchedOn ? PlayerType.Computer : PlayerType.Human;
-        private PlayerType BlackPlayer => OptionScreen.BlackAI.SwitchedOn ? PlayerType.Computer : PlayerType.Human;
+        private PlayerType WhitePlayer => OptionScreen.WhiteAI.SwitchedOn ? PlayerType.Online : PlayerType.Computer;
+        private PlayerType BlackPlayer => OptionScreen.BlackAI.SwitchedOn ? PlayerType.Online : PlayerType.Computer;
         internal CheckerColor CurrentPlayer => ViewInterface.GetNextPlayerToMove();
         private GameState State;
         private List<int> MovableCheckers, PossibleDestinations;
@@ -41,6 +42,7 @@ namespace Backgammon.Screen
         private static readonly float DiceScale = 0.8f;
         private int[] DiceRolls;
         private List<Change> NotifyPropertyChanged = new List<Change>();
+        private int GamePadIndex = 0;
 
         #endregion
 
@@ -60,6 +62,10 @@ namespace Backgammon.Screen
             Model = new BackgammonGame(InitialBoard, new RealDice());
             ViewInterface = new ViewInterface(Model);
             Model.ConnectView(this);
+            if (WhitePlayer == PlayerType.Online)
+                TcpInstance.Instance.Instantiate(Model, White);
+            if (BlackPlayer == PlayerType.Online)
+                TcpInstance.Instance.Instantiate(Model, Black);
         }
 
         private void PlayAnimation(Change c)
@@ -128,7 +134,7 @@ namespace Backgammon.Screen
             }
 
             if (IsPlayerType(CurrentPlayer, PlayerType.Online))
-                NetworkMove();
+                OnlineTurn();
             else if (IsPlayerType(CurrentPlayer, PlayerType.Computer))
                 AITurn();
             else
@@ -147,6 +153,8 @@ namespace Backgammon.Screen
                         Board.GetAmountOfCheckersAtPoint(i + 1) +
                         ", model's got " + motherboard[i]);
         }
+
+        private void OnlineTurn() { TcpInstance.Instance.MakeMove(Model, CurrentPlayer); }
 
         private void AITurn() { AIInstance.Instance.Move(Model, CurrentPlayer); }
 
@@ -178,6 +186,32 @@ namespace Backgammon.Screen
             Board.RemoveCheckerHighlight();
         }
 
+        private void GamePadMoveHighlight()
+        {
+            if (!GamePadArrow.IsActive)
+                GamePadArrow.IsActive = true;
+            else if (InputManager.Instance.GamePadButtonPressed(Buttons.DPadDown, Buttons.DPadUp))
+                GamePadIndex = (GamePadIndex + 14) % 28;
+            else
+            {
+                if (InputManager.Instance.GamePadButtonPressed(Buttons.DPadLeft))
+                    GamePadIndex++;
+                else
+                    GamePadIndex--;
+                    if (GamePadIndex <= 14) // Is in upper row
+                        GamePadIndex = (GamePadIndex + 1) % 14;
+                    else
+                        GamePadIndex = ((GamePadIndex + 1) % 14) + 14;
+            }
+
+            GamePadArrow.Position = new Vector2(Board.GamePadPointOrdering[GamePadIndex].Position.X, 0);
+        }
+
+        private void GamePadTrigger()
+        {
+
+        }
+
         #endregion
 
         #region Framework Methods
@@ -205,6 +239,10 @@ namespace Backgammon.Screen
             if (InputManager.Instance.KeyPressed(Keys.M)) AudioManager.Instance.ToggleAudio();
             if (Board.GameOver() && (InputManager.Instance.KeyPressed(Keys.Enter) || InputManager.Instance.MouseLeftPressed()))
                 ScreenManager.Instance.ChangeScreens("SplashScreen");
+            if (InputManager.Instance.GamePadButtonPressed(Buttons.DPadUp, Buttons.DPadDown, Buttons.DPadLeft, Buttons.DPadRight))
+                GamePadMoveHighlight();
+            if (InputManager.Instance.GamePadButtonPressed(Buttons.A, Buttons.B, Buttons.X, Buttons.Y))
+                GamePadTrigger();
 
             int clickedPoint = Board.GetClickedPoint();
 
@@ -264,16 +302,6 @@ namespace Backgammon.Screen
             Computer,
             Online
         }
-
-        #region Onrain Pray
-
-        public void NetworkMove()
-        {
-            // 1) Send latest move as data
-            // 2) Retrieve move in return
-        }
-
-        #endregion
 
     }
 
