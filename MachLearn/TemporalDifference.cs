@@ -13,7 +13,7 @@ namespace MachLearn
         //internal static double[] w = new double[8] { 0, 0, 0, 0, 0, 0, 0, 0 };
         private static CheckerColor color;
         internal static double[] theta = new double[8] { 0.5, 0.5, 3, 3, 0.5, 0.5, 0.05, 0.05 };  // => (color == White) ? thetaWhite : thetaBlack;
-        internal static double[] et => (color == White) ? etWhite : etBlack;
+        internal static double[] EligibilityTraces => (color == White) ? etWhite : etBlack;
         internal static double[] thetaWhite = new double[8] { 0, 0, 0, 0, 0, 0, 0, 0 };
         internal static double[] thetaBlack = new double[8] { 0, 0, 0, 0, 0, 0, 0, 0 };
         internal static double[] etWhite = new double[8] { 0.1, 0.1, 3, 3, 0.1, 0.1, 0.01, 0.01 };
@@ -61,8 +61,8 @@ namespace MachLearn
 
         private static void DefineEligibilityTraces(GameBoardState st)
         {
-            for (int i = 0; i < et.Length; i++)
-                et[i] = lambda * et[i] + DerivativeFunction(F[i], st);
+            for (int i = 0; i < EligibilityTraces.Length; i++)
+                EligibilityTraces[i] = lambda * EligibilityTraces[i] + DerivativeFunction(F[i], st);
         }
 
         private static double DerivativeFunction(double d, GameBoardState st)
@@ -74,7 +74,7 @@ namespace MachLearn
         private static void ParameterUpdate(GameBoardState st, GameBoardState st1)
         {
             for (int i = 0; i < theta.Length; i++)
-                theta[i] = theta[i] + alpha * DifferenceFunction(st, st1) * et[i];
+                theta[i] = theta[i] + alpha * DifferenceFunction(st, st1) * EligibilityTraces[i];
         }
 
         public static void UpdateWeights(GameBoardState st, GameBoardState st1, CheckerColor c)
@@ -83,7 +83,7 @@ namespace MachLearn
             UpdateF(st);
             DefineEligibilityTraces(st);
             ParameterUpdate(st, st1);
-            if (double.IsNaN(et[3]))
+            if (double.IsNaN(EligibilityTraces[3]))
                 throw new Exception();
         }
 

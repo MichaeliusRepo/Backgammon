@@ -84,8 +84,25 @@ namespace Backgammon.Screen
         public Rectangle GetBounds()
         {
             Rectangle rectangle = Texture.Bounds;
-            rectangle.Offset(Position.X - (rectangle.Width/2), Position.Y - (rectangle.Height/2));
+            rectangle.Offset(Position.X - (rectangle.Width / 2), Position.Y - (rectangle.Height / 2));
             return rectangle;
+        }
+
+        private void UpdateString()
+        {
+            Vector2 dimensions = new Vector2(font.MeasureString(Text).X, font.MeasureString(Text).Y);
+            if (SourceRect == Rectangle.Empty)
+                SourceRect = new Rectangle(0, 0, (int)dimensions.X, (int)dimensions.Y);
+            renderTarget = new RenderTarget2D(ScreenManager.Instance.GraphicsDevice, (int)dimensions.X, (int)dimensions.Y);
+
+            ScreenManager.Instance.GraphicsDevice.SetRenderTarget(renderTarget);
+            ScreenManager.Instance.GraphicsDevice.Clear(Color.Transparent);
+            ScreenManager.Instance.SpriteBatch.Begin();
+            ScreenManager.Instance.SpriteBatch.DrawString(font, Text, Vector2.Zero, Color.White);
+            ScreenManager.Instance.SpriteBatch.End();
+            Texture = renderTarget;
+            ScreenManager.Instance.GraphicsDevice.SetRenderTarget(null);
+
         }
 
         public void LoadContent()
@@ -147,6 +164,8 @@ namespace Backgammon.Screen
 
         public void Update(GameTime gameTime)
         {
+            if (!String.IsNullOrEmpty(Text))
+                UpdateString();
             foreach (var effect in effectList)
                 if (effect.Value.IsActive)
                     effect.Value.Update(gameTime);

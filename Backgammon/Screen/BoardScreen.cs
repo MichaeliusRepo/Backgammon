@@ -27,6 +27,7 @@ namespace Backgammon.Screen
         private Image Image = new Image { Path = "Images/Board", Position = new Vector2(540, 360) };
         private Image GamePadArrow = new Image { Path = "Images/GamePadArrow", IsActive = false };
         private List<Image> DiceImages = new List<Image>();
+        private Image WhitePips, BlackPips;
 
         private Board Board;
         private BackgammonGame Model;
@@ -35,6 +36,7 @@ namespace Backgammon.Screen
         private PlayerType BlackPlayer => OptionScreen.BlackAI.SwitchedOn ? PlayerType.Computer : PlayerType.Human;
         internal CheckerColor CurrentPlayer => ViewInterface.GetNextPlayerToMove();
         private GameState State;
+
         private List<int> MovableCheckers, PossibleDestinations;
         private int SelectedPoint;
         private static readonly float[] DiceXPositions = { Board.midX - 4 * Board.leftX, Board.midX - 2 * Board.leftX,
@@ -66,14 +68,21 @@ namespace Backgammon.Screen
                 TcpInstance.Instance.Instantiate(Model, White);
             if (BlackPlayer == PlayerType.Online)
                 TcpInstance.Instance.Instantiate(Model, Black);
+            if (OptionScreen.ShowPips.SwitchedOn)
+            {
+                WhitePips = new Image() { Text = "White: " + Model.GetGameBoardState().pip(White), Position = new Vector2(Board.midX, 700) };
+                BlackPips = new Image() { Text = "Black: " + Model.GetGameBoardState().pip(Black), Position = new Vector2(Board.midX, 20) };
+                WhitePips.LoadContent();
+                BlackPips.LoadContent();
+            }
         }
 
         private void PlayAnimation(Change c)
         {
             NotifyPropertyChanged.Remove(c);
             if (c is DiceState) AnimateDice(c as DiceState);
-            else if (c is Move) AnimateCheckers(c as Move);
-            else throw new Exception("Unrecognized change type returned.");
+            if (c is Move) AnimateCheckers(c as Move);
+            //else throw new Exception("Unrecognized change type returned.");
         }
 
         private void AnimateDice(DiceState c)
@@ -102,6 +111,12 @@ namespace Backgammon.Screen
                 Board.MoveChecker(m.from, m.to); // Basic board move
         }
 
+        private void GenerateDice()
+        {
+            DiceRolls = Model.GetMovesLeft().ToArray();
+            GenerateDiceImages();
+        }
+
         private void GenerateDiceImages()
         {
             foreach (Image DiceImage in DiceImages)
@@ -125,6 +140,7 @@ namespace Backgammon.Screen
             if (Board.GameOver())
                 return;
             //CheckInconsistency(); // Gives and cures cancer at the same time. Have a taste!
+            GenerateDice();
             Board.RemoveCheckerHighlight();
             Board.StopGlowPoints();
             if (ViewInterface.GetMoveableCheckers().Count == 0)
@@ -217,8 +233,6 @@ namespace Backgammon.Screen
             Image.LoadContent();
             GamePadArrow.LoadContent();
             Instantiate();
-            DiceRolls = Model.GetMovesLeft().ToArray();
-            GenerateDiceImages();
             BeginTurn();
         }
 
@@ -227,6 +241,11 @@ namespace Backgammon.Screen
             base.UnloadContent();
             Image.UnloadContent();
             GamePadArrow.UnloadContent();
+            if (OptionScreen.ShowPips.SwitchedOn)
+            {
+                WhitePips.UnloadContent();
+                BlackPips.UnloadContent();
+            }
             foreach (Image DiceImage in DiceImages)
                 DiceImage.UnloadContent();
         }
@@ -273,6 +292,13 @@ namespace Backgammon.Screen
             Image.Update(gameTime);
             GamePadArrow.Update(gameTime);
             Board.Update(gameTime);
+            if (OptionScreen.ShowPips.SwitchedOn)
+            {
+                WhitePips.Text = "White: " + Model.GetGameBoardState().pip(White);
+                BlackPips.Text = "Black: " + Model.GetGameBoardState().pip(Black);
+                WhitePips.Update(gameTime);
+                BlackPips.Update(gameTime);
+            }
             foreach (Image DiceImage in DiceImages)
                 DiceImage.Update(gameTime);
         }
@@ -282,6 +308,11 @@ namespace Backgammon.Screen
             Image.Draw(spriteBatch);
             GamePadArrow.Draw(spriteBatch);
             Board.Draw(spriteBatch);
+            if (OptionScreen.ShowPips.SwitchedOn)
+            {
+                WhitePips.Draw(spriteBatch);
+                BlackPips.Draw(spriteBatch);
+            }
             foreach (Image DiceImage in DiceImages)
                 DiceImage.Draw(spriteBatch);
         }
