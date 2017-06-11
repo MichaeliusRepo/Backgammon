@@ -28,7 +28,7 @@ namespace Backgammon.Audio
             }
         }
 
-        private AudioManager() { } // Remove default public constructor
+        private AudioManager() { MediaPlayer.Stop(); } // Remove default public constructor
 
         internal void ToggleAudio()
         {

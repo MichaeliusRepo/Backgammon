@@ -28,7 +28,7 @@ namespace Backgammon.Screen
 
         internal Button(Vector2 Position, bool Enabled) : this(Position)
         {
-            On.IsActive = true;
+            On.IsActive = Enabled;
         }
 
         internal Button(Vector2 Position)

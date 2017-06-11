@@ -12,12 +12,12 @@ namespace MachLearn
     {
         //internal static double[] w = new double[8] { 0, 0, 0, 0, 0, 0, 0, 0 };
         private static CheckerColor color;
-        internal static double[] theta => (color == White) ? thetaWhite : thetaBlack;
+        internal static double[] theta = new double[8] { 0.5, 0.5, 3, 3, 0.5, 0.5, 0.05, 0.05 };  // => (color == White) ? thetaWhite : thetaBlack;
         internal static double[] et => (color == White) ? etWhite : etBlack;
         internal static double[] thetaWhite = new double[8] { 0, 0, 0, 0, 0, 0, 0, 0 };
         internal static double[] thetaBlack = new double[8] { 0, 0, 0, 0, 0, 0, 0, 0 };
-        internal static double[] etWhite = new double[8] { 0, 0, 0, 0, 0, 0, 0, 0 };
-        internal static double[] etBlack = new double[8] { 0, 0, 0, 0, 0, 0, 0, 0 };
+        internal static double[] etWhite = new double[8] { 0.1, 0.1, 3, 3, 0.1, 0.1, 0.01, 0.01 };
+        internal static double[] etBlack = new double[8] { 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.01, 0.01 };
         internal static double lambda = 0.9, alpha = 0.1; // default values were lambda = 0.7, alpha = 0.1 or 0.02.
         internal static int[] F = new int[8];
 

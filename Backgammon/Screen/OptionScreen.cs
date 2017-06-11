@@ -24,7 +24,7 @@ namespace Backgammon.Screen
 
         private void MakeButtons()
         {
-            AudioMuted = new Button(new Vector2(200, 200));
+            AudioMuted = new Button(new Vector2(200, 200), !AudioManager.Instance.AudioMuted());
             ShowPips = new Button(new Vector2(200, 400), true);
             WhiteAI = new Button(new Vector2(600, 200));
             BlackAI = new Button(new Vector2(600, 400), true);
@@ -65,8 +65,6 @@ namespace Backgammon.Screen
 
         public override void Update(GameTime gameTime)
         {
-            if (AudioMuted.Triggered)
-                AudioManager.Instance.ToggleAudio();
             if (InputManager.Instance.KeyPressed(Keys.Enter) || InputManager.Instance.GamePadButtonPressed(Buttons.Start))
                 ScreenManager.Instance.ChangeScreens("BoardScreen");
             if (InputManager.Instance.GamePadButtonPressed(Buttons.DPadUp, Buttons.DPadDown))
@@ -75,6 +73,9 @@ namespace Backgammon.Screen
                 MoveHighlight(Buttons.DPadLeft);
             if (InputManager.Instance.GamePadButtonPressed(Buttons.A, Buttons.B, Buttons.X, Buttons.Y))
                 ButtonList[Hover].Trigger();
+
+            if (AudioMuted.Triggered)
+                AudioManager.Instance.ToggleAudio();
 
             base.Update(gameTime);
             Image.Update(gameTime);

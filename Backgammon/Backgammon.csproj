@@ -109,6 +109,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="Content\EBGaramond12-Regular.ttf" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

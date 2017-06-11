@@ -132,6 +132,13 @@ namespace Backgammon.Object
             catch (ArgumentOutOfRangeException) { return false; }
         }
 
+        internal int GetClickedPoint(int i)
+        {
+            if (GamePadPointOrdering[i] == WhiteBearOff) return White.BearOffPositionID();
+            else if (GamePadPointOrdering[i] == BlackBearOff) return Black.BearOffPositionID();
+            return Points.IndexOf(GamePadPointOrdering[i]);
+        }
+
         internal int GetClickedPoint()
         {
             foreach (Point p in Points)
@@ -249,23 +256,13 @@ namespace Backgammon.Object
         private List<Point> CreateGamePadList()
         {
             var list = new List<Point>();
-            for (int i = 13; i <= 24; i++)
-            {
+            for (int i = 13; i < 25; i++)
                 list.Add(Points[i]);
-                if (i == 18)
-                    list.Add(WhiteBar);
-                if (i == 24)
-                    list.Add(BlackBearOff);
-            }
-            for (int i = 12; i <= 1; i--)
-            {
+            list.Add(BlackBearOff);
+            for (int i = 12; i > 0; i--)
                 list.Add(Points[i]);
-                if (i == 7)
-                    list.Add(BlackBar);
-                if (i == 1)
-                    list.Add(WhiteBearOff);
-            }
-            return new List<Point>() { };
+            list.Add(WhiteBearOff);
+            return list;
         }
 
         internal void Update(GameTime gameTime)

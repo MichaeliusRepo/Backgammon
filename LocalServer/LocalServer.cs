@@ -16,8 +16,19 @@ namespace LocalServer
 
         static void Main(string[] args)
         {
-            Initialize();
-            ExchangeData();
+            while (true)
+                try
+                {
+                    Initialize();
+                    ExchangeData();
+                }
+                catch (Exception)
+                {
+                    serverSocket.Stop();
+                    player1.Close();
+                    player2.Close();
+            }
+
         }
 
         static void Initialize()
@@ -37,7 +48,7 @@ namespace LocalServer
             while (true)
                 try
                 {
-                    if (Send(player1,player2).Equals("EndGame"))
+                    if (Send(player1, player2).Equals("EndGame"))
                         break;
                     if (Send(player2, player1).Equals("EndGame"))
                         break;

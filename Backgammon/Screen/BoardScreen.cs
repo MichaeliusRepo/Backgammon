@@ -31,8 +31,8 @@ namespace Backgammon.Screen
         private Board Board;
         private BackgammonGame Model;
         private ViewInterface ViewInterface;
-        private PlayerType WhitePlayer => OptionScreen.WhiteAI.SwitchedOn ? PlayerType.Online : PlayerType.Computer;
-        private PlayerType BlackPlayer => OptionScreen.BlackAI.SwitchedOn ? PlayerType.Online : PlayerType.Computer;
+        private PlayerType WhitePlayer => OptionScreen.WhiteAI.SwitchedOn ? PlayerType.Computer : PlayerType.Human;
+        private PlayerType BlackPlayer => OptionScreen.BlackAI.SwitchedOn ? PlayerType.Computer : PlayerType.Human;
         internal CheckerColor CurrentPlayer => ViewInterface.GetNextPlayerToMove();
         private GameState State;
         private List<int> MovableCheckers, PossibleDestinations;
@@ -191,25 +191,20 @@ namespace Backgammon.Screen
             if (!GamePadArrow.IsActive)
                 GamePadArrow.IsActive = true;
             else if (InputManager.Instance.GamePadButtonPressed(Buttons.DPadDown, Buttons.DPadUp))
-                GamePadIndex = (GamePadIndex + 14) % 28;
+            {
+                GamePadIndex = (GamePadIndex + 13) % 26;
+                GamePadArrow.Scale = GamePadArrow.Scale * (-1);
+            }
             else
             {
+                bool upperRow = (GamePadIndex < 13);
                 if (InputManager.Instance.GamePadButtonPressed(Buttons.DPadLeft))
-                    GamePadIndex++;
-                else
                     GamePadIndex--;
-                    if (GamePadIndex <= 14) // Is in upper row
-                        GamePadIndex = (GamePadIndex + 1) % 14;
-                    else
-                        GamePadIndex = ((GamePadIndex + 1) % 14) + 14;
+                else
+                    GamePadIndex++;
+                GamePadIndex = (upperRow) ? (GamePadIndex + 13) % 13 : (GamePadIndex % 13) + 13;
             }
-
-            GamePadArrow.Position = new Vector2(Board.GamePadPointOrdering[GamePadIndex].Position.X, 0);
-        }
-
-        private void GamePadTrigger()
-        {
-
+            GamePadArrow.Position = new Vector2(Board.GamePadPointOrdering[GamePadIndex].Position.X, (GamePadIndex < 13) ? 20 : 700);
         }
 
         #endregion
@@ -220,6 +215,7 @@ namespace Backgammon.Screen
         {
             base.LoadContent();
             Image.LoadContent();
+            GamePadArrow.LoadContent();
             Instantiate();
             DiceRolls = Model.GetMovesLeft().ToArray();
             GenerateDiceImages();
@@ -230,6 +226,7 @@ namespace Backgammon.Screen
         {
             base.UnloadContent();
             Image.UnloadContent();
+            GamePadArrow.UnloadContent();
             foreach (Image DiceImage in DiceImages)
                 DiceImage.UnloadContent();
         }
@@ -237,14 +234,14 @@ namespace Backgammon.Screen
         public override void Update(GameTime gameTime)
         {
             if (InputManager.Instance.KeyPressed(Keys.M)) AudioManager.Instance.ToggleAudio();
-            if (Board.GameOver() && (InputManager.Instance.KeyPressed(Keys.Enter) || InputManager.Instance.MouseLeftPressed()))
+            if (InputManager.Instance.KeyPressed(Keys.R) || InputManager.Instance.GamePadButtonPressed(Buttons.Back))
+                ScreenManager.Instance.ChangeScreens("SplashScreen");
+
+            if (Board.GameOver() && (InputManager.Instance.KeyPressed(Keys.Enter) || InputManager.Instance.MouseLeftPressed() || InputManager.Instance.GamePadButtonPressed(Buttons.Start)))
                 ScreenManager.Instance.ChangeScreens("SplashScreen");
             if (InputManager.Instance.GamePadButtonPressed(Buttons.DPadUp, Buttons.DPadDown, Buttons.DPadLeft, Buttons.DPadRight))
                 GamePadMoveHighlight();
-            if (InputManager.Instance.GamePadButtonPressed(Buttons.A, Buttons.B, Buttons.X, Buttons.Y))
-                GamePadTrigger();
-
-            int clickedPoint = Board.GetClickedPoint();
+            int clickedPoint = (InputManager.Instance.GamePadButtonPressed(Buttons.A, Buttons.X, Buttons.Y)) ? Board.GetClickedPoint(GamePadIndex) : Board.GetClickedPoint();
 
             switch (State)
             {
@@ -262,7 +259,7 @@ namespace Backgammon.Screen
                     break;
 
                 case GameState.PickDestination:
-                    if (clickedPoint == SelectedPoint && !SelectedPoint.Equals(CurrentPlayer.GetBar()))
+                    if ((clickedPoint == SelectedPoint && !SelectedPoint.Equals(CurrentPlayer.GetBar())) || InputManager.Instance.GamePadButtonPressed(Buttons.B))
                     { // Cancel selected checker
                         BeginTurn();
                         AudioManager.Instance.PlaySound("MenuClick");
@@ -274,6 +271,7 @@ namespace Backgammon.Screen
 
             base.Update(gameTime);
             Image.Update(gameTime);
+            GamePadArrow.Update(gameTime);
             Board.Update(gameTime);
             foreach (Image DiceImage in DiceImages)
                 DiceImage.Update(gameTime);
@@ -282,6 +280,7 @@ namespace Backgammon.Screen
         public override void Draw(SpriteBatch spriteBatch)
         {
             Image.Draw(spriteBatch);
+            GamePadArrow.Draw(spriteBatch);
             Board.Draw(spriteBatch);
             foreach (Image DiceImage in DiceImages)
                 DiceImage.Draw(spriteBatch);

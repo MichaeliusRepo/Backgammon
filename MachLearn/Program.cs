@@ -14,8 +14,8 @@ namespace MachLearn
         static void Main(string[] args)
         {
             //MineData();
-            MineData2();
-            //PitMachVsNaive1000();
+            //MineData2();
+            PitMachVsNaive1000();
         }
 
         static void MineData2()
@@ -26,7 +26,7 @@ namespace MachLearn
                 {
                     //if (gameCount % 100 == 0)
                     PrintData(gameCount, MachWins, NaiveWins);
-                    if (LearnVsNaive(gameCount) is MachPlayer) MachWins++;
+                    if (LearnVsNaive(gameCount) is MachAI) MachWins++;
                     else NaiveWins++;
                     gameCount++;
                 }
@@ -39,12 +39,12 @@ namespace MachLearn
             var game = new BackgammonGame(BackgammonGame.DefaultGameBoard, new RealDice());
             if (gameCount % 2 == 0)
             {
-                white = new MachPlayer(game);
+                white = new MachAI(game);
                 black = new NaiveAI(game, Black);
             }
             else
             {
-                black = new MachPlayer(game);
+                black = new MachAI(game);
                 white = new NaiveAI(game, White);
             }
             while (!TemporalDifference.GameOver(game.GetGameBoardState()))
@@ -67,7 +67,7 @@ namespace MachLearn
                 {
                     if (gameCount % Modulo == 0)
                         PrintData(gameCount, WhiteWins, BlackWins);
-                    if (new MachPlayer(new BackgammonGame(BackgammonGame.DefaultGameBoard, new RealDice())).Run() == White)
+                    if (new MachAI(new BackgammonGame(BackgammonGame.DefaultGameBoard, new RealDice())).Run() == White)
                         WhiteWins++;
                     else
                         BlackWins++;
@@ -93,9 +93,9 @@ namespace MachLearn
         }
 
         static CheckerColor PitMachVsNaive(int gameCount)
-        {
+        { // MachAI 
             var game = new BackgammonGame(BackgammonGame.DefaultGameBoard, new RealDice());
-            Player white = new MachPlayer(game);
+            Player white = new MachAI(game);
             Player black = new NaiveAI(game, Black);
             while (!TemporalDifference.GameOver(game.GetGameBoardState()))
                 if (game.playerToMove() == White)

@@ -14,7 +14,7 @@ namespace Backgammon.AI_Networking
         private Player WhiteAI;
         private Player BlackAI;
 #pragma warning restore 0649
-        private bool naive = true;
+        private bool naive = false;
 
         private static AIInstance instance;
         internal static AIInstance Instance
@@ -40,7 +40,7 @@ namespace Backgammon.AI_Networking
                 if (naive)
                     ai = new NaiveAI(model, c);
                 else
-                    ai = new MachPlayer(model);
+                    ai = new MachAI(model);
             ai.MakeMove();
         }
 

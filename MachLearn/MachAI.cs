@@ -8,10 +8,11 @@ using static ModelDLL.CheckerColor;
 
 namespace MachLearn
 {
-    public class MachPlayer : Player
+    public class MachAI : Player
     {
         private BackgammonGame game;
         private GameBoardState st;
+        private MovesCalculator.ReachableState outcome;
 
         internal CheckerColor Run()
         {
@@ -33,7 +34,7 @@ namespace MachLearn
             return (game.GetGameBoardState().getCheckersOnTarget(White) == 15) ? White : Black;
         }
 
-        public MachPlayer(BackgammonGame g)
+        public MachAI(BackgammonGame g)
         {
             game = g;
             st = g.GetGameBoardState();
@@ -42,15 +43,20 @@ namespace MachLearn
         public void MakeMove()
         { // Use this for AI in View.
             st = game.GetGameBoardState();
-            var outcome = PickBestOutcome();
+            outcome = PickBestOutcome();
             if (outcome == null)
                 game.EndTurn(game.playerToMove());
             else
             {
                 for (int i = 0; i < outcome.movesMade.Count; i++)
                     game.Move(game.playerToMove(), outcome.movesMade[i].from, outcome.movesMade[i].to);
-                TemporalDifference.UpdateWeights(st, outcome.state, game.playerToMove());
             }
+        }
+
+        internal void MakeMoveAndLearn()
+        {
+            MakeMove();
+            TemporalDifference.UpdateWeights(st, outcome.state, game.playerToMove());
         }
 
         private MovesCalculator.ReachableState PickBestOutcome()
