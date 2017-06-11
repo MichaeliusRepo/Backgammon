@@ -43,8 +43,10 @@ namespace ModelDLL
             Dice dice = new RealDice();
             BackgammonGame game = new BackgammonGame(BackgammonGame.DefaultGameBoard, dice);
 
+            View view1 = new ConsoleView(game, "Game View for human color: " + humanColor);
 
-            
+
+
             RealClient client = new RealClient(null);
             RemotePlayer remotePlayer = new RemotePlayer(game, client, humanColor.OppositeColor());
             client.player = remotePlayer;
