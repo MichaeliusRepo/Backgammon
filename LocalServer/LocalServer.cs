@@ -37,30 +37,24 @@ namespace LocalServer
             while (true)
                 try
                 {
-                    byte[] receive = new byte[1337];
-                    int k = player1.Receive(receive);
-                    string data = GetString(receive, k);
-
-                    player2.Send(new ASCIIEncoding().GetBytes(data));
-
-                    if (data.Equals("EndGame"))
+                    if (Send(player1,player2).Equals("EndGame"))
                         break;
-
-                    // Warning: code repeat below. May trigger programmers.
-
-                    receive = new byte[1337];
-                    k = player2.Receive(receive);
-                    data = GetString(receive, k);
-
-                    player1.Send(new ASCIIEncoding().GetBytes(data));
-
-                    if (data.Equals("EndGame"))
+                    if (Send(player2, player1).Equals("EndGame"))
                         break;
                 }
                 catch (Exception e) { Console.WriteLine(e.StackTrace); }
             player1.Close();
             player2.Close();
             serverSocket.Stop();
+        }
+
+        static string Send(Socket from, Socket to)
+        {
+            byte[] receive = new byte[1337];
+            int k = from.Receive(receive);
+            string data = GetString(receive, k);
+            to.Send(new ASCIIEncoding().GetBytes(data));
+            return data;
         }
 
         static string GetString(byte[] receive, int k)
