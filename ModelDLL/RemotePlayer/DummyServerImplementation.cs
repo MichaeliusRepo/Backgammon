@@ -78,20 +78,20 @@ namespace ModelDLL
         public void NotifyView()
         {
 
-            Console.WriteLine("----------------------------------------------------");
+           /* Console.WriteLine("----------------------------------------------------");
             Console.WriteLine("Moves left" + string.Join(",", model.GetMovesLeft()));
             Console.WriteLine("Number of final reachable states: " + MovesCalculator.GetReachableStatesThisTurn(model.GetGameBoardState(), model.playerToMove(), model.GetMovesLeft()).Count());
             Console.WriteLine("----------------------------------------------------");
-            //Console.ReadLine();
+            //Console.ReadLine();*/
 
-            /* var changes = model.GetChanges();
+             var changes = model.GetChanges();
              if (changes.Where(c => c is Move).Count() > 0)
              {
                  Console.WriteLine("----------------------------------------------------");
                  Console.WriteLine("This is coming from ConsoleView: " + identifier);
                  Console.WriteLine(model.GetGameBoardState().Stringify());
                  Console.WriteLine("----------------------------------------------------");
-             }*/
+             }
         }
     }
 }

@@ -26,6 +26,8 @@ namespace ModelDLL
         {
             var turn = model.GetPreviousTurn();
 
+
+
             var state = model.GetGameBoardState();
             var data = UpdateCreatorParser.CreateXmlForGameBoardState(state, "");
 

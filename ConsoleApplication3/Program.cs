@@ -44,6 +44,7 @@ namespace ModelDLL
             BackgammonGame game = new BackgammonGame(BackgammonGame.DefaultGameBoard, dice);
 
             View view1 = new ConsoleView(game, "Game View for human color: " + humanColor);
+            game.ConnectView(view1);
 
 
 
@@ -51,19 +52,26 @@ namespace ModelDLL
             RemotePlayer remotePlayer = new RemotePlayer(game, client, humanColor.OppositeColor());
             client.player = remotePlayer;
 
-            NaiveAI ai = new NaiveAI(game, CheckerColor.White);
+            NaiveAI ai = new NaiveAI(game, humanColor);
 
 
             Player whitePlayer = humanColor == CheckerColor.White ? (Player)ai : (Player)remotePlayer;
             Player blackPlayer = humanColor == CheckerColor.Black ? (Player)ai : (Player)remotePlayer;
 
-            if(humanColor.OppositeColor() == CheckerColor.Black)
+            Console.WriteLine("white player is " + whitePlayer);
+            Console.WriteLine("black player is " + blackPlayer);
+
+            if (humanColor == CheckerColor.Black)
             {
                 client.SendDataToPlayer("");
             }
 
-            Console.WriteLine("Game is ready to start. Press enter when both players are connected");
-            Console.ReadLine();
+            if(humanColor == CheckerColor.White)
+            {
+                Console.WriteLine("Game is ready to start. Press enter when both players are connected");
+                Console.ReadLine();
+            }
+            
 
             while (!game.GameIsOver())
             {
@@ -71,6 +79,7 @@ namespace ModelDLL
             }
 
             Console.WriteLine("Game is over");
+            Console.ReadLine();
 
 
 

@@ -32,6 +32,9 @@ namespace ModelDLL
             byte[] send = new ASCIIEncoding().GetBytes(data);
             Stream stream = tcpClient.GetStream();
             stream.Write(send, 0, send.Length);
+
+            //Immediately start listening for reply from server
+            SendDataToPlayer("");
         }
 
         private string GetString(byte[] receive, int k)

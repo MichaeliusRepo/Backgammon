@@ -54,6 +54,10 @@ namespace LocalServer
             int k = from.Receive(receive);
             string data = GetString(receive, k);
             to.Send(new ASCIIEncoding().GetBytes(data));
+
+            Console.WriteLine("------------------------------------");
+            Console.WriteLine(data);
+            Console.WriteLine("------------------------------------");
             return data;
         }
 
