@@ -15,10 +15,6 @@ using static ModelDLL.CheckerColor;
 
 namespace Backgammon.Screen
 {
-    /*
-     * 5) Inform players no available moves were left. Give time to animate dice rollz.
-    *  2) Display Pips
-    * */
 
     internal class BoardScreen : GameScreen, View
     {
@@ -36,13 +32,12 @@ namespace Backgammon.Screen
         private PlayerType BlackPlayer => OptionScreen.BlackAI.SwitchedOn ? PlayerType.Computer : PlayerType.Human;
         internal CheckerColor CurrentPlayer => ViewInterface.GetNextPlayerToMove();
         private GameState State;
-
         private List<int> MovableCheckers, PossibleDestinations;
         private int SelectedPoint;
         private static readonly float[] DiceXPositions = { Board.midX - 4 * Board.leftX, Board.midX - 2 * Board.leftX,
             Board.midX + 2 * Board.leftX, Board.midX + 4 * Board.leftX };
         private static readonly float DiceScale = 0.8f;
-        private int[] DiceRolls;
+        private List<int> DiceRolls;
         private List<Change> NotifyPropertyChanged = new List<Change>();
         private int GamePadIndex = 0;
 
@@ -81,19 +76,21 @@ namespace Backgammon.Screen
         {
             NotifyPropertyChanged.Remove(c);
             if (c is DiceState) AnimateDice(c as DiceState);
-            if (c is Move) AnimateCheckers(c as Move);
-            //else throw new Exception("Unrecognized change type returned.");
+            else if (c is Move) AnimateCheckers(c as Move);
+            else throw new Exception("Unrecognized change type returned.");
         }
 
         private void AnimateDice(DiceState c)
         {
-            DiceRolls = c.GetDiceValues();
-            GenerateDiceImages();
+            DiceRolls = c.GetDiceValues().ToList();
+            if (NotifyPropertyChanged.Count != 0 && NotifyPropertyChanged[0] is DiceState)
+                NotifyNoPossibleMovesAvailable();
+            else
+                GenerateDiceImages();
         }
 
         private void NotifyNoPossibleMovesAvailable()
         { // TODO
-            Model.EndTurn(CurrentPlayer);
             Console.WriteLine("No possible moves were available.");
         }
 
@@ -113,7 +110,7 @@ namespace Backgammon.Screen
 
         private void GenerateDice()
         {
-            DiceRolls = Model.GetMovesLeft().ToArray();
+            DiceRolls = Model.GetMovesLeft();
             GenerateDiceImages();
         }
 
@@ -123,14 +120,8 @@ namespace Backgammon.Screen
                 DiceImage.UnloadContent();
             DiceImages.Clear();
 
-            for (int i = 0; i < DiceRolls.Length; i++)
-                DiceImages.Add(new Image()
-                {
-                    Path = "Images/" + DiceRolls[i],
-                    Scale = new Vector2(DiceScale, DiceScale),
-                    Position = new Vector2(DiceXPositions[i], Board.midY)
-                });
-
+            for (int i = 0; i < DiceRolls.Count; i++)
+                DiceImages.Add(new Image() { Path = "Images/" + DiceRolls[i], Scale = new Vector2(DiceScale, DiceScale), Position = new Vector2(DiceXPositions[i], Board.midY) });
             foreach (Image DiceImage in DiceImages)
                 DiceImage.LoadContent();
         }
@@ -138,17 +129,16 @@ namespace Backgammon.Screen
         private void BeginTurn()
         {
             if (Board.GameOver())
+            {
+                DiceRolls.Clear();
+                GenerateDiceImages();
                 return;
+            }
+
             //CheckInconsistency(); // Gives and cures cancer at the same time. Have a taste!
             GenerateDice();
             Board.RemoveCheckerHighlight();
             Board.StopGlowPoints();
-            if (ViewInterface.GetMoveableCheckers().Count == 0)
-            {
-                NotifyNoPossibleMovesAvailable();
-                return;
-            }
-
             if (IsPlayerType(CurrentPlayer, PlayerType.Online))
                 OnlineTurn();
             else if (IsPlayerType(CurrentPlayer, PlayerType.Computer))
@@ -253,7 +243,7 @@ namespace Backgammon.Screen
         public override void Update(GameTime gameTime)
         {
             if (InputManager.Instance.KeyPressed(Keys.M)) AudioManager.Instance.ToggleAudio();
-            if (InputManager.Instance.KeyPressed(Keys.R) || InputManager.Instance.GamePadButtonPressed(Buttons.Back))
+            if (InputManager.Instance.KeyPressed(Keys.Back) || InputManager.Instance.GamePadButtonPressed(Buttons.Back))
                 ScreenManager.Instance.ChangeScreens("SplashScreen");
 
             if (Board.GameOver() && (InputManager.Instance.KeyPressed(Keys.Enter) || InputManager.Instance.MouseLeftPressed() || InputManager.Instance.GamePadButtonPressed(Buttons.Start)))
