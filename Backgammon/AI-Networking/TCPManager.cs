@@ -7,22 +7,22 @@ using ModelDLL;
 
 namespace Backgammon.AI_Networking
 {
-    internal class TcpInstance
+    internal class TCPManager
     {
         private RemotePlayer RemotePlayer;
 
-        private static TcpInstance instance;
-        internal static TcpInstance Instance
+        private static TCPManager instance;
+        internal static TCPManager Instance
         {
             get
             {
                 if (instance == null)
-                    instance = new TcpInstance();
+                    instance = new TCPManager();
                 return instance;
             }
         }
 
-        private TcpInstance() { } // Make singleton.
+        private TCPManager() { } // Make singleton.
 
         internal void Instantiate(BackgammonGame model, CheckerColor color)
         {

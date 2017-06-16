@@ -60,9 +60,9 @@ namespace Backgammon.Screen
             ViewInterface = new ViewInterface(Model);
             Model.ConnectView(this);
             if (WhitePlayer == PlayerType.Online)
-                TcpInstance.Instance.Instantiate(Model, White);
+                TCPManager.Instance.Instantiate(Model, White);
             if (BlackPlayer == PlayerType.Online)
-                TcpInstance.Instance.Instantiate(Model, Black);
+                TCPManager.Instance.Instantiate(Model, Black);
             if (OptionScreen.ShowPips.SwitchedOn)
             {
                 WhitePips = new Image() { Text = "White: " + Model.GetGameBoardState().pip(White), Position = new Vector2(Board.midX, 700) };
@@ -160,9 +160,9 @@ namespace Backgammon.Screen
                         ", model's got " + motherboard[i]);
         }
 
-        private void OnlineTurn() { TcpInstance.Instance.MakeMove(Model, CurrentPlayer); }
+        private void OnlineTurn() { TCPManager.Instance.MakeMove(Model, CurrentPlayer); }
 
-        private void AITurn() { AIInstance.Instance.Move(Model, CurrentPlayer); }
+        private void AITurn() { AIManager.Instance.Move(Model, CurrentPlayer); }
 
         private void PlayerTurn()
         {
@@ -213,6 +213,19 @@ namespace Backgammon.Screen
             GamePadArrow.Position = new Vector2(Board.GamePadPointOrdering[GamePadIndex].Position.X, (GamePadIndex < 13) ? 20 : 700);
         }
 
+        private int RegisterInput()
+        {
+            if (InputManager.Instance.KeyPressed(Keys.M)) AudioManager.Instance.ToggleAudio();
+            if (InputManager.Instance.KeyPressed(Keys.Back) || InputManager.Instance.GamePadButtonPressed(Buttons.Back))
+                ScreenManager.Instance.ChangeScreens("SplashScreen");
+
+            if (Board.GameOver() && (InputManager.Instance.KeyPressed(Keys.Enter) || InputManager.Instance.MouseLeftPressed() || InputManager.Instance.GamePadButtonPressed(Buttons.Start)))
+                ScreenManager.Instance.ChangeScreens("SplashScreen");
+            if (InputManager.Instance.GamePadButtonPressed(Buttons.DPadUp, Buttons.DPadDown, Buttons.DPadLeft, Buttons.DPadRight))
+                GamePadMoveHighlight();
+            return (InputManager.Instance.GamePadButtonPressed(Buttons.A, Buttons.X, Buttons.Y)) ? Board.GetClickedPoint(GamePadIndex) : Board.GetClickedPoint();
+        }
+
         #endregion
 
         #region Framework Methods
@@ -242,15 +255,7 @@ namespace Backgammon.Screen
 
         public override void Update(GameTime gameTime)
         {
-            if (InputManager.Instance.KeyPressed(Keys.M)) AudioManager.Instance.ToggleAudio();
-            if (InputManager.Instance.KeyPressed(Keys.Back) || InputManager.Instance.GamePadButtonPressed(Buttons.Back))
-                ScreenManager.Instance.ChangeScreens("SplashScreen");
-
-            if (Board.GameOver() && (InputManager.Instance.KeyPressed(Keys.Enter) || InputManager.Instance.MouseLeftPressed() || InputManager.Instance.GamePadButtonPressed(Buttons.Start)))
-                ScreenManager.Instance.ChangeScreens("SplashScreen");
-            if (InputManager.Instance.GamePadButtonPressed(Buttons.DPadUp, Buttons.DPadDown, Buttons.DPadLeft, Buttons.DPadRight))
-                GamePadMoveHighlight();
-            int clickedPoint = (InputManager.Instance.GamePadButtonPressed(Buttons.A, Buttons.X, Buttons.Y)) ? Board.GetClickedPoint(GamePadIndex) : Board.GetClickedPoint();
+            int clickedPoint = RegisterInput();
 
             switch (State)
             {

@@ -57,9 +57,9 @@
     <StartupObject>Backgammon.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="AI-Networking\AIInstance.cs" />
-    <Compile Include="AI-Networking\DropboxInstance.cs" />
-    <Compile Include="AI-Networking\TcpInstance.cs" />
+    <Compile Include="AI-Networking\AIManager.cs" />
+    <Compile Include="AI-Networking\DropboxManager.cs" />
+    <Compile Include="AI-Networking\TCPManager.cs" />
     <Compile Include="Audio\AudioManager.cs" />
     <Compile Include="Backgammon.cs" />
     <Compile Include="Input\InputManager.cs" />

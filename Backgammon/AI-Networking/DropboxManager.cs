@@ -9,7 +9,7 @@ using Dropbox.Api.Files;
 
 namespace Backgammon.AI_Networking
 {
-    internal class DropboxInstance
+    internal class DropboxManager
     {
         public bool AwaitingTask => task.IsCompleted;
         private Task task;
@@ -21,18 +21,18 @@ namespace Backgammon.AI_Networking
         private static string RemoteStringPath => @"/string/string.txt"; //+ FileName;
         private static List<string> folderContents;
 
-        private static DropboxInstance instance;
-        internal static DropboxInstance Instance
+        private static DropboxManager instance;
+        internal static DropboxManager Instance
         {
             get
             {
                 if (instance == null)
-                    instance = new DropboxInstance();
+                    instance = new DropboxManager();
                 return instance;
             }
         }
 
-        private DropboxInstance()
+        private DropboxManager()
         {// Make constructor private.
             dbx = new DropboxClient("NVeItGV0k-AAAAAAAAAAJVArSdsLd88exx0nPCmSQbmQV4vX7dHcPqsLn0GuNkc0");
             folderContents = new List<string>();
@@ -41,15 +41,15 @@ namespace Backgammon.AI_Networking
         private void TestNetworking()
         {
             var breakpoint = string.Empty;
-            DropboxInstance.Instance.UploadString("dank 420 blashito");
+            DropboxManager.Instance.UploadString("dank 420 blashito");
             breakpoint = string.Empty;
-            Console.WriteLine(DropboxInstance.Instance.DownloadString());
+            Console.WriteLine(DropboxManager.Instance.DownloadString());
             breakpoint = string.Empty;
-            DropboxInstance.Instance.Upload("Complaint.txt");
+            DropboxManager.Instance.Upload("Complaint.txt");
             breakpoint = string.Empty;
-            DropboxInstance.Instance.Download("Complaint.txt");
+            DropboxManager.Instance.Download("Complaint.txt");
             breakpoint = string.Empty;
-            Console.WriteLine(string.Join(",", DropboxInstance.Instance.ListFiles()));
+            Console.WriteLine(string.Join(",", DropboxManager.Instance.ListFiles()));
             breakpoint = string.Empty;
         }
 

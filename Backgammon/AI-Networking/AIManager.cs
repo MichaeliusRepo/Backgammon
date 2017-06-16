@@ -8,7 +8,7 @@ using MachLearn;
 
 namespace Backgammon.AI_Networking
 {
-    internal class AIInstance
+    internal class AIManager
     {
 #pragma warning disable 0649
         private Player WhiteAI;
@@ -16,18 +16,18 @@ namespace Backgammon.AI_Networking
 #pragma warning restore 0649
         private bool naive = false;
 
-        private static AIInstance instance;
-        internal static AIInstance Instance
+        private static AIManager instance;
+        internal static AIManager Instance
         {
             get
             {
                 if (instance == null)
-                    instance = new AIInstance();
+                    instance = new AIManager();
                 return instance;
             }
         }
 
-        private AIInstance() { } // Make constructor private for singleton.
+        private AIManager() { } // Make constructor private for singleton.
 
         internal void Move(BackgammonGame model, CheckerColor c)
         {
